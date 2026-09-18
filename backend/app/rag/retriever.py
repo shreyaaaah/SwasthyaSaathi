@@ -40,7 +40,6 @@ class FAISSRetriever:
                 self.metadata = json.load(f)
             
             if os.path.exists(vectorizer_path):
-                print("Loading saved local vectorizer fallback...")
                 try:
                     with open(vectorizer_path, "rb") as f:
                         self.fallback_embedder = pickle.load(f)
@@ -65,7 +64,11 @@ class FAISSRetriever:
     def reload(self):
         self._load_store()
 
-    def search(self, query: str, top_k: int = 4, min_score: float = 0.10) -> List[Dict[str, Any]]:
+    def search(self, query: str, top_k: int = 4, min_score: float = 0.45) -> List[Dict[str, Any]]:
+        """
+        Searches FAISS vector store.
+        Applies a strict confidence floor (min_score=0.45) to exclude weak/irrelevant matches.
+        """
         if self.index is None:
             self._load_store()
             if self.index is None:

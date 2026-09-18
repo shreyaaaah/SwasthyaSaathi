@@ -43,9 +43,9 @@ bg_executor = ThreadPoolExecutor(max_workers=5)
 # ---------------------------------------------------------------------------
 
 def search_advisories(query: str, top_k: int = 3) -> List[Dict[str, Any]]:
-    """Runs FAISS retrieval pipeline over health knowledge base."""
+    """Runs FAISS retrieval pipeline over health knowledge base with 0.45 confidence floor."""
     retriever = get_retriever()
-    results = retriever.search(query=query, top_k=top_k, min_score=0.10)
+    results = retriever.search(query=query, top_k=top_k, min_score=0.45)
     cleaned = []
     for r in results:
         cleaned.append({
@@ -282,7 +282,6 @@ GROQ_TOOLS_SCHEMA = [
     }
 ]
 
-# Helper function to execute a single tool with timing
 def _execute_single_tool(tc: Any) -> Dict[str, Any]:
     fn_name = tc.function.name
     t0 = time.time()
@@ -310,12 +309,12 @@ def _execute_single_tool(tc: Any) -> Dict[str, Any]:
     }
 
 # ---------------------------------------------------------------------------
-# Orchestrator Core Loop with Latency Instrumentation & Parallel Tools
+# Orchestrator Core Loop
 # ---------------------------------------------------------------------------
 
 def run_agent(user_id: str, query: str) -> Dict[str, Any]:
-    """Agentic Tool-Calling Orchestrator with parallel tool execution & latency instrumentation."""
-    init_db()  # Ensure database tables exist
+    """Agentic Tool-Calling Orchestrator with parallel tool execution & min_score=0.45 confidence floor."""
+    init_db()
     overall_start = time.time()
     active_model = settings.GROQ_MODEL_NAME
     client = Groq(api_key=settings.GROQ_API_KEY)
@@ -326,13 +325,14 @@ def run_agent(user_id: str, query: str) -> Dict[str, Any]:
         "You are SwasthyaSaathi, an intelligent agentic public health assistant "
         "grounded in official guidelines from MoHFW, ICMR, NHP, and WHO.\n\n"
         "You have tools for: search_advisories, check_myth, get_session_history, log_symptom, triage_classify, get_regional_alerts.\n\n"
-        "Instructions for high efficiency:\n"
+        "Instructions:\n"
         "1. Select ALL necessary tools in your FIRST response turn concurrently.\n"
-        "2. If query mentions past interactions, include `get_session_history`.\n"
+        "2. If query mentions past interactions, fever, or symptoms previously discussed, include `get_session_history`.\n"
         "3. If query asks about remedies/myths (turmeric, garlic), include `check_myth`.\n"
         "4. If query describes symptoms, include `search_advisories` AND `triage_classify`.\n"
         "5. Include `log_symptom` in your tool calls to persist the interaction.\n"
-        "6. Provide grounded, concise, empathetic guidance with safety disclaimers."
+        "6. If `search_advisories` returns empty results due to strict confidence floor (score < 0.45), state clearly: "
+        "'I do not have a strong direct match in my official guidelines for this specific query', but provide helpful general advice."
     )
 
     messages = [
@@ -418,7 +418,9 @@ def run_agent(user_id: str, query: str) -> Dict[str, Any]:
             tool_call_trace.append(trace_entry)
 
             if fn_name == "search_advisories" and isinstance(tool_result, list):
-                sources_collected.extend(tool_result)
+                # Only include sources meeting min_score >= 0.45
+                valid_sources = [s for s in tool_result if s.get("score", 0.0) >= 0.45]
+                sources_collected.extend(valid_sources)
 
             if fn_name == "triage_classify" and isinstance(tool_result, dict):
                 triage_tag = tool_result.get("triage_tag", triage_tag)
@@ -440,53 +442,3 @@ def run_agent(user_id: str, query: str) -> Dict[str, Any]:
         "timing_breakdown": timing_breakdown,
         "response_time_ms": total_duration
     }
-
-# ---------------------------------------------------------------------------
-# Test Suite Execution
-# ---------------------------------------------------------------------------
-
-if __name__ == "__main__":
-    test_queries = [
-        "I've had a persistent cough for 3 weeks",
-        "does turmeric cure diabetes",
-        "what should I do about the fever I mentioned last time",
-        "I'm having severe chest pain and can't breathe"
-    ]
-
-    test_user_id = "test_user_001"
-
-    print("=" * 80)
-    print(f"RUNNING AGENTIC ORCHESTRATOR LATENCY BENCHMARK | MODEL: {settings.GROQ_MODEL_NAME}")
-    print("=" * 80 + "\n")
-
-    for idx, q in enumerate(test_queries, 1):
-        print(f"[{idx}/4] TEST QUERY: \"{q}\"")
-        print("-" * 80)
-        
-        try:
-            result = run_agent(user_id=test_user_id, query=q)
-            
-            print("1. LATENCY BREAKDOWN:")
-            for b in result.get("timing_breakdown", []):
-                print(f"   • {b['step']}: {b['duration_ms']} ms")
-            print(f"   ---> TOTAL LATENCY: {result.get('response_time_ms')} ms ({round(result.get('response_time_ms', 0)/1000, 2)}s)")
-
-            print("\n2. TOOL CALL SEQUENCE & TRACE:")
-            if not result.get("tool_call_trace"):
-                print("   (No tools called)")
-            else:
-                for step, trace in enumerate(result["tool_call_trace"], 1):
-                    print(f"   Step {step}: Tool = '{trace['tool']}' (took {trace.get('duration_ms')} ms)")
-                    print(f"           Args = {json.dumps(trace['args'])}")
-                    print(f"           Result = {json.dumps(trace['result'], ensure_ascii=False)[:200]}...")
-            
-            print(f"\n3. TRIAGE TAG: {result.get('triage_tag')}")
-            print("\n4. FINAL NATURAL-LANGUAGE ANSWER:")
-            print(result.get("answer"))
-            
-        except Exception as err:
-            import traceback
-            print("ERROR ENCOUNTERED:")
-            traceback.print_exc()
-
-        print("\n" + "=" * 80 + "\n")
