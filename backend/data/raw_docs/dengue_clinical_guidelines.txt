@@ -1,0 +1,97 @@
+NATIONAL GUIDELINES FOR CLINICAL MANAGEMENT OF DENGUE FEVER 2023
+National Center for Vector Borne Diseases Control (NCVBDC)
+22-Shamnath Marg, New Delhi-110054
+Directorate General of Health Services
+Ministry of Health & Family Welfare, Government of India
+
+1. INTRODUCTION
+
+Dengue is the most rapidly spreading mosquito borne viral disease of mankind, with a 30-fold increase in global incidence over the last five decades. It is a major public health concern throughout tropical and subtropical regions of the world. Dengue has been identified as one of the 17 neglected tropical diseases by WHO. Every year thousands of severe cases of dengue arise, including approximately 20,000 deaths globally.
+
+1.2 National Scenario
+Dengue virus was first isolated in India in 1945. The first evidence of dengue fever in the country was reported in 1956 from Vellore district, Tamil Nadu. In India, all States/UTs except Ladakh have reported dengue cases during the last two decades. During 2018, a total of 1,24,493 cases were reported; 2,05,243 in 2019; 44,585 in 2020; 1,93,752 in 2021 and 2,33,251 in 2022. The case fatality rate has declined from 3.3% in 1996 to 0.1% in 2019, maintained at this level since. Every year during July-November, an upsurge in dengue cases is observed, with cases peaking after monsoon.
+
+2. EPIDEMIOLOGY
+
+Dengue virus is transmitted from infected person to others by the bite of female Aedes mosquitoes. In India, Aedes aegypti is the main vector in most urban areas; Ae. albopictus is also implicated in many states. Female Aedes mosquito deposits eggs singly on damp surfaces just above the water line. Under optimal conditions, the adult emerges in seven days. Eggs can withstand desiccation for more than a year and emerge within 24 hours once in contact with water. Average survival of Ae. aegypti is 30 days. Aedes is a daytime feeder and can fly up to 400 meters.
+
+Ae. aegypti breeds almost entirely in domestic man-made water receptacles: water storage containers, water reservoirs, overhead tanks, desert coolers, unused tires, coconut shells, disposable cups, construction sites, etc.
+
+4. CLINICAL MANIFESTATIONS OF DENGUE FEVER
+
+The average incubation period varies from 4 to 6 days (range 3-14 days). After incubation, fever with non-specific constitutional symptoms such as headache, backache and malaise usually appear. Dengue infection evolves into three clinical phases: acute febrile phase, critical phase, and recovery (convalescent) phase.
+
+Clinical Description: Acute febrile illness of 2-7 days duration with two or more of: headache, retro-orbital pain, myalgia, arthralgia, rash, haemorrhagic manifestations, thrombocytopenia or leucopenia, warning signs and symptoms.
+
+Febrile phase: Sudden rise of high-grade body temperature (≥38.5°C), may be biphasic, lasting 2-7 days, associated with headache, flushing, vomiting, myalgia, arthralgia, and macular rash appearing after day 3-4 over the face, neck, chest and abdomen.
+
+Warning symptoms and signs (Box 2):
+- Persistent vomiting
+- Abdominal pain and tenderness
+- Lethargy and/or restlessness, sudden behavioral changes
+- Bleeding manifestations like epistaxis, melena, haematemesis, excessive menstrual bleeding, and haematuria
+- Syncope or giddiness
+- Clinical fluid accumulation (ascites and pleural effusion)
+- Enlarged liver (>2cm)
+- Laboratory: progressive increase in haematocrit with rapid decrease in platelet count
+
+Critical phase (leakage phase): 5-10% of patients may progress to critical phase, commonly in patients with a history of previous dengue infection (secondary infection). Usually begins after 3rd or 4th day of fever, lasts about 24 to 48 hours. Characterized by vasculopathy and coagulopathy leading to plasma leakage, excessive haemoconcentration, bleeding, potentially leading to shock and organ dysfunction.
+
+Convalescent phase (Recovery phase): Occurs after the critical phase, lasts 2-3 days. Patient develops a convalescent rash characterized by confluent erythematous eruption with sparing areas of normal skin, often pruritic (itchy).
+
+Case classification:
+1. Dengue without warning sign (Mild dengue) - Group A
+2. Dengue with warning sign (Moderate Dengue) - Group B
+3. Severe dengue - Group C (profound shock, significant bleeding, severe metabolic disorder, organ involvement)
+
+High-risk factors for severe disease:
+- Infants and children (age<10 years) especially with malnutrition
+- Elderly (age > 65 years)
+- Obesity
+- Pregnant women
+- Hemolytic diseases such as G6PD deficiency, thalassemia
+- Peptic ulcer disease
+- Congenital heart disease
+- Chronic diseases: diabetes mellitus, hypertension, obstructive lung diseases, cardiovascular diseases, chronic renal failure, chronic liver disease
+- Patients on long-term steroid or NSAID treatment
+
+Differential Diagnosis: COVID-19, Chikungunya, Malaria, Scrub typhus, Enteric fever, Pharyngitis, Influenza, Leptospirosis, Meningococcal infection
+
+6. LABORATORY DIAGNOSIS
+
+NS1 antigen testing enables early detection during the viremic stage (useful days 1-5 of illness). IgM-capture ELISA (MAC-ELISA) detects dengue-specific IgM antibodies, usually detectable by day 5 of illness, though this varies (some patients show detectable IgM by days 2-4, others not until days 7-8). RDT (Rapid Diagnostic Test) kits give results within 15-25 minutes but the programme does not recommend RDTs alone for diagnosis and guiding management due to variable accuracy.
+
+Sample timing guidance: NS1 for samples collected day 1 to 5 of fever, IgM testing after day 5.
+
+7. MANAGEMENT OF DENGUE FEVER (General Public-Relevant Guidance)
+
+Management of Mild Dengue patients (Group A) - can be managed on OPD (outpatient) basis:
+
+Patient and family should be educated on:
+1. Warning signs to watch for and report immediately:
+   - Severe abdominal pain and persistent vomiting
+   - Red spots/patches on skin
+   - Bleeding from nose and gums
+   - Vomiting blood
+   - Black tarry stools
+   - Drowsiness or irritability
+   - Pale, cold or clammy skin
+   - Difficulty in breathing
+2. Consume adequate oral fluids (ORS/coconut juice); avoid carbonated drinks
+3. Take adequate bed rest
+4. Body temperature should be kept below 100°F. If temperature exceeds 100°F, give paracetamol. Recommended dose is 10 mg/kg/dose, administered not less than every six hours. Maximum adult dose is 4 gm/day. AVOID aspirin or NSAIDs (these increase bleeding risk).
+5. Tepid sponging of forehead, armpits, and extremities; lukewarm shower/bath recommended for adults with high fever not responding to paracetamol.
+
+Follow-up: Patients should be monitored closely for progression from mild to moderate or severe disease, with clinical examination, CBC, and hematocrit checks as advised by the treating physician.
+
+8. SPECIAL CONDITIONS
+
+8.1.1 Dengue in Pregnancy: Carries risk of severe bleeding, fetal complications, low birth weight and premature birth. Risk of vertical transmission from mother to child is high if mother has severe viremia around the time of labor. Requires strict vital monitoring, frequent platelet count and coagulation profile testing.
+
+8.1.3 Dengue with Co-morbidities: Diabetic patients may present with severe complications when target organs are involved. Dengue infection in diabetes may cause hyperglycemia requiring insulin therapy. Patients with pre-existing heart disease, kidney disease, or liver disease require careful, specialist-guided management.
+
+8.1.4 Co-infections: Healthcare providers face challenges distinguishing dengue from HIV, TB, malaria, chikungunya, enteric fever, and leptospirosis, as these share overlapping symptoms (fever, headache, abdominal pain, malaise) and lab findings (leukopenia, thrombocytopenia). A high index of clinical suspicion is required.
+
+Note: This document also contains detailed clinical/hospital-level content (Sections 5, 7.3-7.6, 9-13) covering IV fluid resuscitation protocols, shock management algorithms, ICU-level care, and platelet transfusion criteria — this content is intended for treating clinicians managing hospitalized dengue patients, not for general public health awareness guidance, and should be used with that distinction in mind if incorporated into a public-facing knowledge base.
+
+Source: National Center for Vector Borne Diseases Control (NCVBDC), Directorate General of Health Services, Ministry of Health and Family Welfare, Government of India. National Guidelines for Clinical Management of Dengue Fever, 2023.

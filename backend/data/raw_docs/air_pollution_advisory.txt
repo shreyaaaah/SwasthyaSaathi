@@ -1,0 +1,88 @@
+HEALTH ADVISORY ON AIR POLLUTION
+National Programme on Climate Change & Human Health (NPCCHH)
+National Centre for Disease Control, Directorate General of Health Services
+Ministry of Health and Family Welfare, Government of India
+October 2023
+
+1. What is Air Pollution and its key pollutants?
+Air pollution is the contamination of the indoor or outdoor environment by any chemical, physical or biological agent that modifies the natural characteristics of the atmosphere (WHO). Key health harmful air pollutants include: Particulate Matter (PM2.5 and PM10), Carbon Monoxide (CO), ground level Ozone (O3), Volatile Organic Compounds, metals, Sulphur dioxide (SO2) and Nitrogen dioxide (NO2).
+
+2. Burden of Air Pollution Related Illnesses in India
+A recent ICMR study reported: 1.7 million deaths (18% of total deaths) in India (2019) were attributable to air pollution, including Chronic Obstructive Pulmonary Disease (32.5%), Ischaemic heart disease (29.2%), Stroke (16.2%), and Lower respiratory infections (11.2%). 11.5% of total DALYs in India (2019) were attributable to air pollution, from lung diseases (39.5%: COPD 22.7%, lower respiratory infections 15.5%, lung cancer 1.3%) and other causes (Ischaemic heart disease 24.9%, Stroke 13.7%, Diabetes 5.5%, Neonatal disorders 14.5%, Cataract 1.5%).
+
+3. Sources of Air Pollution in India
+Ambient (outdoor) air pollution: industrial emissions, vehicular exhaust, re-suspension of road dust, construction and demolition activities, refuse burning (garbage, horticulture wastes, crop residues), use of solid fuels for cooking, burning of firecrackers.
+Household (Indoor) air pollution: burning biomass such as wood, coal, dung, kerosene in chulhas or fireplaces; burning mosquito coils, incense sticks, cigarettes, bidis; use of sprays, solvents, fumes from chemicals used in building interiors.
+Sick Building Syndrome (SBS): acute health and comfort effects linked to time spent in a building with no specific illness or cause identified; major sources are inadequate ventilation, chemical and biological contaminants, dust, smoke, fumes.
+
+4. Understanding Air Quality/AQI Levels and Health Significance
+Central Pollution Control Board (CPCB) publishes Air Quality Index (AQI) in six colour-coded categories: Good, Satisfactory, Moderately polluted, Poor, Very Poor, Severe.
+
+AQI Levels and Health Effects:
+- Good (0-50): Low risk. No special precautions needed for general population or vulnerable groups.
+- Satisfactory (51-100): Minor breathing discomfort in vulnerable population. Vulnerable population should do less prolonged or strenuous outdoor physical exertion.
+- Moderate (101-200): Breathing discomfort in vulnerable population. General population should do less prolonged or strenuous outdoor exertion; vulnerable population should avoid it.
+- Poor (201-300): Breathing discomfort in healthy people on prolonged exposure; discomfort in vulnerable population on short exposure. General population should avoid outdoor physical exertion; vulnerable population should avoid outdoor physical activities.
+- Very Poor (301-400): Respiratory illness in healthy people on prolonged exposure; pronounced illness in vulnerable population on short exposure. General population should avoid outdoor activities especially morning/late evening; vulnerable population should remain indoors with low activity levels.
+- Severe (401-500): Respiratory illness in healthy people on prolonged exposure; serious illness in vulnerable population on short exposure. Both groups should avoid outdoor activity and remain indoors with low activity levels.
+
+The Sameer app from CPCB provides city-level hourly AQI updates.
+
+5. Health Consequences of Air Pollution
+Short-term high-level exposures can cause acute reactions: irritation of eyes, nose, throat and skin, cough, breathing difficulty, wheezing, chest discomfort, chest pain, headache, giddiness. Vulnerable groups may experience lower respiratory tract inflammation, exacerbation of asthma or bronchitis, COPD, ischaemic heart disease, and cerebrovascular strokes. Long term exposure to even lower level of air pollution can result in chronic respiratory and cardiovascular illness, lung cancer, and premature death.
+
+6. Vulnerable Population to Health Effects of Air Pollution
+- Age group: Children particularly under 5 years and elderly
+- Pregnant women (exposure may affect child in womb)
+- Those with pre-existing respiratory, cardiovascular and cerebrovascular illnesses
+- Low socio-economic groups with poor nutrition or using fossil fuels for cooking/heating
+- Outdoor working groups: traffic police, construction workers, road sweepers, rickshaw pullers, roadside vendors, miners
+- Women exposed to biomass burning for cooking
+
+8. Recommendations for Health Department in the States
+Getting Air Quality information regularly from CPCB or State Pollution Control Board, sharing with health facilities for action and surveillance. Public Awareness Generation via IEC materials (posters, GIFs, audio-video spots, social media messages), with dissemination timed around winter months, pre/post Diwali, stubble burning days, and International Day of Clean Air.
+
+Annexure I: IEC Messages for Public Awareness
+
+General Population precautions:
+1. Avoid outdoor morning and late evening walk, run, jog, and physical exercise on days with poor to severe AQI. Do not open external doors/windows during morning and late evening hours; ventilate between 12pm-4pm if necessary.
+2. Avoid burning biomass such as wood, coal, animal dung, kerosene. Use clean fuels (gas or electricity) for cooking and heating.
+3. Avoid burning wood/charcoal in closed, confined conditions (risk of fatal CO and CO2 buildup).
+4. Avoid use of room fresheners as they consume oxygen quickly.
+5. Avoid burning firecrackers.
+6. Avoid burning any form of wood, leaves, crop residues, or waste in the open.
+7. Do not smoke cigarettes, bidis, or related tobacco products.
+8. Avoid burning mosquito coils and incense sticks in closed premises.
+9. Reschedule outdoor activities as per AQI; remain indoors on poor to severe AQI days.
+10. Practice wet mopping instead of sweeping or vacuum cleaning; if using a vacuum, use one with a HEPA filter.
+11. Keep washing eyes with running water regularly; do regular gargles with warm water.
+12. Consult the nearest doctor in case of breathlessness, giddiness, cough, chest discomfort or pain, or irritation in eyes.
+13. Maintain a healthy diet rich in antioxidants (fruits, vegetables) and adequate hydration.
+
+For those with underlying medical conditions (chronic pulmonary/cardiovascular problems):
+1. Be more careful to avoid exposure to air pollution.
+2. Avoid strenuous activity and stay indoors during higher AQI levels.
+3. Keep a check on exacerbation of symptoms.
+4. Properly follow doctor's instructions on healthcare.
+5. Keep prescribed medications readily available.
+6. Seek immediate medical advice if symptoms worsen.
+
+Optional protective choices:
+1. Face masks: disposable N95 or N99 masks may help for short exposure periods if properly fitted; replace after use as instructed. Paper masks, handkerchiefs, scarves, and cloth are NOT effective.
+2. Air purifiers: follow manufacturer guidelines; consult experts on suitability and coverage; replace/clean filters as instructed; avoid ozone-generating purifiers as they increase indoor pollution.
+3. Air conditioners: use "re-circulate" mode in buildings/vehicles to avoid contact with outside air on high pollution days.
+
+Health Advisory for Household Air Pollution:
+Sources to minimise: cooking with solid fuels (firewood, cow dung, coal, kerosene); heating with solid fossil fuels; kerosene lamps for lighting; smoke from mosquito coils/incense sticks; smoking; nearby construction; burning of wastes/crop residues/plastics.
+
+Better kitchen practices: use cleaner fuels (LPG, electric); ventilate adequately while cooking (open windows/doors, use exhaust fans); avoid burning fossil fuels indoors; minimise cooking hours by pre-soaking food; shift cooking timing during poor air quality if possible; cover pots for efficiency; keep elderly and children away from polluting sources.
+
+Health Advisory for School Children:
+- Prefer school buses, public transport, CNG vehicles, carpooling, or electric cars to reduce emissions.
+- Stay away from vehicular exhaust during transit; cover nose with cloth or mask in dusty environments.
+- Ensure proper classroom ventilation; close windows if air quality is poor.
+- Use wet mopping for floor cleaning; use marker pens instead of chalk.
+- Limit outdoor activities (running, jogging, playing) during high pollution days; stay indoors during breaks.
+- Postpone outdoor school functions/celebrations during high pollution days if possible.
+
+Source: National Programme on Climate Change & Human Health (NPCCHH), National Centre for Disease Control (NCDC), Ministry of Health and Family Welfare, Government of India. October 2023.
