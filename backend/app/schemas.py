@@ -7,6 +7,15 @@ class SourceMetadata(BaseModel):
     snippet: str
     score: Optional[float] = None
 
+class PatternResultSchema(BaseModel):
+    pattern_detected: bool = False
+    pattern_type: str = "none"
+    description: str = ""
+    recommended_action: str = ""
+    occurrences_count: int = 0
+    latest_triage: Optional[str] = None
+    topic: Optional[str] = None
+
 class ChatRequest(BaseModel):
     query: str
     user_id: Optional[str] = "anonymous"
@@ -18,6 +27,7 @@ class ChatResponse(BaseModel):
     triage_tag: Optional[str] = "GENERAL_INFO"
     tools_used: List[str] = []
     response_time_ms: Optional[float] = None
+    pattern: Optional[PatternResultSchema] = None
 
 class IngestResponse(BaseModel):
     status: str

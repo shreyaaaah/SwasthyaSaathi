@@ -44,4 +44,14 @@ export const fetchUserHistory = async (userId = 'user_001') => {
   }
 };
 
+export const fetchUserPatterns = async (userId = 'user_001') => {
+  try {
+    const response = await apiClient.get(`/api/patterns/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('API Error fetching user patterns:', error);
+    return { pattern_detected: false };
+  }
+};
+
 export default apiClient;

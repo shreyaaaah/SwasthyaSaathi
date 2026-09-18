@@ -7,9 +7,10 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.db import get_db, init_db
 from app.models import Conversation, SymptomLog
-from app.schemas import ChatRequest, ChatResponse, SourceMetadata, IngestResponse, SymptomLogSchema
+from app.schemas import ChatRequest, ChatResponse, SourceMetadata, IngestResponse, SymptomLogSchema, PatternResultSchema
 from app.rag.retriever import get_retriever
 from app.agent.orchestrator import run_agent, get_session_history
+from app.agent.pattern_engine import detect_symptom_patterns
 
 app = FastAPI(
     title="SwasthyaSaathi Agentic API",
@@ -53,7 +54,6 @@ def health_check():
 @app.get("/api/history/{user_id}", response_model=List[SymptomLogSchema])
 def fetch_user_history(user_id: str):
     history = get_session_history(user_id=user_id, limit=10)
-    # Filter out error entries if any
     clean_history = [
         SymptomLogSchema(
             id=item["id"],
@@ -67,6 +67,11 @@ def fetch_user_history(user_id: str):
     ]
     return clean_history
 
+@app.get("/api/patterns/{user_id}", response_model=PatternResultSchema)
+def fetch_user_patterns(user_id: str):
+    pattern_data = detect_symptom_patterns(user_id=user_id, days_window=14)
+    return PatternResultSchema(**pattern_data)
+
 @app.post("/chat", response_model=ChatResponse)
 @app.post("/api/chat", response_model=ChatResponse)
 @app.post("/api/query", response_model=ChatResponse)
@@ -76,6 +81,9 @@ def agentic_chat_endpoint(request: ChatRequest, db: Session = Depends(get_db)):
     
     user_id = request.user_id or "anonymous"
     agent_output = run_agent(user_id=user_id, query=request.query)
+
+    # Run pattern detection
+    pattern_data = detect_symptom_patterns(user_id=user_id, days_window=14)
 
     # Format sources for API response
     raw_sources = agent_output.get("sources", [])
@@ -110,5 +118,6 @@ def agentic_chat_endpoint(request: ChatRequest, db: Session = Depends(get_db)):
         is_grounded=len(formatted_sources) > 0,
         triage_tag=agent_output.get("triage_tag", "GENERAL_INFO"),
         tools_used=agent_output.get("tools_used", []),
-        response_time_ms=agent_output.get("response_time_ms")
+        response_time_ms=agent_output.get("response_time_ms"),
+        pattern=PatternResultSchema(**pattern_data)
     )

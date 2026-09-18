@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import ChatWindow from './components/ChatWindow';
 import Sidebar from './components/Sidebar';
-import { sendChatMessage, fetchHealthStatus, fetchUserHistory } from './api/client';
-import { Menu } from 'lucide-react';
+import { sendChatMessage, fetchHealthStatus, fetchUserHistory, fetchUserPatterns } from './api/client';
+import { Menu, TrendingUp } from 'lucide-react';
 
 const INITIAL_WELCOME_MESSAGE = {
   sender: 'bot',
   text: `Namaste! I am SwasthyaSaathi (स्वास्थ्य साथी), your AI Public Health Assistant grounded in official guidelines from MoHFW, ICMR, NHP, and WHO.
 
-I am powered by an agentic tool-calling orchestrator with live FAISS retrieval, medical myth detection, session history logs, and triage urgency evaluation.
+I am powered by an agentic tool-calling orchestrator with live FAISS retrieval, medical myth detection, longitudinal pattern analysis, session history logs, and triage urgency evaluation.
 
 How can I assist you today? You can tap any of the quick symptom chips below or type your question.`,
   sources: [],
@@ -25,11 +25,16 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [healthStatus, setHealthStatus] = useState(null);
   const [userHistory, setUserHistory] = useState([]);
+  const [userPattern, setUserPattern] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const loadHistory = async () => {
-    const historyData = await fetchUserHistory(USER_ID);
+  const loadHistoryAndPatterns = async () => {
+    const [historyData, patternData] = await Promise.all([
+      fetchUserHistory(USER_ID),
+      fetchUserPatterns(USER_ID)
+    ]);
     setUserHistory(historyData);
+    setUserPattern(patternData);
   };
 
   useEffect(() => {
@@ -38,7 +43,7 @@ function App() {
       setHealthStatus(status);
     };
     checkHealth();
-    loadHistory();
+    loadHistoryAndPatterns();
   }, []);
 
   const handleSendMessage = async (userQuery) => {
@@ -55,13 +60,18 @@ function App() {
         sources: response.sources || [],
         is_grounded: response.is_grounded,
         triage_tag: response.triage_tag || 'GENERAL_INFO',
-        tools_used: response.tools_used || []
+        tools_used: response.tools_used || [],
+        pattern: response.pattern
       };
 
       setMessages((prev) => [...prev, botMsg]);
 
-      // Refresh sidebar history from Neon DB
-      loadHistory();
+      if (response.pattern && response.pattern.pattern_detected) {
+        setUserPattern(response.pattern);
+      }
+
+      // Refresh sidebar history & patterns from Neon DB
+      loadHistoryAndPatterns();
     } catch (error) {
       const errorMsg = {
         sender: 'bot',
@@ -84,9 +94,10 @@ function App() {
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-slate-950 text-slate-100 font-sans">
-      {/* Sidebar for Symptom History (Neon DB) */}
+      {/* Sidebar for Symptom History & Longitudinal Patterns */}
       <Sidebar
         history={userHistory}
+        pattern={userPattern}
         onSelectHistoryQuery={handleSelectHistoryQuery}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -104,6 +115,24 @@ function App() {
           </button>
           <span className="text-xs font-bold text-teal-300">SwasthyaSaathi Agent</span>
         </div>
+
+        {/* Global Pattern Banner if detected */}
+        {userPattern && userPattern.pattern_detected && (
+          <div className="mb-2 p-2.5 rounded-xl bg-amber-950/70 border border-amber-500/50 text-amber-200 text-xs flex items-center justify-between shadow-md">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-amber-400 flex-shrink-0 animate-pulse" />
+              <span>
+                <strong>Longitudinal Alert:</strong> {userPattern.description}
+              </span>
+            </div>
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="text-[11px] font-bold text-amber-300 underline hover:text-amber-100 whitespace-nowrap ml-2"
+            >
+              View Pattern Details
+            </button>
+          </div>
+        )}
 
         <Header status={healthStatus} />
 

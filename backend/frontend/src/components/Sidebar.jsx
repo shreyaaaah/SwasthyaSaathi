@@ -1,7 +1,7 @@
 import React from 'react';
-import { History, AlertTriangle, CheckCircle, Clock, Stethoscope, ChevronRight } from 'lucide-react';
+import { History, AlertTriangle, CheckCircle, Clock, Stethoscope, ChevronRight, TrendingUp, RefreshCw } from 'lucide-react';
 
-const Sidebar = ({ history = [], onSelectHistoryQuery, isOpen, onClose }) => {
+const Sidebar = ({ history = [], pattern = null, onSelectHistoryQuery, isOpen, onClose }) => {
   const getTriageBadge = (tag) => {
     switch (tag) {
       case 'EMERGENCY':
@@ -32,18 +32,47 @@ const Sidebar = ({ history = [], onSelectHistoryQuery, isOpen, onClose }) => {
   };
 
   return (
-    <aside className={`fixed inset-y-0 left-0 z-40 w-72 bg-slate-900/95 backdrop-blur-xl border-r border-slate-800 p-4 transition-transform duration-300 flex flex-col md:static md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+    <aside className={`fixed inset-y-0 left-0 z-40 w-80 bg-slate-900/95 backdrop-blur-xl border-r border-slate-800 p-4 transition-transform duration-300 flex flex-col md:static md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
         <div className="flex items-center gap-2 text-teal-400 font-semibold text-sm">
           <History className="w-4 h-4 text-teal-300" />
-          <span>Symptom History</span>
+          <span>Longitudinal Health Profile</span>
         </div>
         <button onClick={onClose} className="md:hidden text-slate-400 hover:text-slate-200">
           ✕
         </button>
       </div>
 
-      <div className="text-xs text-slate-400 mb-2 font-medium">Recent Logs (Neon DB)</div>
+      {/* Pattern Detection Alert Banner */}
+      {pattern && pattern.pattern_detected && (
+        <div className={`mb-4 p-3 rounded-xl border text-xs shadow-md animate-fade-in ${
+          pattern.pattern_type === 'escalating'
+            ? 'bg-red-950/80 border-red-500/60 text-red-200'
+            : 'bg-amber-950/80 border-amber-500/60 text-amber-200'
+        }`}>
+          <div className="flex items-center gap-2 font-bold mb-1">
+            {pattern.pattern_type === 'escalating' ? (
+              <TrendingUp className="w-4 h-4 text-red-400" />
+            ) : (
+              <RefreshCw className="w-4 h-4 text-amber-400" />
+            )}
+            <span className="uppercase tracking-wider">
+              {pattern.pattern_type} Pattern Alert
+            </span>
+          </div>
+          <p className="text-[11px] leading-relaxed mb-1.5 opacity-90">
+            {pattern.description}
+          </p>
+          <div className="p-2 rounded bg-slate-900/60 border border-slate-800 text-[10px] text-slate-300 font-medium">
+            💡 {pattern.recommended_action}
+          </div>
+        </div>
+      )}
+
+      <div className="text-xs text-slate-400 mb-2 font-medium flex items-center justify-between">
+        <span>Logged Symptoms (Neon DB)</span>
+        <span className="text-[10px] text-teal-400 font-mono">Past 14 Days</span>
+      </div>
 
       <div className="flex-1 overflow-y-auto space-y-2 pr-1">
         {history.length === 0 ? (
