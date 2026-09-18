@@ -9,7 +9,7 @@ const apiClient = axios.create({
   },
 });
 
-export const sendChatMessage = async (query, userId = 'anonymous') => {
+export const sendChatMessage = async (query, userId = 'user_001') => {
   try {
     const response = await apiClient.post('/chat', {
       query,
@@ -21,7 +21,7 @@ export const sendChatMessage = async (query, userId = 'anonymous') => {
     if (error.response && error.response.data && error.response.data.detail) {
       throw new Error(error.response.data.detail);
     }
-    throw new Error('Unable to connect to SwasthyaSaathi backend. Please ensure the server is running.');
+    throw new Error('Unable to connect to SwasthyaSaathi backend. Please ensure the server is running on port 8000.');
   }
 };
 
@@ -31,6 +31,16 @@ export const fetchHealthStatus = async () => {
     return response.data;
   } catch (error) {
     return { status: 'offline', vector_store_ready: false, vectors_count: 0 };
+  }
+};
+
+export const fetchUserHistory = async (userId = 'user_001') => {
+  try {
+    const response = await apiClient.get(`/api/history/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('API Error fetching user history:', error);
+    return [];
   }
 };
 

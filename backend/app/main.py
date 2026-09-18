@@ -1,14 +1,15 @@
 import json
+from typing import List
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.db import get_db, init_db
-from app.models import Conversation
-from app.schemas import ChatRequest, ChatResponse, SourceMetadata, IngestResponse
+from app.models import Conversation, SymptomLog
+from app.schemas import ChatRequest, ChatResponse, SourceMetadata, IngestResponse, SymptomLogSchema
 from app.rag.retriever import get_retriever
-from app.agent.orchestrator import run_agent
+from app.agent.orchestrator import run_agent, get_session_history
 
 app = FastAPI(
     title="SwasthyaSaathi Agentic API",
@@ -49,6 +50,23 @@ def health_check():
         "database_url": settings.formatted_db_url.split("@")[-1] if "@" in settings.formatted_db_url else "local"
     }
 
+@app.get("/api/history/{user_id}", response_model=List[SymptomLogSchema])
+def fetch_user_history(user_id: str):
+    history = get_session_history(user_id=user_id, limit=10)
+    # Filter out error entries if any
+    clean_history = [
+        SymptomLogSchema(
+            id=item["id"],
+            user_id=item["user_id"],
+            query_text=item["query_text"],
+            topic=item.get("topic"),
+            triage_tag=item.get("triage_tag"),
+            created_at=item.get("created_at")
+        )
+        for item in history if "id" in item
+    ]
+    return clean_history
+
 @app.post("/chat", response_model=ChatResponse)
 @app.post("/api/chat", response_model=ChatResponse)
 @app.post("/api/query", response_model=ChatResponse)
@@ -71,7 +89,7 @@ def agentic_chat_endpoint(request: ChatRequest, db: Session = Depends(get_db)):
         for s in raw_sources
     ]
 
-    # Also log to conversations table
+    # Log to conversations audit table
     try:
         conv_record = Conversation(
             user_id=user_id,
@@ -90,5 +108,7 @@ def agentic_chat_endpoint(request: ChatRequest, db: Session = Depends(get_db)):
         answer=agent_output.get("answer", ""),
         sources=formatted_sources,
         is_grounded=len(formatted_sources) > 0,
-        triage_tag=agent_output.get("triage_tag", "GENERAL_INFO")
+        triage_tag=agent_output.get("triage_tag", "GENERAL_INFO"),
+        tools_used=agent_output.get("tools_used", []),
+        response_time_ms=agent_output.get("response_time_ms")
     )
