@@ -1,0 +1,82 @@
+[
+  {
+    "myth": "antibiotics cure viral infections",
+    "fact": "Antibiotics only kill bacteria, not viruses. They are ineffective against viral infections such as colds, flu, dengue, or viral bronchitis.",
+    "topic": "medication"
+  },
+  {
+    "myth": "turmeric cures diabetes completely",
+    "fact": "While turmeric (curcumin) has anti-inflammatory properties, it cannot cure diabetes. Diabetes requires proper medical management, diet control, and prescribed medication.",
+    "topic": "chronic_disease"
+  },
+  {
+    "myth": "papaya leaf juice cures dengue overnight",
+    "fact": "Papaya leaf extract may support platelet count recovery, but it is not a cure for dengue virus. Dengue management relies on hydration, monitoring warning signs, and medical care.",
+    "topic": "dengue"
+  },
+  {
+    "myth": "cold weather causes the common cold",
+    "fact": "Colds are caused by viruses, not low temperature. Cold weather may cause people to stay indoors closer together, facilitating viral spread.",
+    "topic": "general"
+  },
+  {
+    "myth": "drinking hot water kills coronavirus or influenza in the throat",
+    "fact": "Drinking hot water stays in the digestive tract and does not destroy viruses in the respiratory tract or bloodstream.",
+    "topic": "infections"
+  },
+  {
+    "myth": "tuberculosis spreads through shaking hands or sharing food",
+    "fact": "TB is spread through the air when a person with active lung TB coughs, sneezes, or speaks. It does not spread by touch, clothes, or sharing eating utensils.",
+    "topic": "tuberculosis"
+  },
+  {
+    "myth": "TB treatment can be stopped as soon as symptoms disappear",
+    "fact": "Stopping TB treatment early can cause drug-resistant TB (MDR-TB). The full 6-month or longer course must be completed as prescribed by a doctor.",
+    "topic": "tuberculosis"
+  },
+  {
+    "myth": "pregnant women should eat for two",
+    "fact": "Pregnant women need extra nutrients and slightly more calories (around 300 extra kcal/day in 2nd/3rd trimester), not double the amount of food.",
+    "topic": "maternal_child_health"
+  },
+  {
+    "myth": "colostrum first milk should be thrown away",
+    "fact": "Colostrum is rich in antibodies and protective nutrients. It is the baby's first immunization and should always be fed to the newborn immediately after birth.",
+    "topic": "maternal_child_health"
+  },
+  {
+    "myth": "wearing a mask outdoors causes carbon dioxide poisoning",
+    "fact": "Standard surgical and cloth masks allow oxygen and CO2 molecules to pass freely while filtering out larger droplets and respiratory particles.",
+    "topic": "air_pollution"
+  },
+  {
+    "myth": "air purifiers eliminate all health risks of severe air pollution",
+    "fact": "Air purifiers help indoor PM2.5 levels, but outdoor exposure, proper ventilation, and wearing N95 masks during severe AQI alerts remain critical.",
+    "topic": "air_pollution"
+  },
+  {
+    "myth": "flood water is safe to drink if boiled for 5 seconds",
+    "fact": "Flood water contains sewage, chemicals, and pathogens. Water must be brought to a rolling boil for at least 1 full minute or treated with chlorine tablets.",
+    "topic": "flood_health"
+  },
+  {
+    "myth": "mosquitoes carrying dengue only bite at night",
+    "fact": "Aedes mosquitoes which transmit Dengue virus are primary day-biters, most active during early morning and late afternoon before dusk.",
+    "topic": "dengue"
+  },
+  {
+    "myth": "vaccines cause autism",
+    "fact": "Extensive international scientific studies involving millions of children have repeatedly proven there is no link between vaccines and autism.",
+    "topic": "general"
+  },
+  {
+    "myth": "eating garlic prevents dengue infection",
+    "fact": "Garlic does not repel Aedes mosquitoes or prevent dengue virus transmission. Mosquito repellent and eliminating standing water are proven methods.",
+    "topic": "dengue"
+  },
+  {
+    "myth": "herbal teas can replace insulin for type 1 diabetes",
+    "fact": "Type 1 diabetes is an autoimmune condition requiring lifelong insulin replacement. Herbal remedies cannot replace insulin.",
+    "topic": "chronic_disease"
+  }
+]

@@ -1,0 +1,95 @@
+TUBERCULOSIS (TB) — FREQUENTLY ASKED QUESTIONS
+Central TB Division, National Tuberculosis Elimination Programme (NTEP)
+Ministry of Health & Family Welfare, Government of India
+TB Helpline (Nikshay Sampark): 1800-11-6666
+
+1. What is tuberculosis?
+Tuberculosis (TB) is an infectious disease caused by the bacteria Mycobacterium tuberculosis. TB usually affects the lungs, but it can also affect other parts of the body, such as the brain, the kidneys, the spine, etc.
+
+2. How do I know if I have TB?
+Symptoms of TB are usually specific to the site affected by the bacteria. If you experience any symptoms associated with TB, you must visit a health centre and get yourself tested immediately.
+
+Symptoms of Pulmonary TB (lung TB):
+- Persistent cough for two weeks or more
+- Chest pain
+- Shortness of breath
+- Blood in sputum
+
+Symptoms of Extra Pulmonary TB depend on the site/organ affected:
+- Brain TB - meningitis
+- Lymph node TB - enlarged lymph nodes
+- Bone TB - destruction of bones and joints
+- Abdominal TB - intestinal obstruction
+
+Common symptoms across TB types:
+- Weight loss
+- Fatigue
+- Evening rise of temperature (fever)
+- Night sweats
+
+3. What do I do if I notice symptoms of TB?
+If you, or someone you know, is experiencing symptoms of TB, please visit your nearest health centre for a checkup. TB treatment is available free of cost at all government and identified private and NGO health facilities called treatment centres. It is useful to download the TB Aarogya Saathi app for basic clarifications and resources, or call the toll-free number 1800-11-6666 for counseling and support.
+
+4. How is TB diagnosed?
+TB is diagnosed by demonstrating TB bacteria in a clinical specimen taken from the patient. Pulmonary TB is diagnosed through sputum smear microscopy and/or Chest X-Ray. In Extra-pulmonary TB, diagnosis is made based on clinical suspicion and special tests depending on the organ affected (e.g., FNAC for lymph node TB). NAAT (nucleic acid amplification test) is increasingly used - it is highly accurate and rapid, and also detects drug resistance to Rifampicin.
+
+5. How do I locate a TB diagnostic centre in my district?
+Download the TB Aarogya Saathi app and go to "Health Facilities" to find government and private sector TB health centres in your district, along with contact numbers. You can also call 1800-11-6666 for help.
+
+6. Is TB curable?
+TB is curable if the prescribed drugs are taken regularly for the complete duration.
+
+7. Is TB always infectious?
+Microbiologically confirmed pulmonary TB patients (lung TB) are infectious. However, these patients stop being infectious once at least 2 weeks of Anti-TB medicines are taken - though it is important to complete the entire duration of medication. TB affecting other organs (not the lung) is not infectious. Wearing a mask potentially cuts transmission, so anyone with a cough of any duration (even if not yet tested) is encouraged to wear a mask.
+
+8. How does TB spread? Am I likely to spread the infection if I share food or shake hands with someone?
+TB spreads when a person with active lung TB talks, sings, coughs, or sneezes, releasing TB bacteria in the air near a susceptible individual. TB does NOT spread through handshakes, using public toilets, sharing food and utensils, or casual contact. TB patients can continue living their normal lives after treatment completion; they should cover their mouth and nose while coughing and sneezing as a practice.
+
+9. How long does it take to recover from TB?
+Duration depends on drug resistance. For drug-sensitive TB, treatment is generally 6-9 months. Patients with resistance to one or more drugs may need longer treatment - after diagnosis, patients undergo cascade testing to check resistance. Depending on resistance patterns, patients may be diagnosed with DR-TB, MDR-TB (Multi-Drug Resistant), pre-XDR, or XDR-TB (Extensively Drug-Resistant).
+
+10. I have TB. What kind of diet should I follow?
+TB patients should consume a nutritionally rich and balanced diet with all nutrients in required proportions - for example, cereals (maize, rice, sorghum, millets), pulses (peas, beans, lentils), oil, sugar, egg, fish, etc.
+
+11. What kind of social support am I entitled to from the government, especially for nutrition needs?
+Under the "Nikshay Poshan Yojana," the Government of India provides 500 rupees each month to TB patients for the entire duration of their treatment as nutrition support.
+
+12. Who can be affected by TB?
+Anyone can be affected, but certain conditions increase the likelihood of developing active TB disease:
+- Close prolonged contact with a person with Pulmonary TB
+- Being in an overcrowded environment
+- Smoking
+- HIV infection
+- Malnutrition
+- Diabetes
+- Patients on immunosuppressive drugs (anti-cancer, corticosteroids, etc.)
+- Certain lung diseases like silicosis
+
+13. Should a TB patient be dealt with differently within the household and/or community?
+TB patients must be supported through their recovery and encouraged to complete treatment and eat a nutritious diet. There is no need to ostracize TB patients or spread unverifiable and incorrect information about the disease. With complete and correct treatment, TB is completely treatable.
+
+14. What do I do if my family member has TB?
+As a caregiver, ensure the TB patient completes their prescribed treatment and takes a nutritious diet during and after treatment. If they have lung TB and you were in close prolonged contact with them, contact your nearest health centre for professional advice (findable via the "Health Facilities" section of the TB Aarogya Saathi app).
+
+15. What are the side effects of TB drugs?
+Not everyone suffers side effects. Some TB patients may have adverse reactions including nausea, vomiting, gastritis, itching, etc. In this case, the patient should contact their treatment provider and NOT stop treatment - incomplete treatment can lead to drug resistance.
+
+16. How are TB and COVID-19 related? Can one disease act as a risk factor for the other?
+TB and COVID-19 both primarily affect the lungs, though TB is bacterial and COVID-19 is viral. Many symptoms overlap. If you have symptoms such as cough, fever, and difficulty breathing, get tested for both COVID-19 and tuberculosis.
+
+17. How are TB and HIV related?
+HIV is the strongest risk factor for tuberculosis among adults, as it adversely affects the immune system. An HIV-positive person is 20-40 times more likely to develop TB disease once infected, compared to an HIV-negative person.
+
+18. Can TB be cured in HIV co-infected patients?
+Yes, TB is curable in HIV-positive patients using the same medicines used for HIV-negative TB patients. However, HIV/TB co-infected patients require additional medications such as Antiretroviral Therapy (ART) and Co-trimoxazole preventive therapy (CPT) to prevent other opportunistic infections.
+
+19. How is it assessed whether a patient is responding to TB treatment?
+For pulmonary TB, response is assessed via follow-up sputum examinations/culture at regular intervals, and at the end of treatment to declare the patient cured. For extra-pulmonary TB, response is assessed through clinical improvement and follow-up investigations (X-rays, CT scans, etc.) depending on the site affected.
+
+20. Since treatment duration is long, what happens if a patient shifts their place of residence?
+There is a "Transferring Out" provision to ensure continuity of treatment if a patient relocates anywhere in the country. The patient informs programme officials in the district where they were originally notified about the location change; details are automatically updated via the Ni-kshay system, and treatment/benefits continue at the nearest new treatment centre.
+
+21. I have a regular family physician. Can I go to them for guidance on TB?
+Yes, you can consult any certified MBBS doctor for medical advice - they are best placed to diagnose and provide treatment. TB is diagnosed through appropriate sputum examinations and/or molecular diagnostic testing.
+
+Source: Central Tuberculosis Division, National Tuberculosis Elimination Programme (NTEP), Ministry of Health & Family Welfare, Government of India. https://tbcindia.mohfw.gov.in/faqs/

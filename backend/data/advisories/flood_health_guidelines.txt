@@ -1,0 +1,125 @@
+PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS
+National Centre for Disease Control
+22 Sham Nath Marg, Delhi 110054
+Directorate General of Health Services
+Ministry of Health and Family Welfare, Government of India
+
+1. Scope and Background
+
+1.1 Scope of this Document
+This document is intended to assist health authorities in preparing for, and responding to, flood events, with the aim to reduce adverse health effects after floods. Various aspects have been covered including rapid needs assessment for health system planning, setting up of post-flood surveillance system and various aspects of common epidemic prone diseases in post flood situation.
+
+1.2 Background
+Natural disasters continue to strike unabated and without notice. Generally, floods are caused due to the concentrated spells of heavy rains in the upper mountain reaches during the monsoon months (June-September). Although disasters cannot be prevented fully, their impact can be reduced with better disaster management strategies including better public health preparedness and response.
+
+1.3 Types of Floods
+1.3.1 Flash Floods - Such floods that occur within six hours during heavy rainfall and are usually associated with towering cumulus clouds, severe thunderstorms, and tropical cyclones or during the passage of cold weather fronts. This type of flood requires rapid localized warning system and immediate response in favour of affected communities. Other causes of flash floods include dam failure or other river obstructions.
+
+1.3.2 River Floods - Such floods are caused by precipitation over large catchment areas or by melting of snow or sometimes both. They take place in river systems with tributaries that may cover or drain large geographical area and encompass many independent river basins. These floods are normally built up slowly or on seasonal basis and may continue for days or weeks as compared to flash floods.
+
+1.3.3 Coastal Floods - Some floods are associated with the cyclonic activities like Hurricanes, Tropical cyclones, etc. generating catastrophic flood from rainwater which often aggravate wind-induced storm and water surges along the coast.
+
+2. Common Public Health Effects due to Flood
+
+2.1 Immediate and Medium Term Public Health Risks
+The main public health threats in flooding crisis are related to communicable diseases:
+- Interruption of safe water and sanitation supplies: populations displaced by flooding are at immediate and high risk of outbreaks of waterborne and food borne diseases, such as cholera.
+- Population displacement with overcrowding: increased risk for transmission of measles and meningitis and increased incidence of acute respiratory infections (ARI), especially pneumonia in children under 5 years.
+- Vector breeding: flooding can result in the proliferation of vector breeding sites, increasing the medium-term risk of malaria.
+- Poor access to health services due to destroyed or overwhelmed infrastructure.
+- Malnutrition and transmission of communicable diseases, as malnutrition compromises natural immunity.
+
+2.2 Post Flood Epidemic Prone Diseases
+Floods can potentially increase transmission of:
+- Water-borne diseases: typhoid fever, cholera, leptospirosis, water borne hepatitis
+- Vector-borne diseases: malaria, dengue and dengue haemorrhagic fever, Kalaazar, West Nile Fever
+
+Immediate health events (Days to Weeks): Drowning, Injuries, Snake Bites, Animal or insect bites
+Medium term health events (Weeks to Months): Water borne diseases, Vector borne diseases, Leptospirosis, Hepatitis A or E, Skin infections, Eye infections
+Long term health events (Months to Years): Post-traumatic Stress disorders, Other psychological ailments, Nutritional problems
+
+5. Water and Food Borne Diseases
+
+Populations affected by flooding are at immediate risk from outbreaks of waterborne and foodborne diseases, particularly cholera, typhoid, Shigella dysenteriae type 1, and hepatitis A and E.
+
+5.1 Cholera
+Cholera is an acute enteric infection caused by ingestion of bacterium Vibrio cholerae present in fecal contaminated water or food. It is characterized in its most severe form by a sudden onset of acute watery diarrhea that can lead to death by severe dehydration. The incubation period is two hours to five days. About 75% of people infected with cholera do not develop any symptoms, but pathogens stay in their feces for 7 to 14 days.
+
+Key Messages:
+- Cholera is transmitted through contaminated water or food.
+- Water should be chlorinated during and after floods to prevent cholera.
+- Cholera can rapidly lead to severe dehydration and death if left untreated.
+- ORS can successfully treat 80% of cholera cases.
+- Appropriate antibiotics can reduce the duration of purging.
+
+Case Management: Efficient treatment relies on prompt rehydration through oral rehydration salts (ORS) or intravenous fluids depending on severity. Up to 80% of patients can be treated with ORS. Very severely dehydrated patients need intravenous fluids, preferably Ringer lactate. For children up to five years, supplementary zinc reduces duration of diarrhoea: below 6 months age, add zinc 10mg daily for 2 weeks; 6 months to 12 years, add zinc 20mg daily for 2 weeks.
+
+5.2 Foodborne Diseases
+Five Keys to Food Safety at household level:
+- Wash hands before cooking and eating food
+- Wash vegetables, fruits and raw material prior to cooking with safe water
+- Keep food preparation area clean
+- Cook food thoroughly
+- Store food at safe temperature
+
+5.3 Viral Hepatitis A and E
+Food- and water-borne infections resulting in acute outbreaks in communities with unsafe water and poor sanitation. Generally self-limiting; most patients improve in a few weeks with no specific treatment needed for uncomplicated disease. Pregnant women with hepatitis E are at greater risk of developing liver failure and adverse outcomes.
+
+Control measures: increase free chlorine concentration to more than 0.5 mg/L during outbreaks; consume only boiled water (boiled for at least 1 minute, cooled, then consumed); wash hands with soap after defecation; ensure safe disposal of excreta and prevent open defecation. Incubation period of hepatitis A is 2-6 weeks and hepatitis E is 2-10 weeks.
+
+6. Water, Sanitation and Personal Hygiene
+
+6.1 Safe Drinking Water
+Minimum drinking water requirement per person per day is 5 litres. Daily activities like cooking, toilet use, hand washing require a minimum of 20 litres of water.
+
+6.1.1 Boiling of Water
+Water can be made safe by bringing it to a rolling boil. After boiling, allow the water to cool down on its own without adding ice.
+
+6.1.2 Using Sodium Hypochlorite (Bleach)
+To treat clear drinking water: use about 1/8 teaspoon bleach (approximately 0.75 ml) per 1 gallon (nearly 4 litres) of water, let stand for 30 minutes before using. For cloudy drinking water, add 1/4 teaspoon bleach per gallon and let stand for 30 minutes. Never mix bleach with any other domestic cleaning agent, especially those containing ammonia.
+
+6.1.3 Using Chlorine Tablets
+At room temperature (25°C), minimum contact time should be 30 minutes; double the time for each 10°C less than 25°C. This solution should leave a free residual chlorine concentration of 0.4 to 0.5 mg/l after 30 minutes.
+
+7. Vector Borne Diseases: Emergency Vector Control Response
+
+After floods, water stagnation in low lying areas may become breeding sites for vector breeding after 15 days to 1 month for anopheline and culicine breeding. Heavy rains in dengue prone areas usually flush Aedes larvae from outdoor breeding sites, but indoor receptacles may retain eggs and larvae, increasing adult Aedes population within 7-10 days. Malaria cases may be reported after 4-6 weeks if parasitic reservoir is available.
+
+Actions required: intensify vector surveillance in high risk areas; larval control near human rehabilitation sites; community awareness to cover water storage containers with lids; use of Indoor residual spray (IRS) based on disease incidence in last 3-5 years; use of space spray in areas reporting confirmed malaria/dengue cases.
+
+8. Rodent-Borne Diseases
+
+Leptospirosis is an example of a rodent-transmitted disease that can increase during or after heavy rainfall and flooding. Advice during floods: keep food in sealed cupboards/containers out of reach of rodents; dispose waste in covered rubbish bins; ensure entrances and windows are suitably sealed.
+
+8.1 Snakebites
+Increased risk of snakebite during floods as venomous snakes are washed from normal habitats. First aid: reassure the victim; immobilize the whole body and especially the bitten limb; avoid interference with the bite wound (no incisions, rubbing, or application of herbs); release tight bands/ligatures only under medical care; transport patient to hospital immediately. Snake antivenoms are the only effective treatment.
+
+8.2 Leptospirosis
+A bacterial disease causing serious illnesses such as kidney or liver failure, meningitis, difficulty breathing, and bleeding. Transmitted through direct contact with urine/tissue of infected animals, or indirectly through contaminated soil, water, or vegetation. People at risk: farm and agricultural workers, sewer workers, slaughterhouse workers, and survivors of flooding wading in contaminated water.
+
+Prevention: wear protective clothing (boots, gloves); cover skin lesions with waterproof dressings; avoid wading or swimming in potentially contaminated water; wash or shower after exposure to urine splashes or contaminated soil/water; consume chlorinated drinking water. Antibiotic prophylaxis with Doxycycline weekly has been used in high risk areas during Kerala floods (2018) and Maharashtra floods (2018).
+
+9. Vaccination during Flooding
+
+9.1 Tetanus: not transmitted person to person, caused by toxin from Clostridium tetani in contaminated wounds. One dose of Tetanus Toxoid Injection should be administered to injured persons in all health facilities.
+
+9.2 Measles: risk of transmission depends on baseline vaccination coverage rates, particularly among children under 15 years. Crowded living conditions facilitate transmission.
+
+9.3 Vaccination for Rescuers and Relief Workers: Hepatitis A vaccination recommended for high-risk individuals such as public utility workers involved in cleaning, sewage, or waste management. Tetanus toxoid recommended for those whose vaccinations are not up to date.
+
+11. Health Advisory for the Public/Relief Camp Officials During Flood and Post Flood Period
+
+11.2 Infectious Diseases Prevention and Control - Public advised to follow these precautions:
+- Only safe drinking water to be used; boiled water is most preferable for drinking.
+- Frequent hand washing with soap and water is a must to prevent infections.
+- Food materials soaked in flood water should not be used.
+- If anyone develops fever or diarrhoea, they should seek health care in Government health facilities including medical camps. Self-treatment is not advisable.
+
+11.3 Protected and Safe Drinking Water
+Method of super-chlorination for water tanks: 5gms (1 teaspoon) of commercial bleaching powder for 1000 litres of water. Make a paste with small amount of water, then add water up to 3/4th of the bucket, mix thoroughly, wait 10-15 minutes to sediment, transfer supernatant chlorine water to the tank. One hour after super chlorination, the water may be used.
+
+11.6 Fly Control Activities: Flies multiply in garbage and decaying materials; these should be removed at the earliest and disinfected with bleaching powder and lime mixture.
+
+11.7 Mosquito Control: Regular mosquito breeding preventive measures should be followed; general use of mosquito repellent creams and mosquito coils are advisable.
+
+Source: National Centre for Disease Control (NCDC), Directorate General of Health Services, Ministry of Health and Family Welfare, Government of India.

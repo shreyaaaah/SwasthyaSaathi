@@ -23,8 +23,14 @@ class FAISSRetriever:
         self._load_store()
 
     def _load_store(self):
-        index_path = os.path.join(self.vector_store_dir, "index.faiss")
-        metadata_path = os.path.join(self.vector_store_dir, "metadata.json")
+        index_bin = os.path.join(self.vector_store_dir, "faiss_index.bin")
+        index_faiss = os.path.join(self.vector_store_dir, "index.faiss")
+        index_path = index_bin if os.path.exists(index_bin) else index_faiss
+
+        meta_chunk = os.path.join(self.vector_store_dir, "chunk_metadata.json")
+        meta_json = os.path.join(self.vector_store_dir, "metadata.json")
+        metadata_path = meta_chunk if os.path.exists(meta_chunk) else meta_json
+
         vectorizer_path = os.path.join(self.vector_store_dir, "vectorizer.pkl")
 
         if os.path.exists(index_path) and os.path.exists(metadata_path):
@@ -47,7 +53,7 @@ class FAISSRetriever:
                     self.model = SentenceTransformer(self.model_name)
                 except Exception as e:
                     print(f"Could not load SentenceTransformer ({e}). Initializing TF-IDF embedder...")
-                    from app.rag.ingest import FallbackEmbedder
+                    from data_pipeline.embed_and_index import FallbackEmbedder
                     self.fallback_embedder = FallbackEmbedder(dim=self.index.d)
                     all_texts = [m.get("chunk_text", "") for m in self.metadata]
                     self.fallback_embedder.fit_encode(all_texts)
