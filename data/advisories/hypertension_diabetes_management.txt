@@ -1,0 +1,151 @@
+DOCUMENT: hypertension_diabetes_management.txt
+SOURCE: Ministry of Health and Family Welfare (MoHFW) India — National Programme for Prevention and Control of Non-Communicable Diseases (NP-NCD); Indian Council of Medical Research (ICMR) — Clinical Practice Guidelines for Type 2 Diabetes 2023; WHO — Hypertension Key Facts 2023
+TOPIC: Hypertension, High Blood Pressure, Diabetes, Blood Sugar Management
+
+=======================================================================
+SECTION 1: HYPERTENSION (HIGH BLOOD PRESSURE)
+=======================================================================
+
+WHAT IS HYPERTENSION?
+Blood pressure is recorded as two numbers: Systolic (top) / Diastolic (bottom), measured in mmHg.
+
+Blood Pressure Categories (Adults):
+- Normal: Below 120/80 mmHg
+- Elevated: 120–129 / below 80 mmHg
+- Stage 1 Hypertension: 130–139 / 80–89 mmHg
+- Stage 2 Hypertension: 140/90 mmHg or higher
+- Hypertensive Crisis (Emergency): 180/120 mmHg or higher — seek emergency care immediately
+
+SYMPTOMS
+Hypertension is often called the "silent killer" because most people have NO symptoms. When symptoms occur, they may include:
+- Headache (especially at the back of the head, in the morning)
+- Dizziness or lightheadedness
+- Blurred vision
+- Nosebleeds (in severe hypertension)
+
+Hypertensive Emergency Signs (Seek Emergency Care — Call 112/108):
+- Blood pressure above 180/120 mmHg
+- Severe headache with blurred vision or chest pain
+- Difficulty breathing, seizures, or confusion
+
+LIFESTYLE MODIFICATIONS (All stages of hypertension)
+1. DIET — DASH Approach (Dietary Approaches to Stop Hypertension):
+   - Reduce salt (sodium): Target less than 5g per day (about 1 teaspoon). Avoid pickles, papad, processed foods, and salted snacks.
+   - Increase potassium-rich foods: bananas, sweet potatoes, spinach, lentils (dal), tomatoes
+   - Eat more fruits, vegetables, and whole grains
+   - Reduce saturated fat: avoid vanaspati, excessive ghee, full-fat dairy in large amounts
+
+2. PHYSICAL ACTIVITY:
+   - At least 150 minutes per week of moderate aerobic exercise (brisk walking, cycling, swimming)
+   - Aim for 30 minutes most days of the week
+
+3. WEIGHT MANAGEMENT:
+   - Every 1 kg reduction in body weight lowers BP by approximately 1 mmHg
+   - Target BMI: 18.5–22.9 kg/m² for Indians
+
+4. TOBACCO CESSATION:
+   - Smoking raises BP acutely and is a major risk factor for heart attack and stroke
+   - Free tobacco cessation support: iCare helpline 1800-11-2356
+
+5. ALCOHOL REDUCTION:
+   - Limit to no more than 1 standard drink per day (women) or 2 per day (men)
+   - Alcohol raises BP and reduces the effectiveness of BP medications
+
+MEDICATION
+- If lifestyle changes are insufficient, antihypertensive medications are prescribed by a doctor
+- Common first-line medicines in India: Amlodipine, Losartan, Hydrochlorothiazide, Atenolol
+- CRITICAL: Do NOT stop BP medication suddenly without consulting your doctor — it can cause a dangerous rebound rise in blood pressure
+- Take medication at the same time every day; use a pill organiser or mobile reminder
+- Free antihypertensives are available under the Jan Aushadhi Scheme and at government PHCs
+
+MONITORING AT HOME
+- Check blood pressure at rest after sitting quietly for 5 minutes
+- Check at the same time each day (morning before medication is ideal)
+- Keep a record to share with your doctor
+
+=======================================================================
+SECTION 2: DIABETES (TYPE 2) MANAGEMENT
+=======================================================================
+
+WHAT IS DIABETES?
+Type 2 Diabetes is a chronic condition where blood sugar (glucose) remains too high because the body cannot use insulin properly.
+
+Diagnostic Criteria:
+- Fasting blood glucose: 126 mg/dL or above (on two separate days)
+- Random blood glucose: 200 mg/dL or above with symptoms
+- HbA1c: 6.5% or above
+- Pre-diabetes: Fasting glucose 100–125 mg/dL; HbA1c 5.7–6.4%
+
+SYMPTOMS OF HIGH BLOOD SUGAR (Hyperglycemia)
+- Increased thirst and frequent urination
+- Fatigue and weakness
+- Blurred vision
+- Slow healing of cuts or wounds
+- Frequent infections (skin, urinary tract)
+- Tingling or numbness in feet or hands
+
+LIFESTYLE MANAGEMENT (Cornerstone of Diabetes Control)
+1. DIET:
+   - Control portion sizes; avoid skipping meals
+   - Choose complex carbohydrates: whole grains (brown rice, millets, whole wheat), lentils
+   - Avoid refined carbohydrates: maida, white rice (large portions), sweet beverages, packaged snacks
+   - Increase dietary fibre: vegetables, fruits (in moderate portions), legumes
+   - Healthy Indian food choices: dal, sabzi, roti (whole wheat), curd (plain), buttermilk
+   - Foods to limit: rice in large amounts, potato, fruit juices, jaggery, sweets, alcohol
+
+2. PHYSICAL ACTIVITY:
+   - 150 minutes of moderate exercise per week (30 min/day, 5 days a week)
+   - Walking after meals (15–20 minutes) significantly reduces post-meal blood sugar spikes
+   - Resistance/strength exercises twice a week improve insulin sensitivity
+
+3. WEIGHT MANAGEMENT:
+   - Even a 5–7% reduction in body weight can significantly improve blood sugar levels in overweight individuals
+
+MEDICATION
+- Common first-line medication: Metformin (taken with meals to reduce side effects)
+- Other medicines: Glipizide, Glimepiride, DPP-4 inhibitors, SGLT2 inhibitors — prescribed based on individual assessment
+- Some patients require insulin injections; this is NOT a failure — it is a medical decision based on the body's needs
+- Do NOT adjust or stop diabetes medication without consulting your doctor
+
+MONITORING BLOOD SUGAR AT HOME
+- Fasting glucose (before breakfast): Target 80–130 mg/dL
+- Post-meal glucose (2 hours after eating): Target below 180 mg/dL
+- HbA1c every 3–6 months: Target below 7% (individualised by your doctor)
+
+RECOGNISING AND MANAGING HYPOGLYCEMIA (LOW BLOOD SUGAR)
+Blood sugar below 70 mg/dL is hypoglycemia — this is a medical emergency.
+
+Symptoms: Trembling, sweating, rapid heartbeat, dizziness, confusion, pale skin, sudden hunger
+Treatment (Rule of 15):
+- Eat 15g of fast-acting carbohydrates: 3–4 glucose tablets, 1/2 cup (125ml) of fruit juice or regular (not diet) soda, or 1 tablespoon of sugar dissolved in water
+- Wait 15 minutes; if symptoms persist, repeat
+- Once recovered, eat a small snack (biscuit + milk)
+- If unconscious — DO NOT give anything by mouth; call 108 immediately
+
+FOOT CARE FOR DIABETICS
+- Inspect feet DAILY for cuts, blisters, redness, or swelling
+- Wash feet daily in warm (not hot) water and dry gently between toes
+- Wear well-fitting, closed footwear — never walk barefoot
+- See a doctor immediately for any foot wound, ulcer, or infection (diabetic foot infections can worsen rapidly)
+
+PREVENTING COMPLICATIONS
+Uncontrolled diabetes damages blood vessels and nerves over time. Regular check-ups:
+- Eye check (retinal exam): Every 1–2 years
+- Kidney function (urine microalbumin, creatinine): Every year
+- Foot examination: Every visit
+- Lipid profile and BP check: Every visit
+
+FREE DIABETES CARE RESOURCES IN INDIA
+- Free testing and medicines at government PHCs and CHCs under NP-NCD
+- Jan Aushadhi Kendras: Metformin, Glimepiride, insulin at reduced cost
+- NHP helpline: 1800-11-4000
+
+=======================================================================
+SECTION 3: HYPERTENSION + DIABETES TOGETHER (DUAL RISK)
+=======================================================================
+
+Having both hypertension and diabetes significantly increases the risk of heart attack, stroke, and kidney disease.
+- Blood pressure target for diabetics: Below 130/80 mmHg
+- Use of an ACE inhibitor or ARB (e.g., Ramipril, Losartan) is preferred in diabetics with hypertension — protects the kidneys
+- Strict HbA1c control (below 7%) along with BP control is essential
+- Annual urine albumin test is critical to detect early kidney damage

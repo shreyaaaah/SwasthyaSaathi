@@ -1,0 +1,104 @@
+DOCUMENT: cardiac_emergency_guidelines.txt
+SOURCE: Ministry of Health and Family Welfare (MoHFW) India — National Programme for Prevention and Control of Cardiovascular Diseases; World Health Organization (WHO) — Cardiovascular Disease Factsheet 2023
+TOPIC: Cardiac Symptoms, Chest Pain, Emergency Services
+
+=======================================================================
+SECTION 1: WHEN TO CALL EMERGENCY SERVICES IMMEDIATELY (112 / 108)
+=======================================================================
+
+Call emergency services (112 or 108 ambulance) WITHOUT DELAY if you or someone around you experiences ANY of the following:
+
+CHEST PAIN OR PRESSURE
+- Sudden, severe pain, tightness, squeezing, crushing, or pressure in the centre or left side of the chest
+- Chest discomfort that lasts more than a few minutes or comes and goes
+- Chest pain spreading or radiating to the arm (especially left arm), shoulder, jaw, neck, or back
+- Chest pain accompanied by sweating (diaphoresis), nausea, or vomiting
+- Chest pain with shortness of breath even at rest
+- Chest pain in a person with known heart disease, diabetes, or hypertension
+
+BREATHING DIFFICULTY (DYSPNEA)
+- Sudden severe shortness of breath at rest (not caused by exercise)
+- Unable to complete a sentence due to difficulty breathing
+- Breathing with audible wheezing, gurgling, or gasping sounds
+- Bluish discolouration of lips, fingertips, or face (cyanosis)
+
+LOSS OF CONSCIOUSNESS / COLLAPSE
+- Sudden fainting or loss of consciousness
+- Unresponsiveness — person cannot be woken up
+- Seizures with no prior history of epilepsy
+
+STROKE SYMPTOMS — REMEMBER "FAST"
+- FACE: Sudden drooping on one side of the face; uneven smile
+- ARM: Sudden weakness or numbness in one arm; inability to raise both arms equally
+- SPEECH: Sudden slurred or garbled speech; unable to speak or understand
+- TIME: If any of the above — Time to call 112 immediately
+- Additional stroke signs: sudden severe headache with no cause, sudden vision loss in one or both eyes, sudden loss of balance or coordination
+
+HEART ATTACK (MYOCARDIAL INFARCTION) KEY SIGNS
+- Chest pain or pressure lasting more than 15–20 minutes
+- Cold sweat, paleness, and extreme weakness
+- Feeling of impending doom or extreme anxiety
+- Jaw pain or toothache-like pain with no dental cause
+- Pain between the shoulder blades
+Note: In women, symptoms may be atypical — fatigue, nausea, upper abdominal pain, and jaw pain without classic chest pain.
+
+=======================================================================
+SECTION 2: WHAT TO DO WHILE WAITING FOR THE AMBULANCE
+=======================================================================
+
+1. CALL 112 or 108 — state clearly "possible heart attack" or "chest pain" and your location.
+2. Keep the person CALM and at REST — do not allow them to walk or exert themselves.
+3. Loosen tight clothing (collar, belt, tie) to help breathing.
+4. If the person is conscious, and not allergic — give ONE tablet of Aspirin 325mg (or two 150mg tablets) to chew (not swallow whole), ONLY if available and not contraindicated.
+5. If the person is unconscious and not breathing — begin CPR (Cardiopulmonary Resuscitation) if you are trained.
+6. Do NOT give food, water, or any other medication.
+7. Do NOT leave the person alone.
+8. Note the time symptoms started — this information is critical for emergency staff.
+
+=======================================================================
+SECTION 3: HIGH-RISK GROUPS FOR HEART ATTACK AND CARDIAC EVENTS
+=======================================================================
+
+The following groups have significantly higher risk and should seek evaluation even for mild or atypical symptoms:
+- Age above 45 years (men) or above 55 years (women)
+- Known hypertension (high blood pressure) or diabetes
+- Known coronary artery disease or previous heart attack
+- Smokers or tobacco users (current or former)
+- Obesity (BMI > 30 kg/m²) or abdominal obesity
+- Family history of heart disease at a young age
+- Chronic kidney disease or dyslipidemia (abnormal cholesterol)
+
+These individuals should NOT wait — seek emergency care for any chest discomfort, even if mild.
+
+=======================================================================
+SECTION 4: NON-EMERGENCY CHEST PAIN — CONSULT DOCTOR SOON
+=======================================================================
+
+Not all chest pain is cardiac. The following patterns suggest non-emergency causes but still require a doctor's evaluation within 24–48 hours:
+
+- Sharp, stabbing pain that worsens only when you press on the chest wall (costochondritis / musculoskeletal)
+- Pain clearly related to breathing in and out (pleurisy)
+- Burning behind the breastbone after meals (GERD / acid reflux) — typically relieved by antacids
+- Brief, fleeting pain lasting only 1–2 seconds
+- Chest tightness with a productive cough and fever (likely respiratory infection)
+
+Important: If you are unsure whether your chest pain is cardiac or non-cardiac, ALWAYS treat it as a potential emergency and seek evaluation. It is always safer to be evaluated and reassured than to ignore a cardiac event.
+
+=======================================================================
+SECTION 5: CHEST PAIN IN CHILDREN
+=======================================================================
+
+Chest pain in children is usually non-cardiac (most often musculoskeletal or related to cough and respiratory infection). However, seek emergency care if a child has:
+- Chest pain during exertion (running, sports)
+- Chest pain with fainting or near-fainting
+- Chest pain with palpitations or an irregular heartbeat
+- Known congenital heart disease
+
+=======================================================================
+SECTION 6: NATIONAL HELPLINES AND EMERGENCY RESOURCES
+=======================================================================
+
+- Emergency Ambulance: 108 (free, nationwide)
+- National Emergency Number: 112
+- Chest pain / cardiac care — go to the nearest government hospital with a 24-hour emergency or ICU. In India, government hospitals under the PM Jan Arogya Yojana (Ayushman Bharat) provide free emergency cardiac care for eligible beneficiaries.
+- National Helpline for NCD (Non-Communicable Diseases including heart disease): 1800-11-4000 (Toll-free)

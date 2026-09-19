@@ -5,13 +5,18 @@ from typing import List, Dict, Any
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ADVISORIES_DIR = os.path.join(BASE_DIR, "data", "advisories")
+# Also check backend/data/raw_docs in case pipeline is run from within backend directory
+BACKEND_RAW_DOCS_DIR = os.path.join(BASE_DIR, "backend", "data", "raw_docs")
 OUTPUT_FILE = os.path.join(BASE_DIR, "data", "advisory_chunks.json")
 BACKEND_OUTPUT_FILE = os.path.join(BASE_DIR, "backend", "data", "advisory_chunks.json")
 
 TOPIC_MAP = {
     "air_pollution_advisory.txt": "air_pollution",
+    "cardiac_emergency_guidelines.txt": "cardiac_emergency",
     "dengue_clinical_guidelines.txt": "dengue",
+    "fever_flu_diarrhea_selfcare.txt": "fever_flu_diarrhea",
     "flood_health_guidelines.txt": "flood_health",
+    "hypertension_diabetes_management.txt": "hypertension_diabetes",
     "maternal_child_health_guidelines.txt": "maternal_child_health",
     "tb_public_faqs.txt": "tuberculosis"
 }
@@ -55,17 +60,20 @@ def chunk_text(doc_name: str, topic: str, content: str, chunk_size: int = 500, c
     return chunks
 
 def main():
-    if not os.path.exists(ADVISORIES_DIR):
-        print(f"Error: Advisories directory not found at {ADVISORIES_DIR}")
+    # Prefer ADVISORIES_DIR; fall back to BACKEND_RAW_DOCS_DIR
+    active_dir = ADVISORIES_DIR if os.path.exists(ADVISORIES_DIR) else BACKEND_RAW_DOCS_DIR
+    if not os.path.exists(active_dir):
+        print(f"Error: Advisories directory not found at {ADVISORIES_DIR} or {BACKEND_RAW_DOCS_DIR}")
         return
+    print(f"Reading advisories from: {active_dir}")
 
-    files = [f for f in os.listdir(ADVISORIES_DIR) if f.endswith(".txt")]
+    files = [f for f in os.listdir(active_dir) if f.endswith(".txt")]
     all_chunks = []
     chunk_counter = 0
 
     for file_name in sorted(files):
         topic = TOPIC_MAP.get(file_name, file_name.replace(".txt", ""))
-        file_path = os.path.join(ADVISORIES_DIR, file_name)
+        file_path = os.path.join(active_dir, file_name)
         with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
             content = f.read()
 

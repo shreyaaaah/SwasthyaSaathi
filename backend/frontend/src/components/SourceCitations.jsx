@@ -1,10 +1,28 @@
 import React, { useState } from 'react';
-import { BookOpen, ChevronDown, ChevronUp, FileText, CheckCircle2 } from 'lucide-react';
+import { BookOpen, ChevronDown, ChevronUp, FileText, CheckCircle2, ShieldAlert } from 'lucide-react';
 
-const SourceCitations = ({ sources }) => {
+const SourceCitations = ({ sources, isGrounded = true }) => {
   const [expandedIdx, setExpandedIdx] = useState(null);
 
-  if (!sources || sources.length === 0) return null;
+  const hasSources = sources && sources.length > 0;
+
+  if (!hasSources || isGrounded === false) {
+    return (
+      <div className="mt-3 pt-2.5 border-t border-slate-700/60">
+        <div className="p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-amber-200 text-xs flex items-start gap-2.5 shadow-sm">
+          <ShieldAlert className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <span className="font-bold text-amber-300 block">
+              ℹ️ General AI Response (No Official Guideline Match)
+            </span>
+            <span className="text-[11px] text-amber-200/90 leading-tight block mt-0.5">
+              No official MoHFW, ICMR, or WHO guideline matched this question with high confidence (&ge;45%). This answer is provided for general information only — please consult a qualified doctor for clinical guidance.
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const toggleExpand = (idx) => {
     setExpandedIdx(expandedIdx === idx ? null : idx);

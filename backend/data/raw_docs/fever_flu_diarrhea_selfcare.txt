@@ -1,0 +1,125 @@
+DOCUMENT: fever_flu_diarrhea_selfcare.txt
+SOURCE: Ministry of Health and Family Welfare (MoHFW) India — National Health Portal (NHP); World Health Organization (WHO) — Home Care for Patients with COVID-19 and similar febrile illnesses 2023; ICMR — Guidelines for Management of Common Illnesses in Primary Care
+TOPIC: Fever, Influenza, Common Cold, Diarrhea, Self-Care
+
+=======================================================================
+SECTION 1: FEVER — SELF-CARE AND WHEN TO SEE A DOCTOR
+=======================================================================
+
+WHAT IS FEVER?
+Normal body temperature is 37°C (98.6°F). A temperature of 38°C (100.4°F) or above is considered a fever.
+
+SELF-CARE FOR MILD FEVER (38°C–38.9°C / 100.4°F–102°F)
+- Rest and drink plenty of fluids (water, oral rehydration solution, coconut water, clear soups)
+- Wear light, comfortable clothing; use a light blanket only if shivering
+- Apply a cool, damp cloth to the forehead, armpits, and neck for comfort (do not use very cold water or ice)
+- Paracetamol (Acetaminophen): 500mg–1000mg for adults every 4–6 hours (not more than 4g per day) — safe and effective for reducing fever
+  - For children: weight-based dosing (15mg/kg per dose, every 4–6 hours)
+  - Do NOT give Aspirin to children under 18 years
+- Avoid strenuous activity
+
+WHEN TO SEE A DOCTOR (Consult Within 24 Hours)
+- Fever above 39.5°C (103°F) not responding to paracetamol after 1 hour
+- Fever lasting more than 3 days in adults or more than 2 days in young children
+- Fever in an infant under 3 months — ALWAYS seek medical evaluation
+- Fever with severe headache and neck stiffness (possible meningitis — seek emergency care)
+- Fever with a rash, especially a red, non-blanching rash
+- Fever with confusion or altered mental state (possible encephalitis)
+- Fever with severe abdominal pain or back pain
+- Fever in a returned traveller (possible malaria, typhoid, dengue)
+- Fever in a person with diabetes, heart disease, or immunocompromised conditions
+
+DENGUE WARNING SIGNS WITH FEVER — SEEK EMERGENCY CARE
+- Severe abdominal pain or persistent vomiting
+- Bleeding from gums or nose, blood in urine or stool
+- Sudden drop in fever with extreme weakness, pale cold skin (shock)
+- Difficulty breathing
+
+=======================================================================
+SECTION 2: COMMON COLD AND INFLUENZA (FLU) — SELF-CARE
+=======================================================================
+
+SYMPTOMS
+- Common Cold: Runny/blocked nose, sneezing, sore throat, mild cough, low-grade fever
+- Influenza (Flu): Sudden high fever (39–40°C), severe body aches, fatigue, headache, dry cough, sore throat
+
+SELF-CARE (Both Common Cold and Flu)
+- REST — one of the most important treatments
+- FLUIDS — drink 8–10 glasses of water per day; warm water with honey and lemon can soothe the throat
+- STEAM INHALATION — 2–3 times per day for congestion (take care to avoid burns)
+- SALT WATER GARGLE — 1/4 to 1/2 teaspoon of salt in warm water, gargle 3 times daily
+- HONEY — 1–2 teaspoons before sleep can help reduce cough (not for infants under 1 year)
+- NASAL DROPS — normal saline nasal drops can relieve congestion in children safely
+- PARACETAMOL — for fever and body aches; follow dosing as above
+
+INFLUENZA VACCINATION
+The seasonal influenza vaccine is recommended annually. High-priority groups include:
+- Elderly (above 65 years)
+- Pregnant women
+- Young children aged 6 months to 5 years
+- Healthcare workers
+- Persons with chronic illness (diabetes, heart disease, asthma)
+
+WHEN TO SEEK MEDICAL ATTENTION (Flu Complications)
+- Difficulty breathing or rapid breathing
+- Persistent chest pain or pressure
+- Confusion or altered consciousness
+- Severe or persistent vomiting (unable to keep fluids down)
+- Symptoms improve then return with fever and worsening cough
+- Lips or face turning bluish (cyanosis)
+- High-risk groups: infants, elderly, pregnant women, and immunocompromised — should seek care sooner
+
+PREVENTION
+- Wash hands frequently with soap and water for 20 seconds
+- Cover mouth and nose with a bent elbow or tissue when coughing or sneezing
+- Avoid close contact with sick people
+- Avoid touching your eyes, nose, and mouth
+
+=======================================================================
+SECTION 3: DIARRHEA — SELF-CARE AND WHEN TO SEEK CARE
+=======================================================================
+
+WHAT IS DIARRHEA?
+Passing 3 or more loose or liquid stools per day. Most acute diarrhea in adults is self-limiting and resolves within 2–3 days.
+
+THE MOST IMPORTANT TREATMENT: ORAL REHYDRATION
+Diarrhea causes loss of water and salts. The primary risk is DEHYDRATION.
+
+ORS (Oral Rehydration Solution) — HOW TO PREPARE AT HOME
+- 1 litre of clean boiled water
+- 6 level teaspoons of sugar
+- 1/2 teaspoon of salt
+- Mix well and drink throughout the day
+
+Alternatively, use packaged ORS sachets (available free at government health centres and Anganwadi centres).
+
+FEEDING DURING DIARRHEA
+- Adults and older children: continue eating normally — bland foods like rice, curd, banana, boiled potatoes
+- Infants: continue breastfeeding; do NOT stop breast milk during diarrhea
+- Avoid: spicy food, oily food, raw vegetables, sugary drinks, fruit juices (these worsen diarrhea)
+
+ZINC FOR CHILDREN (WHO/UNICEF Recommendation)
+- Children 6 months–5 years with diarrhea: Zinc 20mg/day for 14 days (10mg/day for infants under 6 months)
+- Available free at government PHCs; reduces severity and duration of diarrhea
+
+WHEN TO SEEK MEDICAL CARE URGENTLY
+- Signs of severe dehydration: sunken eyes, dry mouth, no urination for 6+ hours, very dark urine, extreme thirst, skin tenting (skin stays pinched when pulled)
+- Bloody or mucoid diarrhea (red, black, or tarry stools)
+- Fever above 39°C with diarrhea
+- Diarrhea lasting more than 3 days without improvement
+- Vomiting with inability to keep ORS down
+- Diarrhea in an infant under 6 months
+- In children: high-pitched cry, inability to drink, prolonged sleep, not waking up
+
+PREVENTION
+- Drink only clean, boiled, or purified water
+- Wash hands before eating and after using the toilet
+- Keep food covered; avoid street food in monsoon season
+- Immunise children against Rotavirus (free under Universal Immunisation Programme — UIP)
+
+=======================================================================
+SECTION 4: NATIONAL HELPLINES
+=======================================================================
+
+- National Health Portal Helpline: 1800-11-4000 (Toll-Free)
+- Nearest government PHC (Primary Health Centre) or CHC (Community Health Centre) for free ORS, Zinc, and basic fever management

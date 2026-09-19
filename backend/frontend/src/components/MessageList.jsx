@@ -126,9 +126,9 @@ const MessageList = ({ messages, isLoading }) => {
                 {msg.text}
               </div>
 
-              {/* Source Citations */}
-              {!isUser && msg.sources && msg.sources.length > 0 && (
-                <SourceCitations sources={msg.sources} />
+              {/* Source Citations & Grounding Status */}
+              {!isUser && (
+                <SourceCitations sources={msg.sources} isGrounded={msg.is_grounded} />
               )}
             </div>
           </div>

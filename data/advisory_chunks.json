@@ -119,486 +119,794 @@
     "chunk_id": 16
   },
   {
+    "doc_name": "cardiac_emergency_guidelines.txt",
+    "topic": "cardiac_emergency",
+    "section": "SECTION 1: WHEN TO CALL EMERGENCY SERVICES IMMEDIATELY (112 / 108)",
+    "chunk_text": "DOCUMENT: cardiac_emergency_guidelines.txt\nSOURCE: Ministry of Health and Family Welfare (MoHFW) India — National Programme for Prevention and Control of Cardiovascular Diseases; World Health Organization (WHO) — Cardiovascular Disease Factsheet 2023\nTOPIC: Cardiac Symptoms, Chest Pain, Emergency Services\n\n=======================================================================\nSECTION 1: WHEN TO CALL EMERGENCY SERVICES IMMEDIATELY (112 / 108)\n=======================================================================",
+    "chunk_id": 17
+  },
+  {
+    "doc_name": "cardiac_emergency_guidelines.txt",
+    "topic": "cardiac_emergency",
+    "section": "CHEST PAIN OR PRESSURE",
+    "chunk_text": "=================================================\n\nCall emergency services (112 or 108 ambulance) WITHOUT DELAY if you or someone around you experiences ANY of the following:\n\nCHEST PAIN OR PRESSURE\n- Sudden, severe pain, tightness, squeezing, crushing, or pressure in the centre or left side of the chest\n- Chest discomfort that lasts more than a few minutes or comes and goes\n- Chest pain spreading or radiating to the arm (especially left arm), shoulder, jaw, neck, or back\n- Chest pain accompanied by sweating (diaphoresis), nausea, or vomiting",
+    "chunk_id": 18
+  },
+  {
+    "doc_name": "cardiac_emergency_guidelines.txt",
+    "topic": "cardiac_emergency",
+    "section": "LOSS OF CONSCIOUSNESS / COLLAPSE",
+    "chunk_text": "ed by sweating (diaphoresis), nausea, or vomiting\n- Chest pain with shortness of breath even at rest\n- Chest pain in a person with known heart disease, diabetes, or hypertension\n\nBREATHING DIFFICULTY (DYSPNEA)\n- Sudden severe shortness of breath at rest (not caused by exercise)\n- Unable to complete a sentence due to difficulty breathing\n- Breathing with audible wheezing, gurgling, or gasping sounds\n- Bluish discolouration of lips, fingertips, or face (cyanosis)\n\nLOSS OF CONSCIOUSNESS / COLLAPSE",
+    "chunk_id": 19
+  },
+  {
+    "doc_name": "cardiac_emergency_guidelines.txt",
+    "topic": "cardiac_emergency",
+    "section": "STROKE SYMPTOMS — REMEMBER \"FAST\"",
+    "chunk_text": "face (cyanosis)\n\nLOSS OF CONSCIOUSNESS / COLLAPSE\n- Sudden fainting or loss of consciousness\n- Unresponsiveness — person cannot be woken up\n- Seizures with no prior history of epilepsy\n\nSTROKE SYMPTOMS — REMEMBER \"FAST\"\n- FACE: Sudden drooping on one side of the face; uneven smile\n- ARM: Sudden weakness or numbness in one arm; inability to raise both arms equally\n- SPEECH: Sudden slurred or garbled speech; unable to speak or understand\n- TIME: If any of the above — Time to call 112 immediately\n- Additional stroke signs: sudden severe headache with no cause, sudden vision loss in one or both eyes, sudden loss of balance or coordination",
+    "chunk_id": 20
+  },
+  {
+    "doc_name": "cardiac_emergency_guidelines.txt",
+    "topic": "cardiac_emergency",
+    "section": "HEART ATTACK (MYOCARDIAL INFARCTION) KEY SIGNS",
+    "chunk_text": "both eyes, sudden loss of balance or coordination\n\nHEART ATTACK (MYOCARDIAL INFARCTION) KEY SIGNS\n- Chest pain or pressure lasting more than 15–20 minutes\n- Cold sweat, paleness, and extreme weakness\n- Feeling of impending doom or extreme anxiety\n- Jaw pain or toothache-like pain with no dental cause\n- Pain between the shoulder blades\nNote: In women, symptoms may be atypical — fatigue, nausea, upper abdominal pain, and jaw pain without classic chest pain.\n\n=======================================================================",
+    "chunk_id": 21
+  },
+  {
+    "doc_name": "cardiac_emergency_guidelines.txt",
+    "topic": "cardiac_emergency",
+    "section": "SECTION 2: WHAT TO DO WHILE WAITING FOR THE AMBULANCE",
+    "chunk_text": "=================================================\nSECTION 2: WHAT TO DO WHILE WAITING FOR THE AMBULANCE\n=======================================================================\n\n1. CALL 112 or 108 — state clearly \"possible heart attack\" or \"chest pain\" and your location.\n2. Keep the person CALM and at REST — do not allow them to walk or exert themselves.\n3. Loosen tight clothing (collar, belt, tie) to help breathing.\n4. If the person is conscious, and not allergic — give ONE tablet of Aspirin 325mg (or two 150mg tablets) to chew (not swallow whole), ONLY if available and not contraindicated.",
+    "chunk_id": 22
+  },
+  {
+    "doc_name": "cardiac_emergency_guidelines.txt",
+    "topic": "cardiac_emergency",
+    "section": "SECTION 3: HIGH-RISK GROUPS FOR HEART ATTACK AND CARDIAC EVENTS",
+    "chunk_text": "hole), ONLY if available and not contraindicated.\n5. If the person is unconscious and not breathing — begin CPR (Cardiopulmonary Resuscitation) if you are trained.\n6. Do NOT give food, water, or any other medication.\n7. Do NOT leave the person alone.\n8. Note the time symptoms started — this information is critical for emergency staff.\n\n=======================================================================\nSECTION 3: HIGH-RISK GROUPS FOR HEART ATTACK AND CARDIAC EVENTS\n=======================================================================",
+    "chunk_id": 23
+  },
+  {
+    "doc_name": "cardiac_emergency_guidelines.txt",
+    "topic": "cardiac_emergency",
+    "section": "SECTION 3: HIGH-RISK GROUPS FOR HEART ATTACK AND CARDIAC EVENTS",
+    "chunk_text": "=================================================\n\nThe following groups have significantly higher risk and should seek evaluation even for mild or atypical symptoms:\n- Age above 45 years (men) or above 55 years (women)\n- Known hypertension (high blood pressure) or diabetes\n- Known coronary artery disease or previous heart attack\n- Smokers or tobacco users (current or former)\n- Obesity (BMI > 30 kg/m²) or abdominal obesity\n- Family history of heart disease at a young age\n- Chronic kidney disease or dyslipidemia (abnormal cholesterol)",
+    "chunk_id": 24
+  },
+  {
+    "doc_name": "cardiac_emergency_guidelines.txt",
+    "topic": "cardiac_emergency",
+    "section": "SECTION 4: NON-EMERGENCY CHEST PAIN — CONSULT DOCTOR SOON",
+    "chunk_text": "ey disease or dyslipidemia (abnormal cholesterol)\n\nThese individuals should NOT wait — seek emergency care for any chest discomfort, even if mild.\n\n=======================================================================\nSECTION 4: NON-EMERGENCY CHEST PAIN — CONSULT DOCTOR SOON\n=======================================================================\n\nNot all chest pain is cardiac. The following patterns suggest non-emergency causes but still require a doctor's evaluation within 24–48 hours:\n\n- Sharp, stabbing pain that worsens only when you press on the chest wall (costochondritis / musculoskeletal)",
+    "chunk_id": 25
+  },
+  {
+    "doc_name": "cardiac_emergency_guidelines.txt",
+    "topic": "cardiac_emergency",
+    "section": "SECTION 4: NON-EMERGENCY CHEST PAIN — CONSULT DOCTOR SOON",
+    "chunk_text": "he chest wall (costochondritis / musculoskeletal)\n- Pain clearly related to breathing in and out (pleurisy)\n- Burning behind the breastbone after meals (GERD / acid reflux) — typically relieved by antacids\n- Brief, fleeting pain lasting only 1–2 seconds\n- Chest tightness with a productive cough and fever (likely respiratory infection)\n\nImportant: If you are unsure whether your chest pain is cardiac or non-cardiac, ALWAYS treat it as a potential emergency and seek evaluation. It is always safer to be evaluated and reassured than to ignore a cardiac event.",
+    "chunk_id": 26
+  },
+  {
+    "doc_name": "cardiac_emergency_guidelines.txt",
+    "topic": "cardiac_emergency",
+    "section": "SECTION 5: CHEST PAIN IN CHILDREN",
+    "chunk_text": "ted and reassured than to ignore a cardiac event.\n\n=======================================================================\nSECTION 5: CHEST PAIN IN CHILDREN\n=======================================================================\n\nChest pain in children is usually non-cardiac (most often musculoskeletal or related to cough and respiratory infection). However, seek emergency care if a child has:\n- Chest pain during exertion (running, sports)\n- Chest pain with fainting or near-fainting\n- Chest pain with palpitations or an irregular heartbeat",
+    "chunk_id": 27
+  },
+  {
+    "doc_name": "cardiac_emergency_guidelines.txt",
+    "topic": "cardiac_emergency",
+    "section": "SECTION 6: NATIONAL HELPLINES AND EMERGENCY RESOURCES",
+    "chunk_text": "pain with palpitations or an irregular heartbeat\n- Known congenital heart disease\n\n=======================================================================\nSECTION 6: NATIONAL HELPLINES AND EMERGENCY RESOURCES\n=======================================================================\n\n- Emergency Ambulance: 108 (free, nationwide)\n- National Emergency Number: 112\n- Chest pain / cardiac care — go to the nearest government hospital with a 24-hour emergency or ICU. In India, government hospitals under the PM Jan Arogya Yojana (Ayushman Bharat) provide free emergency cardiac care for eligible beneficiaries.",
+    "chunk_id": 28
+  },
+  {
+    "doc_name": "cardiac_emergency_guidelines.txt",
+    "topic": "cardiac_emergency",
+    "section": "SECTION 6: NATIONAL HELPLINES AND EMERGENCY RESOURCES",
+    "chunk_text": "mergency cardiac care for eligible beneficiaries.\n- National Helpline for NCD (Non-Communicable Diseases including heart disease): 1800-11-4000 (Toll-free)",
+    "chunk_id": 29
+  },
+  {
     "doc_name": "dengue_clinical_guidelines.txt",
     "topic": "dengue",
     "section": "1. INTRODUCTION",
     "chunk_text": "NATIONAL GUIDELINES FOR CLINICAL MANAGEMENT OF DENGUE FEVER 2023\nNational Center for Vector Borne Diseases Control (NCVBDC)\n22-Shamnath Marg, New Delhi-110054\nDirectorate General of Health Services\nMinistry of Health & Family Welfare, Government of India\n\n1. INTRODUCTION\n\nDengue is the most rapidly spreading mosquito borne viral disease of mankind, with a 30-fold increase in global incidence over the last five decades. It is a major public health concern throughout tropical and subtropical regions of the world. Dengue has been identified as one of the 17 neglected tropical diseases by WHO. Every year thousands of severe cases of dengue arise, including approximately 20,000 deaths globally.",
-    "chunk_id": 17
+    "chunk_id": 30
   },
   {
     "doc_name": "dengue_clinical_guidelines.txt",
     "topic": "dengue",
     "section": "1. INTRODUCTION",
     "chunk_text": ", including approximately 20,000 deaths globally.\n\n1.2 National Scenario\nDengue virus was first isolated in India in 1945. The first evidence of dengue fever in the country was reported in 1956 from Vellore district, Tamil Nadu. In India, all States/UTs except Ladakh have reported dengue cases during the last two decades. During 2018, a total of 1,24,493 cases were reported; 2,05,243 in 2019; 44,585 in 2020; 1,93,752 in 2021 and 2,33,251 in 2022. The case fatality rate has declined from 3.3% in 1996 to 0.1% in 2019, maintained at this level since. Every year during July-November, an upsurge in dengue cases is observed, with cases peaking after monsoon.",
-    "chunk_id": 18
+    "chunk_id": 31
   },
   {
     "doc_name": "dengue_clinical_guidelines.txt",
     "topic": "dengue",
     "section": "2. EPIDEMIOLOGY",
     "chunk_text": "es is observed, with cases peaking after monsoon.\n\n2. EPIDEMIOLOGY\n\nDengue virus is transmitted from infected person to others by the bite of female Aedes mosquitoes. In India, Aedes aegypti is the main vector in most urban areas; Ae. albopictus is also implicated in many states. Female Aedes mosquito deposits eggs singly on damp surfaces just above the water line. Under optimal conditions, the adult emerges in seven days. Eggs can withstand desiccation for more than a year and emerge within 24 hours once in contact with water. Average survival of Ae. aegypti is 30 days. Aedes is a daytime feeder and can fly up to 400 meters.",
-    "chunk_id": 19
+    "chunk_id": 32
   },
   {
     "doc_name": "dengue_clinical_guidelines.txt",
     "topic": "dengue",
     "section": "4. CLINICAL MANIFESTATIONS OF DENGUE FEVER",
     "chunk_text": "is a daytime feeder and can fly up to 400 meters.\n\nAe. aegypti breeds almost entirely in domestic man-made water receptacles: water storage containers, water reservoirs, overhead tanks, desert coolers, unused tires, coconut shells, disposable cups, construction sites, etc.\n\n4. CLINICAL MANIFESTATIONS OF DENGUE FEVER\n\nThe average incubation period varies from 4 to 6 days (range 3-14 days). After incubation, fever with non-specific constitutional symptoms such as headache, backache and malaise usually appear. Dengue infection evolves into three clinical phases: acute febrile phase, critical phase, and recovery (convalescent) phase.",
-    "chunk_id": 20
+    "chunk_id": 33
   },
   {
     "doc_name": "dengue_clinical_guidelines.txt",
     "topic": "dengue",
     "section": "4. CLINICAL MANIFESTATIONS OF DENGUE FEVER",
     "chunk_text": "ritical phase, and recovery (convalescent) phase.\n\nClinical Description: Acute febrile illness of 2-7 days duration with two or more of: headache, retro-orbital pain, myalgia, arthralgia, rash, haemorrhagic manifestations, thrombocytopenia or leucopenia, warning signs and symptoms.\n\nFebrile phase: Sudden rise of high-grade body temperature (≥38.5°C), may be biphasic, lasting 2-7 days, associated with headache, flushing, vomiting, myalgia, arthralgia, and macular rash appearing after day 3-4 over the face, neck, chest and abdomen.",
-    "chunk_id": 21
+    "chunk_id": 34
   },
   {
     "doc_name": "dengue_clinical_guidelines.txt",
     "topic": "dengue",
     "section": "4. CLINICAL MANIFESTATIONS OF DENGUE FEVER",
     "chunk_text": "r day 3-4 over the face, neck, chest and abdomen.\n\nWarning symptoms and signs (Box 2):\n- Persistent vomiting\n- Abdominal pain and tenderness\n- Lethargy and/or restlessness, sudden behavioral changes\n- Bleeding manifestations like epistaxis, melena, haematemesis, excessive menstrual bleeding, and haematuria\n- Syncope or giddiness\n- Clinical fluid accumulation (ascites and pleural effusion)\n- Enlarged liver (>2cm)\n- Laboratory: progressive increase in haematocrit with rapid decrease in platelet count",
-    "chunk_id": 22
+    "chunk_id": 35
   },
   {
     "doc_name": "dengue_clinical_guidelines.txt",
     "topic": "dengue",
     "section": "4. CLINICAL MANIFESTATIONS OF DENGUE FEVER",
     "chunk_text": "haematocrit with rapid decrease in platelet count\n\nCritical phase (leakage phase): 5-10% of patients may progress to critical phase, commonly in patients with a history of previous dengue infection (secondary infection). Usually begins after 3rd or 4th day of fever, lasts about 24 to 48 hours. Characterized by vasculopathy and coagulopathy leading to plasma leakage, excessive haemoconcentration, bleeding, potentially leading to shock and organ dysfunction.\n\nConvalescent phase (Recovery phase): Occurs after the critical phase, lasts 2-3 days. Patient develops a convalescent rash characterized by confluent erythematous eruption with sparing areas of normal skin, often pruritic (itchy).",
-    "chunk_id": 23
+    "chunk_id": 36
   },
   {
     "doc_name": "dengue_clinical_guidelines.txt",
     "topic": "dengue",
     "section": "4. CLINICAL MANIFESTATIONS OF DENGUE FEVER",
     "chunk_text": "ing areas of normal skin, often pruritic (itchy).\n\nCase classification:\n1. Dengue without warning sign (Mild dengue) - Group A\n2. Dengue with warning sign (Moderate Dengue) - Group B\n3. Severe dengue - Group C (profound shock, significant bleeding, severe metabolic disorder, organ involvement)\n\nHigh-risk factors for severe disease:\n- Infants and children (age<10 years) especially with malnutrition\n- Elderly (age > 65 years)\n- Obesity\n- Pregnant women\n- Hemolytic diseases such as G6PD deficiency, thalassemia",
-    "chunk_id": 24
+    "chunk_id": 37
   },
   {
     "doc_name": "dengue_clinical_guidelines.txt",
     "topic": "dengue",
     "section": "6. LABORATORY DIAGNOSIS",
     "chunk_text": "tic diseases such as G6PD deficiency, thalassemia\n- Peptic ulcer disease\n- Congenital heart disease\n- Chronic diseases: diabetes mellitus, hypertension, obstructive lung diseases, cardiovascular diseases, chronic renal failure, chronic liver disease\n- Patients on long-term steroid or NSAID treatment\n\nDifferential Diagnosis: COVID-19, Chikungunya, Malaria, Scrub typhus, Enteric fever, Pharyngitis, Influenza, Leptospirosis, Meningococcal infection\n\n6. LABORATORY DIAGNOSIS\n\nNS1 antigen testing enables early detection during the viremic stage (useful days 1-5 of illness). IgM-capture ELISA (MAC-ELISA) detects dengue-specific IgM antibodies, usually detectable by day 5 of illness, though this varies (some patients show detectable IgM by days 2-4, others not until days 7-8). RDT (Rapid Diagnostic Test) kits give results within 15-25 minutes but the programme does not recommend RDTs alone for diagnosis and guiding management due to variable accuracy.",
-    "chunk_id": 25
+    "chunk_id": 38
   },
   {
     "doc_name": "dengue_clinical_guidelines.txt",
     "topic": "dengue",
     "section": "6. LABORATORY DIAGNOSIS",
     "chunk_text": "and guiding management due to variable accuracy.\n\nSample timing guidance: NS1 for samples collected day 1 to 5 of fever, IgM testing after day 5.\n\n7. MANAGEMENT OF DENGUE FEVER (General Public-Relevant Guidance)\n\nManagement of Mild Dengue patients (Group A) - can be managed on OPD (outpatient) basis:\n\nPatient and family should be educated on:\n1. Warning signs to watch for and report immediately:\n   - Severe abdominal pain and persistent vomiting\n   - Red spots/patches on skin\n   - Bleeding from nose and gums",
-    "chunk_id": 26
+    "chunk_id": 39
   },
   {
     "doc_name": "dengue_clinical_guidelines.txt",
     "topic": "dengue",
     "section": "6. LABORATORY DIAGNOSIS",
     "chunk_text": "/patches on skin\n   - Bleeding from nose and gums\n   - Vomiting blood\n   - Black tarry stools\n   - Drowsiness or irritability\n   - Pale, cold or clammy skin\n   - Difficulty in breathing\n2. Consume adequate oral fluids (ORS/coconut juice); avoid carbonated drinks\n3. Take adequate bed rest\n4. Body temperature should be kept below 100°F. If temperature exceeds 100°F, give paracetamol. Recommended dose is 10 mg/kg/dose, administered not less than every six hours. Maximum adult dose is 4 gm/day. AVOID aspirin or NSAIDs (these increase bleeding risk).",
-    "chunk_id": 27
+    "chunk_id": 40
   },
   {
     "doc_name": "dengue_clinical_guidelines.txt",
     "topic": "dengue",
     "section": "8. SPECIAL CONDITIONS",
     "chunk_text": "aspirin or NSAIDs (these increase bleeding risk).\n5. Tepid sponging of forehead, armpits, and extremities; lukewarm shower/bath recommended for adults with high fever not responding to paracetamol.\n\nFollow-up: Patients should be monitored closely for progression from mild to moderate or severe disease, with clinical examination, CBC, and hematocrit checks as advised by the treating physician.\n\n8. SPECIAL CONDITIONS\n\n8.1.1 Dengue in Pregnancy: Carries risk of severe bleeding, fetal complications, low birth weight and premature birth. Risk of vertical transmission from mother to child is high if mother has severe viremia around the time of labor. Requires strict vital monitoring, frequent platelet count and coagulation profile testing.",
-    "chunk_id": 28
+    "chunk_id": 41
   },
   {
     "doc_name": "dengue_clinical_guidelines.txt",
     "topic": "dengue",
     "section": "8. SPECIAL CONDITIONS",
     "chunk_text": "t platelet count and coagulation profile testing.\n\n8.1.3 Dengue with Co-morbidities: Diabetic patients may present with severe complications when target organs are involved. Dengue infection in diabetes may cause hyperglycemia requiring insulin therapy. Patients with pre-existing heart disease, kidney disease, or liver disease require careful, specialist-guided management.\n\n8.1.4 Co-infections: Healthcare providers face challenges distinguishing dengue from HIV, TB, malaria, chikungunya, enteric fever, and leptospirosis, as these share overlapping symptoms (fever, headache, abdominal pain, malaise) and lab findings (leukopenia, thrombocytopenia). A high index of clinical suspicion is required.",
-    "chunk_id": 29
+    "chunk_id": 42
   },
   {
     "doc_name": "dengue_clinical_guidelines.txt",
     "topic": "dengue",
     "section": "8. SPECIAL CONDITIONS",
     "chunk_text": ". A high index of clinical suspicion is required.\n\nNote: This document also contains detailed clinical/hospital-level content (Sections 5, 7.3-7.6, 9-13) covering IV fluid resuscitation protocols, shock management algorithms, ICU-level care, and platelet transfusion criteria — this content is intended for treating clinicians managing hospitalized dengue patients, not for general public health awareness guidance, and should be used with that distinction in mind if incorporated into a public-facing knowledge base.",
-    "chunk_id": 30
+    "chunk_id": 43
   },
   {
     "doc_name": "dengue_clinical_guidelines.txt",
     "topic": "dengue",
     "section": "8. SPECIAL CONDITIONS",
     "chunk_text": "incorporated into a public-facing knowledge base.\n\nSource: National Center for Vector Borne Diseases Control (NCVBDC), Directorate General of Health Services, Ministry of Health and Family Welfare, Government of India. National Guidelines for Clinical Management of Dengue Fever, 2023.",
-    "chunk_id": 31
+    "chunk_id": 44
+  },
+  {
+    "doc_name": "fever_flu_diarrhea_selfcare.txt",
+    "topic": "fever_flu_diarrhea",
+    "section": "SECTION 1: FEVER — SELF-CARE AND WHEN TO SEE A DOCTOR",
+    "chunk_text": "DOCUMENT: fever_flu_diarrhea_selfcare.txt\nSOURCE: Ministry of Health and Family Welfare (MoHFW) India — National Health Portal (NHP); World Health Organization (WHO) — Home Care for Patients with COVID-19 and similar febrile illnesses 2023; ICMR — Guidelines for Management of Common Illnesses in Primary Care\nTOPIC: Fever, Influenza, Common Cold, Diarrhea, Self-Care\n\n=======================================================================\nSECTION 1: FEVER — SELF-CARE AND WHEN TO SEE A DOCTOR\n=======================================================================",
+    "chunk_id": 45
+  },
+  {
+    "doc_name": "fever_flu_diarrhea_selfcare.txt",
+    "topic": "fever_flu_diarrhea",
+    "section": "SELF-CARE FOR MILD FEVER (38°C–38.9°C / 100.4°F–102°F)",
+    "chunk_text": "=================================================\n\nWHAT IS FEVER?\nNormal body temperature is 37°C (98.6°F). A temperature of 38°C (100.4°F) or above is considered a fever.\n\nSELF-CARE FOR MILD FEVER (38°C–38.9°C / 100.4°F–102°F)\n- Rest and drink plenty of fluids (water, oral rehydration solution, coconut water, clear soups)\n- Wear light, comfortable clothing; use a light blanket only if shivering\n- Apply a cool, damp cloth to the forehead, armpits, and neck for comfort (do not use very cold water or ice)",
+    "chunk_id": 46
+  },
+  {
+    "doc_name": "fever_flu_diarrhea_selfcare.txt",
+    "topic": "fever_flu_diarrhea",
+    "section": "SELF-CARE FOR MILD FEVER (38°C–38.9°C / 100.4°F–102°F)",
+    "chunk_text": "k for comfort (do not use very cold water or ice)\n- Paracetamol (Acetaminophen): 500mg–1000mg for adults every 4–6 hours (not more than 4g per day) — safe and effective for reducing fever\n  - For children: weight-based dosing (15mg/kg per dose, every 4–6 hours)\n  - Do NOT give Aspirin to children under 18 years\n- Avoid strenuous activity\n\nWHEN TO SEE A DOCTOR (Consult Within 24 Hours)\n- Fever above 39.5°C (103°F) not responding to paracetamol after 1 hour\n- Fever lasting more than 3 days in adults or more than 2 days in young children",
+    "chunk_id": 47
+  },
+  {
+    "doc_name": "fever_flu_diarrhea_selfcare.txt",
+    "topic": "fever_flu_diarrhea",
+    "section": "SELF-CARE FOR MILD FEVER (38°C–38.9°C / 100.4°F–102°F)",
+    "chunk_text": "s in adults or more than 2 days in young children\n- Fever in an infant under 3 months — ALWAYS seek medical evaluation\n- Fever with severe headache and neck stiffness (possible meningitis — seek emergency care)\n- Fever with a rash, especially a red, non-blanching rash\n- Fever with confusion or altered mental state (possible encephalitis)\n- Fever with severe abdominal pain or back pain\n- Fever in a returned traveller (possible malaria, typhoid, dengue)\n- Fever in a person with diabetes, heart disease, or immunocompromised conditions",
+    "chunk_id": 48
+  },
+  {
+    "doc_name": "fever_flu_diarrhea_selfcare.txt",
+    "topic": "fever_flu_diarrhea",
+    "section": "SYMPTOMS",
+    "chunk_text": "s, heart disease, or immunocompromised conditions\n\nDENGUE WARNING SIGNS WITH FEVER — SEEK EMERGENCY CARE\n- Severe abdominal pain or persistent vomiting\n- Bleeding from gums or nose, blood in urine or stool\n- Sudden drop in fever with extreme weakness, pale cold skin (shock)\n- Difficulty breathing\n\n=======================================================================\nSECTION 2: COMMON COLD AND INFLUENZA (FLU) — SELF-CARE\n=======================================================================\n\nSYMPTOMS",
+    "chunk_id": 49
+  },
+  {
+    "doc_name": "fever_flu_diarrhea_selfcare.txt",
+    "topic": "fever_flu_diarrhea",
+    "section": "SYMPTOMS",
+    "chunk_text": "=======================================\n\nSYMPTOMS\n- Common Cold: Runny/blocked nose, sneezing, sore throat, mild cough, low-grade fever\n- Influenza (Flu): Sudden high fever (39–40°C), severe body aches, fatigue, headache, dry cough, sore throat\n\nSELF-CARE (Both Common Cold and Flu)\n- REST — one of the most important treatments\n- FLUIDS — drink 8–10 glasses of water per day; warm water with honey and lemon can soothe the throat\n- STEAM INHALATION — 2–3 times per day for congestion (take care to avoid burns)",
+    "chunk_id": 50
+  },
+  {
+    "doc_name": "fever_flu_diarrhea_selfcare.txt",
+    "topic": "fever_flu_diarrhea",
+    "section": "INFLUENZA VACCINATION",
+    "chunk_text": "per day for congestion (take care to avoid burns)\n- SALT WATER GARGLE — 1/4 to 1/2 teaspoon of salt in warm water, gargle 3 times daily\n- HONEY — 1–2 teaspoons before sleep can help reduce cough (not for infants under 1 year)\n- NASAL DROPS — normal saline nasal drops can relieve congestion in children safely\n- PARACETAMOL — for fever and body aches; follow dosing as above\n\nINFLUENZA VACCINATION\nThe seasonal influenza vaccine is recommended annually. High-priority groups include:\n- Elderly (above 65 years)",
+    "chunk_id": 51
+  },
+  {
+    "doc_name": "fever_flu_diarrhea_selfcare.txt",
+    "topic": "fever_flu_diarrhea",
+    "section": "INFLUENZA VACCINATION",
+    "chunk_text": "iority groups include:\n- Elderly (above 65 years)\n- Pregnant women\n- Young children aged 6 months to 5 years\n- Healthcare workers\n- Persons with chronic illness (diabetes, heart disease, asthma)\n\nWHEN TO SEEK MEDICAL ATTENTION (Flu Complications)\n- Difficulty breathing or rapid breathing\n- Persistent chest pain or pressure\n- Confusion or altered consciousness\n- Severe or persistent vomiting (unable to keep fluids down)\n- Symptoms improve then return with fever and worsening cough\n- Lips or face turning bluish (cyanosis)",
+    "chunk_id": 52
+  },
+  {
+    "doc_name": "fever_flu_diarrhea_selfcare.txt",
+    "topic": "fever_flu_diarrhea",
+    "section": "SECTION 3: DIARRHEA — SELF-CARE AND WHEN TO SEEK CARE",
+    "chunk_text": "ng cough\n- Lips or face turning bluish (cyanosis)\n- High-risk groups: infants, elderly, pregnant women, and immunocompromised — should seek care sooner\n\nPREVENTION\n- Wash hands frequently with soap and water for 20 seconds\n- Cover mouth and nose with a bent elbow or tissue when coughing or sneezing\n- Avoid close contact with sick people\n- Avoid touching your eyes, nose, and mouth\n\n=======================================================================\nSECTION 3: DIARRHEA — SELF-CARE AND WHEN TO SEEK CARE",
+    "chunk_id": 53
+  },
+  {
+    "doc_name": "fever_flu_diarrhea_selfcare.txt",
+    "topic": "fever_flu_diarrhea",
+    "section": "THE MOST IMPORTANT TREATMENT: ORAL REHYDRATION",
+    "chunk_text": "ION 3: DIARRHEA — SELF-CARE AND WHEN TO SEEK CARE\n=======================================================================\n\nWHAT IS DIARRHEA?\nPassing 3 or more loose or liquid stools per day. Most acute diarrhea in adults is self-limiting and resolves within 2–3 days.\n\nTHE MOST IMPORTANT TREATMENT: ORAL REHYDRATION\nDiarrhea causes loss of water and salts. The primary risk is DEHYDRATION.\n\nORS (Oral Rehydration Solution) — HOW TO PREPARE AT HOME\n- 1 litre of clean boiled water\n- 6 level teaspoons of sugar",
+    "chunk_id": 54
+  },
+  {
+    "doc_name": "fever_flu_diarrhea_selfcare.txt",
+    "topic": "fever_flu_diarrhea",
+    "section": "FEEDING DURING DIARRHEA",
+    "chunk_text": "f clean boiled water\n- 6 level teaspoons of sugar\n- 1/2 teaspoon of salt\n- Mix well and drink throughout the day\n\nAlternatively, use packaged ORS sachets (available free at government health centres and Anganwadi centres).\n\nFEEDING DURING DIARRHEA\n- Adults and older children: continue eating normally — bland foods like rice, curd, banana, boiled potatoes\n- Infants: continue breastfeeding; do NOT stop breast milk during diarrhea\n- Avoid: spicy food, oily food, raw vegetables, sugary drinks, fruit juices (these worsen diarrhea)",
+    "chunk_id": 55
+  },
+  {
+    "doc_name": "fever_flu_diarrhea_selfcare.txt",
+    "topic": "fever_flu_diarrhea",
+    "section": "WHEN TO SEEK MEDICAL CARE URGENTLY",
+    "chunk_text": "gary drinks, fruit juices (these worsen diarrhea)\n\nZINC FOR CHILDREN (WHO/UNICEF Recommendation)\n- Children 6 months–5 years with diarrhea: Zinc 20mg/day for 14 days (10mg/day for infants under 6 months)\n- Available free at government PHCs; reduces severity and duration of diarrhea\n\nWHEN TO SEEK MEDICAL CARE URGENTLY\n- Signs of severe dehydration: sunken eyes, dry mouth, no urination for 6+ hours, very dark urine, extreme thirst, skin tenting (skin stays pinched when pulled)\n- Bloody or mucoid diarrhea (red, black, or tarry stools)",
+    "chunk_id": 56
+  },
+  {
+    "doc_name": "fever_flu_diarrhea_selfcare.txt",
+    "topic": "fever_flu_diarrhea",
+    "section": "PREVENTION",
+    "chunk_text": "or mucoid diarrhea (red, black, or tarry stools)\n- Fever above 39°C with diarrhea\n- Diarrhea lasting more than 3 days without improvement\n- Vomiting with inability to keep ORS down\n- Diarrhea in an infant under 6 months\n- In children: high-pitched cry, inability to drink, prolonged sleep, not waking up\n\nPREVENTION\n- Drink only clean, boiled, or purified water\n- Wash hands before eating and after using the toilet\n- Keep food covered; avoid street food in monsoon season\n- Immunise children against Rotavirus (free under Universal Immunisation Programme — UIP)",
+    "chunk_id": 57
+  },
+  {
+    "doc_name": "fever_flu_diarrhea_selfcare.txt",
+    "topic": "fever_flu_diarrhea",
+    "section": "SECTION 4: NATIONAL HELPLINES",
+    "chunk_text": "ree under Universal Immunisation Programme — UIP)\n\n=======================================================================\nSECTION 4: NATIONAL HELPLINES\n=======================================================================\n\n- National Health Portal Helpline: 1800-11-4000 (Toll-Free)\n- Nearest government PHC (Primary Health Centre) or CHC (Community Health Centre) for free ORS, Zinc, and basic fever management",
+    "chunk_id": 58
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS\nNational Centre for Disease Control\n22 Sham Nath Marg, Delhi 110054\nDirectorate General of Health Services\nMinistry of Health and Family Welfare, Government of India\n\n1. Scope and Background\n\n1.1 Scope of this Document\nThis document is intended to assist health authorities in preparing for, and responding to, flood events, with the aim to reduce adverse health effects after floods. Various aspects have been covered including rapid needs assessment for health system planning, setting up of post-flood surveillance system and various aspects of common epidemic prone diseases in post flood situation.",
-    "chunk_id": 32
+    "chunk_id": 59
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": "epidemic prone diseases in post flood situation.\n\n1.2 Background\nNatural disasters continue to strike unabated and without notice. Generally, floods are caused due to the concentrated spells of heavy rains in the upper mountain reaches during the monsoon months (June-September). Although disasters cannot be prevented fully, their impact can be reduced with better disaster management strategies including better public health preparedness and response.\n\n1.3 Types of Floods\n1.3.1 Flash Floods - Such floods that occur within six hours during heavy rainfall and are usually associated with towering cumulus clouds, severe thunderstorms, and tropical cyclones or during the passage of cold weather fronts. This type of flood requires rapid localized warning system and immediate response in favour of affected communities. Other causes of flash floods include dam failure or other river obstructions.",
-    "chunk_id": 33
+    "chunk_id": 60
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": "include dam failure or other river obstructions.\n\n1.3.2 River Floods - Such floods are caused by precipitation over large catchment areas or by melting of snow or sometimes both. They take place in river systems with tributaries that may cover or drain large geographical area and encompass many independent river basins. These floods are normally built up slowly or on seasonal basis and may continue for days or weeks as compared to flash floods.\n\n1.3.3 Coastal Floods - Some floods are associated with the cyclonic activities like Hurricanes, Tropical cyclones, etc. generating catastrophic flood from rainwater which often aggravate wind-induced storm and water surges along the coast.",
-    "chunk_id": 34
+    "chunk_id": 61
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": "d-induced storm and water surges along the coast.\n\n2. Common Public Health Effects due to Flood\n\n2.1 Immediate and Medium Term Public Health Risks\nThe main public health threats in flooding crisis are related to communicable diseases:\n- Interruption of safe water and sanitation supplies: populations displaced by flooding are at immediate and high risk of outbreaks of waterborne and food borne diseases, such as cholera.\n- Population displacement with overcrowding: increased risk for transmission of measles and meningitis and increased incidence of acute respiratory infections (ARI), especially pneumonia in children under 5 years.",
-    "chunk_id": 35
+    "chunk_id": 62
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": ", especially pneumonia in children under 5 years.\n- Vector breeding: flooding can result in the proliferation of vector breeding sites, increasing the medium-term risk of malaria.\n- Poor access to health services due to destroyed or overwhelmed infrastructure.\n- Malnutrition and transmission of communicable diseases, as malnutrition compromises natural immunity.\n\n2.2 Post Flood Epidemic Prone Diseases\nFloods can potentially increase transmission of:\n- Water-borne diseases: typhoid fever, cholera, leptospirosis, water borne hepatitis",
-    "chunk_id": 36
+    "chunk_id": 63
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": "er, cholera, leptospirosis, water borne hepatitis\n- Vector-borne diseases: malaria, dengue and dengue haemorrhagic fever, Kalaazar, West Nile Fever\n\nImmediate health events (Days to Weeks): Drowning, Injuries, Snake Bites, Animal or insect bites\nMedium term health events (Weeks to Months): Water borne diseases, Vector borne diseases, Leptospirosis, Hepatitis A or E, Skin infections, Eye infections\nLong term health events (Months to Years): Post-traumatic Stress disorders, Other psychological ailments, Nutritional problems",
-    "chunk_id": 37
+    "chunk_id": 64
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": "ther psychological ailments, Nutritional problems\n\n5. Water and Food Borne Diseases\n\nPopulations affected by flooding are at immediate risk from outbreaks of waterborne and foodborne diseases, particularly cholera, typhoid, Shigella dysenteriae type 1, and hepatitis A and E.\n\n5.1 Cholera\nCholera is an acute enteric infection caused by ingestion of bacterium Vibrio cholerae present in fecal contaminated water or food. It is characterized in its most severe form by a sudden onset of acute watery diarrhea that can lead to death by severe dehydration. The incubation period is two hours to five days. About 75% of people infected with cholera do not develop any symptoms, but pathogens stay in their feces for 7 to 14 days.",
-    "chunk_id": 38
+    "chunk_id": 65
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": "t pathogens stay in their feces for 7 to 14 days.\n\nKey Messages:\n- Cholera is transmitted through contaminated water or food.\n- Water should be chlorinated during and after floods to prevent cholera.\n- Cholera can rapidly lead to severe dehydration and death if left untreated.\n- ORS can successfully treat 80% of cholera cases.\n- Appropriate antibiotics can reduce the duration of purging.\n\nCase Management: Efficient treatment relies on prompt rehydration through oral rehydration salts (ORS) or intravenous fluids depending on severity. Up to 80% of patients can be treated with ORS. Very severely dehydrated patients need intravenous fluids, preferably Ringer lactate. For children up to five years, supplementary zinc reduces duration of diarrhoea: below 6 months age, add zinc 10mg daily for 2 weeks; 6 months to 12 years, add zinc 20mg daily for 2 weeks.",
-    "chunk_id": 39
+    "chunk_id": 66
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": "ths to 12 years, add zinc 20mg daily for 2 weeks.\n\n5.2 Foodborne Diseases\nFive Keys to Food Safety at household level:\n- Wash hands before cooking and eating food\n- Wash vegetables, fruits and raw material prior to cooking with safe water\n- Keep food preparation area clean\n- Cook food thoroughly\n- Store food at safe temperature\n\n5.3 Viral Hepatitis A and E\nFood- and water-borne infections resulting in acute outbreaks in communities with unsafe water and poor sanitation. Generally self-limiting; most patients improve in a few weeks with no specific treatment needed for uncomplicated disease. Pregnant women with hepatitis E are at greater risk of developing liver failure and adverse outcomes.",
-    "chunk_id": 40
+    "chunk_id": 67
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": "of developing liver failure and adverse outcomes.\n\nControl measures: increase free chlorine concentration to more than 0.5 mg/L during outbreaks; consume only boiled water (boiled for at least 1 minute, cooled, then consumed); wash hands with soap after defecation; ensure safe disposal of excreta and prevent open defecation. Incubation period of hepatitis A is 2-6 weeks and hepatitis E is 2-10 weeks.\n\n6. Water, Sanitation and Personal Hygiene\n\n6.1 Safe Drinking Water\nMinimum drinking water requirement per person per day is 5 litres. Daily activities like cooking, toilet use, hand washing require a minimum of 20 litres of water.",
-    "chunk_id": 41
+    "chunk_id": 68
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": "washing require a minimum of 20 litres of water.\n\n6.1.1 Boiling of Water\nWater can be made safe by bringing it to a rolling boil. After boiling, allow the water to cool down on its own without adding ice.\n\n6.1.2 Using Sodium Hypochlorite (Bleach)\nTo treat clear drinking water: use about 1/8 teaspoon bleach (approximately 0.75 ml) per 1 gallon (nearly 4 litres) of water, let stand for 30 minutes before using. For cloudy drinking water, add 1/4 teaspoon bleach per gallon and let stand for 30 minutes. Never mix bleach with any other domestic cleaning agent, especially those containing ammonia.",
-    "chunk_id": 42
+    "chunk_id": 69
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": "aning agent, especially those containing ammonia.\n\n6.1.3 Using Chlorine Tablets\nAt room temperature (25°C), minimum contact time should be 30 minutes; double the time for each 10°C less than 25°C. This solution should leave a free residual chlorine concentration of 0.4 to 0.5 mg/l after 30 minutes.\n\n7. Vector Borne Diseases: Emergency Vector Control Response\n\nAfter floods, water stagnation in low lying areas may become breeding sites for vector breeding after 15 days to 1 month for anopheline and culicine breeding. Heavy rains in dengue prone areas usually flush Aedes larvae from outdoor breeding sites, but indoor receptacles may retain eggs and larvae, increasing adult Aedes population within 7-10 days. Malaria cases may be reported after 4-6 weeks if parasitic reservoir is available.",
-    "chunk_id": 43
+    "chunk_id": 70
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": "er 4-6 weeks if parasitic reservoir is available.\n\nActions required: intensify vector surveillance in high risk areas; larval control near human rehabilitation sites; community awareness to cover water storage containers with lids; use of Indoor residual spray (IRS) based on disease incidence in last 3-5 years; use of space spray in areas reporting confirmed malaria/dengue cases.\n\n8. Rodent-Borne Diseases\n\nLeptospirosis is an example of a rodent-transmitted disease that can increase during or after heavy rainfall and flooding. Advice during floods: keep food in sealed cupboards/containers out of reach of rodents; dispose waste in covered rubbish bins; ensure entrances and windows are suitably sealed.",
-    "chunk_id": 44
+    "chunk_id": 71
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": "ensure entrances and windows are suitably sealed.\n\n8.1 Snakebites\nIncreased risk of snakebite during floods as venomous snakes are washed from normal habitats. First aid: reassure the victim; immobilize the whole body and especially the bitten limb; avoid interference with the bite wound (no incisions, rubbing, or application of herbs); release tight bands/ligatures only under medical care; transport patient to hospital immediately. Snake antivenoms are the only effective treatment.\n\n8.2 Leptospirosis",
-    "chunk_id": 45
+    "chunk_id": 72
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": "the only effective treatment.\n\n8.2 Leptospirosis\nA bacterial disease causing serious illnesses such as kidney or liver failure, meningitis, difficulty breathing, and bleeding. Transmitted through direct contact with urine/tissue of infected animals, or indirectly through contaminated soil, water, or vegetation. People at risk: farm and agricultural workers, sewer workers, slaughterhouse workers, and survivors of flooding wading in contaminated water.\n\nPrevention: wear protective clothing (boots, gloves); cover skin lesions with waterproof dressings; avoid wading or swimming in potentially contaminated water; wash or shower after exposure to urine splashes or contaminated soil/water; consume chlorinated drinking water. Antibiotic prophylaxis with Doxycycline weekly has been used in high risk areas during Kerala floods (2018) and Maharashtra floods (2018).",
-    "chunk_id": 46
+    "chunk_id": 73
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": "rala floods (2018) and Maharashtra floods (2018).\n\n9. Vaccination during Flooding\n\n9.1 Tetanus: not transmitted person to person, caused by toxin from Clostridium tetani in contaminated wounds. One dose of Tetanus Toxoid Injection should be administered to injured persons in all health facilities.\n\n9.2 Measles: risk of transmission depends on baseline vaccination coverage rates, particularly among children under 15 years. Crowded living conditions facilitate transmission.\n\n9.3 Vaccination for Rescuers and Relief Workers: Hepatitis A vaccination recommended for high-risk individuals such as public utility workers involved in cleaning, sewage, or waste management. Tetanus toxoid recommended for those whose vaccinations are not up to date.",
-    "chunk_id": 47
+    "chunk_id": 74
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": "for those whose vaccinations are not up to date.\n\n11. Health Advisory for the Public/Relief Camp Officials During Flood and Post Flood Period\n\n11.2 Infectious Diseases Prevention and Control - Public advised to follow these precautions:\n- Only safe drinking water to be used; boiled water is most preferable for drinking.\n- Frequent hand washing with soap and water is a must to prevent infections.\n- Food materials soaked in flood water should not be used.\n- If anyone develops fever or diarrhoea, they should seek health care in Government health facilities including medical camps. Self-treatment is not advisable.",
-    "chunk_id": 48
+    "chunk_id": 75
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": "g medical camps. Self-treatment is not advisable.\n\n11.3 Protected and Safe Drinking Water\nMethod of super-chlorination for water tanks: 5gms (1 teaspoon) of commercial bleaching powder for 1000 litres of water. Make a paste with small amount of water, then add water up to 3/4th of the bucket, mix thoroughly, wait 10-15 minutes to sediment, transfer supernatant chlorine water to the tank. One hour after super chlorination, the water may be used.\n\n11.6 Fly Control Activities: Flies multiply in garbage and decaying materials; these should be removed at the earliest and disinfected with bleaching powder and lime mixture.",
-    "chunk_id": 49
+    "chunk_id": 76
   },
   {
     "doc_name": "flood_health_guidelines.txt",
     "topic": "flood_health",
     "section": "PUBLIC HEALTH GUIDELINES FOR FLOOD EVENTS",
     "chunk_text": "sinfected with bleaching powder and lime mixture.\n\n11.7 Mosquito Control: Regular mosquito breeding preventive measures should be followed; general use of mosquito repellent creams and mosquito coils are advisable.\n\nSource: National Centre for Disease Control (NCDC), Directorate General of Health Services, Ministry of Health and Family Welfare, Government of India.",
-    "chunk_id": 50
+    "chunk_id": 77
+  },
+  {
+    "doc_name": "hypertension_diabetes_management.txt",
+    "topic": "hypertension_diabetes",
+    "section": "SECTION 1: HYPERTENSION (HIGH BLOOD PRESSURE)",
+    "chunk_text": "DOCUMENT: hypertension_diabetes_management.txt\nSOURCE: Ministry of Health and Family Welfare (MoHFW) India — National Programme for Prevention and Control of Non-Communicable Diseases (NP-NCD); Indian Council of Medical Research (ICMR) — Clinical Practice Guidelines for Type 2 Diabetes 2023; WHO — Hypertension Key Facts 2023\nTOPIC: Hypertension, High Blood Pressure, Diabetes, Blood Sugar Management\n\n=======================================================================\nSECTION 1: HYPERTENSION (HIGH BLOOD PRESSURE)",
+    "chunk_id": 78
+  },
+  {
+    "doc_name": "hypertension_diabetes_management.txt",
+    "topic": "hypertension_diabetes",
+    "section": "WHAT IS HYPERTENSION?",
+    "chunk_text": "===\nSECTION 1: HYPERTENSION (HIGH BLOOD PRESSURE)\n=======================================================================\n\nWHAT IS HYPERTENSION?\nBlood pressure is recorded as two numbers: Systolic (top) / Diastolic (bottom), measured in mmHg.\n\nBlood Pressure Categories (Adults):\n- Normal: Below 120/80 mmHg\n- Elevated: 120–129 / below 80 mmHg\n- Stage 1 Hypertension: 130–139 / 80–89 mmHg\n- Stage 2 Hypertension: 140/90 mmHg or higher\n- Hypertensive Crisis (Emergency): 180/120 mmHg or higher — seek emergency care immediately",
+    "chunk_id": 79
+  },
+  {
+    "doc_name": "hypertension_diabetes_management.txt",
+    "topic": "hypertension_diabetes",
+    "section": "SYMPTOMS",
+    "chunk_text": "mmHg or higher — seek emergency care immediately\n\nSYMPTOMS\nHypertension is often called the \"silent killer\" because most people have NO symptoms. When symptoms occur, they may include:\n- Headache (especially at the back of the head, in the morning)\n- Dizziness or lightheadedness\n- Blurred vision\n- Nosebleeds (in severe hypertension)\n\nHypertensive Emergency Signs (Seek Emergency Care — Call 112/108):\n- Blood pressure above 180/120 mmHg\n- Severe headache with blurred vision or chest pain\n- Difficulty breathing, seizures, or confusion",
+    "chunk_id": 80
+  },
+  {
+    "doc_name": "hypertension_diabetes_management.txt",
+    "topic": "hypertension_diabetes",
+    "section": "SYMPTOMS",
+    "chunk_text": "in\n- Difficulty breathing, seizures, or confusion\n\nLIFESTYLE MODIFICATIONS (All stages of hypertension)\n1. DIET — DASH Approach (Dietary Approaches to Stop Hypertension):\n   - Reduce salt (sodium): Target less than 5g per day (about 1 teaspoon). Avoid pickles, papad, processed foods, and salted snacks.\n   - Increase potassium-rich foods: bananas, sweet potatoes, spinach, lentils (dal), tomatoes\n   - Eat more fruits, vegetables, and whole grains\n   - Reduce saturated fat: avoid vanaspati, excessive ghee, full-fat dairy in large amounts",
+    "chunk_id": 81
+  },
+  {
+    "doc_name": "hypertension_diabetes_management.txt",
+    "topic": "hypertension_diabetes",
+    "section": "4. TOBACCO CESSATION:",
+    "chunk_text": ", excessive ghee, full-fat dairy in large amounts\n\n2. PHYSICAL ACTIVITY:\n   - At least 150 minutes per week of moderate aerobic exercise (brisk walking, cycling, swimming)\n   - Aim for 30 minutes most days of the week\n\n3. WEIGHT MANAGEMENT:\n   - Every 1 kg reduction in body weight lowers BP by approximately 1 mmHg\n   - Target BMI: 18.5–22.9 kg/m² for Indians\n\n4. TOBACCO CESSATION:\n   - Smoking raises BP acutely and is a major risk factor for heart attack and stroke\n   - Free tobacco cessation support: iCare helpline 1800-11-2356",
+    "chunk_id": 82
+  },
+  {
+    "doc_name": "hypertension_diabetes_management.txt",
+    "topic": "hypertension_diabetes",
+    "section": "MEDICATION",
+    "chunk_text": "co cessation support: iCare helpline 1800-11-2356\n\n5. ALCOHOL REDUCTION:\n   - Limit to no more than 1 standard drink per day (women) or 2 per day (men)\n   - Alcohol raises BP and reduces the effectiveness of BP medications\n\nMEDICATION\n- If lifestyle changes are insufficient, antihypertensive medications are prescribed by a doctor\n- Common first-line medicines in India: Amlodipine, Losartan, Hydrochlorothiazide, Atenolol\n- CRITICAL: Do NOT stop BP medication suddenly without consulting your doctor — it can cause a dangerous rebound rise in blood pressure",
+    "chunk_id": 83
+  },
+  {
+    "doc_name": "hypertension_diabetes_management.txt",
+    "topic": "hypertension_diabetes",
+    "section": "MONITORING AT HOME",
+    "chunk_text": "cause a dangerous rebound rise in blood pressure\n- Take medication at the same time every day; use a pill organiser or mobile reminder\n- Free antihypertensives are available under the Jan Aushadhi Scheme and at government PHCs\n\nMONITORING AT HOME\n- Check blood pressure at rest after sitting quietly for 5 minutes\n- Check at the same time each day (morning before medication is ideal)\n- Keep a record to share with your doctor\n\n=======================================================================",
+    "chunk_id": 84
+  },
+  {
+    "doc_name": "hypertension_diabetes_management.txt",
+    "topic": "hypertension_diabetes",
+    "section": "WHAT IS DIABETES?",
+    "chunk_text": "=================================================\nSECTION 2: DIABETES (TYPE 2) MANAGEMENT\n=======================================================================\n\nWHAT IS DIABETES?\nType 2 Diabetes is a chronic condition where blood sugar (glucose) remains too high because the body cannot use insulin properly.\n\nDiagnostic Criteria:\n- Fasting blood glucose: 126 mg/dL or above (on two separate days)\n- Random blood glucose: 200 mg/dL or above with symptoms\n- HbA1c: 6.5% or above\n- Pre-diabetes: Fasting glucose 100–125 mg/dL; HbA1c 5.7–6.4%",
+    "chunk_id": 85
+  },
+  {
+    "doc_name": "hypertension_diabetes_management.txt",
+    "topic": "hypertension_diabetes",
+    "section": "1. DIET:",
+    "chunk_text": "es: Fasting glucose 100–125 mg/dL; HbA1c 5.7–6.4%\n\nSYMPTOMS OF HIGH BLOOD SUGAR (Hyperglycemia)\n- Increased thirst and frequent urination\n- Fatigue and weakness\n- Blurred vision\n- Slow healing of cuts or wounds\n- Frequent infections (skin, urinary tract)\n- Tingling or numbness in feet or hands\n\nLIFESTYLE MANAGEMENT (Cornerstone of Diabetes Control)\n1. DIET:\n   - Control portion sizes; avoid skipping meals\n   - Choose complex carbohydrates: whole grains (brown rice, millets, whole wheat), lentils",
+    "chunk_id": 86
+  },
+  {
+    "doc_name": "hypertension_diabetes_management.txt",
+    "topic": "hypertension_diabetes",
+    "section": "2. PHYSICAL ACTIVITY:",
+    "chunk_text": "rains (brown rice, millets, whole wheat), lentils\n   - Avoid refined carbohydrates: maida, white rice (large portions), sweet beverages, packaged snacks\n   - Increase dietary fibre: vegetables, fruits (in moderate portions), legumes\n   - Healthy Indian food choices: dal, sabzi, roti (whole wheat), curd (plain), buttermilk\n   - Foods to limit: rice in large amounts, potato, fruit juices, jaggery, sweets, alcohol\n\n2. PHYSICAL ACTIVITY:\n   - 150 minutes of moderate exercise per week (30 min/day, 5 days a week)",
+    "chunk_id": 87
+  },
+  {
+    "doc_name": "hypertension_diabetes_management.txt",
+    "topic": "hypertension_diabetes",
+    "section": "MEDICATION",
+    "chunk_text": "ate exercise per week (30 min/day, 5 days a week)\n   - Walking after meals (15–20 minutes) significantly reduces post-meal blood sugar spikes\n   - Resistance/strength exercises twice a week improve insulin sensitivity\n\n3. WEIGHT MANAGEMENT:\n   - Even a 5–7% reduction in body weight can significantly improve blood sugar levels in overweight individuals\n\nMEDICATION\n- Common first-line medication: Metformin (taken with meals to reduce side effects)\n- Other medicines: Glipizide, Glimepiride, DPP-4 inhibitors, SGLT2 inhibitors — prescribed based on individual assessment",
+    "chunk_id": 88
+  },
+  {
+    "doc_name": "hypertension_diabetes_management.txt",
+    "topic": "hypertension_diabetes",
+    "section": "RECOGNISING AND MANAGING HYPOGLYCEMIA (LOW BLOOD SUGAR)",
+    "chunk_text": "itors — prescribed based on individual assessment\n- Some patients require insulin injections; this is NOT a failure — it is a medical decision based on the body's needs\n- Do NOT adjust or stop diabetes medication without consulting your doctor\n\nMONITORING BLOOD SUGAR AT HOME\n- Fasting glucose (before breakfast): Target 80–130 mg/dL\n- Post-meal glucose (2 hours after eating): Target below 180 mg/dL\n- HbA1c every 3–6 months: Target below 7% (individualised by your doctor)\n\nRECOGNISING AND MANAGING HYPOGLYCEMIA (LOW BLOOD SUGAR)",
+    "chunk_id": 89
+  },
+  {
+    "doc_name": "hypertension_diabetes_management.txt",
+    "topic": "hypertension_diabetes",
+    "section": "RECOGNISING AND MANAGING HYPOGLYCEMIA (LOW BLOOD SUGAR)",
+    "chunk_text": "ISING AND MANAGING HYPOGLYCEMIA (LOW BLOOD SUGAR)\nBlood sugar below 70 mg/dL is hypoglycemia — this is a medical emergency.\n\nSymptoms: Trembling, sweating, rapid heartbeat, dizziness, confusion, pale skin, sudden hunger\nTreatment (Rule of 15):\n- Eat 15g of fast-acting carbohydrates: 3–4 glucose tablets, 1/2 cup (125ml) of fruit juice or regular (not diet) soda, or 1 tablespoon of sugar dissolved in water\n- Wait 15 minutes; if symptoms persist, repeat\n- Once recovered, eat a small snack (biscuit + milk)",
+    "chunk_id": 90
+  },
+  {
+    "doc_name": "hypertension_diabetes_management.txt",
+    "topic": "hypertension_diabetes",
+    "section": "PREVENTING COMPLICATIONS",
+    "chunk_text": "nce recovered, eat a small snack (biscuit + milk)\n- If unconscious — DO NOT give anything by mouth; call 108 immediately\n\nFOOT CARE FOR DIABETICS\n- Inspect feet DAILY for cuts, blisters, redness, or swelling\n- Wash feet daily in warm (not hot) water and dry gently between toes\n- Wear well-fitting, closed footwear — never walk barefoot\n- See a doctor immediately for any foot wound, ulcer, or infection (diabetic foot infections can worsen rapidly)\n\nPREVENTING COMPLICATIONS\nUncontrolled diabetes damages blood vessels and nerves over time. Regular check-ups:",
+    "chunk_id": 91
+  },
+  {
+    "doc_name": "hypertension_diabetes_management.txt",
+    "topic": "hypertension_diabetes",
+    "section": "FREE DIABETES CARE RESOURCES IN INDIA",
+    "chunk_text": "vessels and nerves over time. Regular check-ups:\n- Eye check (retinal exam): Every 1–2 years\n- Kidney function (urine microalbumin, creatinine): Every year\n- Foot examination: Every visit\n- Lipid profile and BP check: Every visit\n\nFREE DIABETES CARE RESOURCES IN INDIA\n- Free testing and medicines at government PHCs and CHCs under NP-NCD\n- Jan Aushadhi Kendras: Metformin, Glimepiride, insulin at reduced cost\n- NHP helpline: 1800-11-4000\n\n=======================================================================",
+    "chunk_id": 92
+  },
+  {
+    "doc_name": "hypertension_diabetes_management.txt",
+    "topic": "hypertension_diabetes",
+    "section": "SECTION 3: HYPERTENSION + DIABETES TOGETHER (DUAL RISK)",
+    "chunk_text": "=================================================\nSECTION 3: HYPERTENSION + DIABETES TOGETHER (DUAL RISK)\n=======================================================================\n\nHaving both hypertension and diabetes significantly increases the risk of heart attack, stroke, and kidney disease.\n- Blood pressure target for diabetics: Below 130/80 mmHg\n- Use of an ACE inhibitor or ARB (e.g., Ramipril, Losartan) is preferred in diabetics with hypertension — protects the kidneys\n- Strict HbA1c control (below 7%) along with BP control is essential",
+    "chunk_id": 93
+  },
+  {
+    "doc_name": "hypertension_diabetes_management.txt",
+    "topic": "hypertension_diabetes",
+    "section": "SECTION 3: HYPERTENSION + DIABETES TOGETHER (DUAL RISK)",
+    "chunk_text": "rol (below 7%) along with BP control is essential\n- Annual urine albumin test is critical to detect early kidney damage",
+    "chunk_id": 94
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "ANTENATAL CARE (CARE DURING PREGNANCY)",
     "chunk_text": "GUIDELINES FOR ANTENATAL CARE, SKILLED ATTENDANCE AT BIRTH, AND NEWBORN CARE\nMaternal Health Division, Department of Family Welfare\nMinistry of Health & Family Welfare, Government of India\n\nNote: This document was originally written for ANMs (Auxiliary Nurse Midwives) and health workers, but contains extensive guidance directly relevant to expectant mothers and families. The content below focuses on the publicly-relevant portions: what to expect, danger signs, nutrition, and newborn care.\n\nANTENATAL CARE (CARE DURING PREGNANCY)",
-    "chunk_id": 51
+    "chunk_id": 95
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "ANTENATAL CARE (CARE DURING PREGNANCY)",
     "chunk_text": "orn care.\n\nANTENATAL CARE (CARE DURING PREGNANCY)\n\nKey Messages:\n- Every pregnancy is at risk - even with the best screening, one cannot predict which woman will develop complications.\n- Good record-keeping and regular checkups assist in early detection of problems.\n- Ensure iron-folic acid (IFA) supplementation for every pregnant woman.\n- Do not take any medication during the first trimester unless specifically advised by a doctor.\n- Adequate rest and diet during pregnancy result in better outcomes for both mother and baby.",
-    "chunk_id": 52
+    "chunk_id": 96
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "ANTENATAL CARE (CARE DURING PREGNANCY)",
     "chunk_text": "sult in better outcomes for both mother and baby.\n\nRegistration and Number of Visits:\n- The first antenatal visit should ideally take place in the first trimester (before 12 weeks of pregnancy), as soon as pregnancy is suspected.\n- At least 4 ANC visits are recommended: 1st visit at registration, 2nd visit between 4th-6th month (around 26 weeks), 3rd visit in the 8th month (around 32 weeks), and 4th visit in the 9th month (around 36 weeks).\n- An antenatal card should be completed and given to the woman; she should carry it to every visit and to delivery.",
-    "chunk_id": 53
+    "chunk_id": 97
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "ANTENATAL CARE (CARE DURING PREGNANCY)",
     "chunk_text": "e should carry it to every visit and to delivery.\n\nWeight Gain:\n- A pregnant woman should normally gain 9-11 kg during her pregnancy - approximately 2 kg per month (0.5 kg per week) after the first trimester.\n- Inadequate weight gain (less than 2 kg/month) may indicate poor nutrition and can lead to a low birth-weight baby - food supplementation may be needed.\n- Excessive weight gain (more than 3 kg/month) should prompt a checkup for pre-eclampsia or multiple pregnancy.\n\nSymptoms That Indicate Discomfort (usually normal): nausea and vomiting, heartburn, constipation, increased urination frequency.",
-    "chunk_id": 54
+    "chunk_id": 98
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "ANTENATAL CARE (CARE DURING PREGNANCY)",
     "chunk_text": "urn, constipation, increased urination frequency.\n\nSymptoms That May Indicate a Complication (seek care promptly): fever, vaginal discharge, palpitations/easy fatigue/breathlessness at rest, generalized swelling of the body or facial puffiness, passing smaller amounts of urine, vaginal bleeding, decreased or absent fetal movements, leaking of watery fluid.\n\nLaboratory Investigations Recommended During Pregnancy:\n- Haemoglobin (Hb) testing: at first visit and again at 28 weeks. Hb below 11 g/dl is considered anaemia (7-11 g/dl = moderate, below 7 g/dl = severe anaemia requiring urgent referral).",
-    "chunk_id": 55
+    "chunk_id": 99
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "ANTENATAL CARE (CARE DURING PREGNANCY)",
     "chunk_text": "g/dl = severe anaemia requiring urgent referral).\n- Blood group testing (important in case blood transfusion is needed).\n- Urine testing for protein (screens for pre-eclampsia) and sugar (screens for gestational diabetes).\n\nIron-Folic Acid (IFA) Supplementation:\n- All pregnant women should take one IFA tablet daily (100 mg elemental iron + 0.5 mg folic acid) for at least 100 days, starting after the first trimester (14-16 weeks).\n- Women with anaemia (Hb below 11 g/dl) need two IFA tablets per day for three months (at least 200 tablets total).",
-    "chunk_id": 56
+    "chunk_id": 100
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "ANTENATAL CARE (CARE DURING PREGNANCY)",
     "chunk_text": "ay for three months (at least 200 tablets total).\n- Common side effects (black stools, mild nausea) are normal and not dangerous - do not stop taking the tablets. Taking tablets with meals (rather than on an empty stomach) can reduce nausea. Avoid taking with tea or coffee, as this reduces iron absorption.\n\nTetanus Toxoid (TT) Vaccination:\n- Two doses of TT are given during pregnancy to prevent neonatal tetanus. The first dose is given after the first trimester; the second dose one month later (but at least one month before the expected delivery date).",
-    "chunk_id": 57
+    "chunk_id": 101
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "ANTENATAL CARE (CARE DURING PREGNANCY)",
     "chunk_text": "ast one month before the expected delivery date).\n\nDiet During Pregnancy:\n- A pregnant woman needs about 300 extra kcal per day compared to her usual diet.\n- Diet should be rich in proteins, iron, vitamin A, and other micronutrients: cereals, milk and milk products, green leafy vegetables, pulses, eggs and meat/fish (if non-vegetarian), nuts (especially groundnuts), jaggery, fruits.\n- Foods rich in vitamin C (lemon, amla, guava, oranges) help iron absorption when eaten alongside iron-rich foods.",
-    "chunk_id": 58
+    "chunk_id": 102
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "ANTENATAL CARE (CARE DURING PREGNANCY)",
     "chunk_text": "absorption when eaten alongside iron-rich foods.\n- Avoid tobacco and alcohol completely during pregnancy.\n- No medication should be taken unless prescribed by a qualified health practitioner.\n- Rest: 8 hours of sleep at night plus 2 hours of rest during the day is recommended; avoid heavy lifting and strenuous work.\n\nDanger Signs During Pregnancy - Seek Emergency Care Immediately (day or night, without waiting) if experiencing:\n- Any vaginal bleeding during pregnancy, or heavy bleeding (soaking more than 2-3 pads in 20-30 minutes) during or after delivery",
-    "chunk_id": 59
+    "chunk_id": 103
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "ANTENATAL CARE (CARE DURING PREGNANCY)",
     "chunk_text": "3 pads in 20-30 minutes) during or after delivery\n- Severe headache with blurred vision\n- Convulsions or loss of consciousness\n- Labour lasting longer than 12 hours\n- Placenta not delivered within 30 minutes of the baby's birth\n- Labour starting before 8 months (preterm labour)\n- Water breaking before labour starts\n- Continuous severe abdominal pain\n\nSeek care at a health centre promptly if experiencing:\n- High fever with or without abdominal pain, feeling too weak to get out of bed\n- Fast or difficult breathing",
-    "chunk_id": 60
+    "chunk_id": 104
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "ANTENATAL CARE (CARE DURING PREGNANCY)",
     "chunk_text": "k to get out of bed\n- Fast or difficult breathing\n- Decreased or absent fetal movements\n- Excessive vomiting with inability to keep anything down\n\nBirth Preparedness:\n- All pregnant women are strongly encouraged to opt for an institutional delivery (at a hospital/health facility), since complications can develop suddenly and are not always predictable, and facilities have staff, equipment, and referral systems available.\n- Families should identify a skilled birth attendant, arrange transportation in advance, and know the location of the nearest functioning health facility.",
-    "chunk_id": 61
+    "chunk_id": 105
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "POSTPARTUM CARE (AFTER DELIVERY)",
     "chunk_text": "ation of the nearest functioning health facility.\n- Having blood donors identified in advance (family/community members) can be life-saving in case of haemorrhage.\n\nSex During Pregnancy: Generally safe throughout a normal pregnancy. Should be avoided if there is a history of recurrent miscarriage or preterm labour.\n\nPOSTPARTUM CARE (AFTER DELIVERY)\n\nMore than 50% of maternal deaths occur during the postpartum period, and the first 48 hours after delivery are the most critical.\n\nTwo postnatal check-up visits are recommended: the first within 48 hours of delivery, and the second within 7-10 days.",
-    "chunk_id": 62
+    "chunk_id": 106
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "POSTPARTUM CARE (AFTER DELIVERY)",
     "chunk_text": "urs of delivery, and the second within 7-10 days.\n\nDanger Signs After Delivery - Seek Emergency Care Immediately:\n- Excessive vaginal bleeding (soaking more than 2-3 pads in 20-30 minutes), or bleeding that increases rather than decreases after delivery\n- Convulsions\n- Fast or difficult breathing\n- Fever and weakness such that the woman cannot get out of bed\n- Severe abdominal pain\n\nSeek care promptly (non-emergency but should not be delayed) for:\n- Fever\n- Abdominal pain or feeling generally unwell",
-    "chunk_id": 63
+    "chunk_id": 107
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "POSTPARTUM CARE (AFTER DELIVERY)",
     "chunk_text": "ever\n- Abdominal pain or feeling generally unwell\n- Swollen, red, or tender breasts, or sore/cracked nipples\n- Painful or difficult urination\n- Pain in the perineum or pus discharge from the area\n- Foul-smelling vaginal discharge (may indicate infection)\n\nPostpartum feelings of sadness or crying easily, especially after the first week, may indicate postpartum depression and should be discussed with a health provider.\n\nPostpartum Nutrition: A breastfeeding mother needs approximately 550 extra kcal/day for the first six months, and 400 extra kcal/day for the next six months, compared to her pre-pregnancy diet.",
-    "chunk_id": 64
+    "chunk_id": 108
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "BREASTFEEDING AND INFANT FEEDING",
     "chunk_text": "t six months, compared to her pre-pregnancy diet.\n\nFamily Planning After Delivery: A woman can become pregnant as early as six weeks after delivery if she has sex and is not exclusively breastfeeding. Couples should plan for birth spacing - a gap of 3-5 years between pregnancies is healthier for both mother and child.\n\nBREASTFEEDING AND INFANT FEEDING\n\n- Breastfeeding should be initiated within half an hour of a normal delivery (or within two hours of a caesarean section).\n- Colostrum (the first milk, often yellowish) is highly nutritious and rich in protective antibodies - it should NOT be discarded, and pre-lacteal feeds (giving anything else before breastfeeding) should be avoided.",
-    "chunk_id": 65
+    "chunk_id": 109
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "BREASTFEEDING AND INFANT FEEDING",
     "chunk_text": "ing else before breastfeeding) should be avoided.\n- Exclusive breastfeeding is recommended for the first 6 months - only breast milk, not even water, is needed during this period.\n- After 6 months, the baby needs complementary (solid/semi-solid) food in addition to continued breastfeeding, as breast milk alone is no longer sufficient.\n- Demand feeding (feeding whenever the baby shows hunger cues) is recommended over feeding by a fixed schedule.\n- Night feeding helps babies sleep more soundly and should be encouraged, not discouraged.",
-    "chunk_id": 66
+    "chunk_id": 110
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "ESSENTIAL NEWBORN CARE",
     "chunk_text": "oundly and should be encouraged, not discouraged.\n- Feeding bottles should be avoided due to hygiene and infection risks.\n\nESSENTIAL NEWBORN CARE\n\nKey Messages:\n- Keep the newborn warm - babies can die of hypothermia (low body temperature).\n- Ensure a clean cord cut, clean cord tie, and clean, dry cord stump to prevent infection.\n- Nothing should be applied to the umbilical cord stump - it should be kept clean and dry, and will fall off on its own.\n\nKeeping the Baby Warm:\n- Dry the baby immediately after birth with a clean, warm towel, then wrap in fresh dry cloth.",
-    "chunk_id": 67
+    "chunk_id": 111
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "ESSENTIAL NEWBORN CARE",
     "chunk_text": "clean, warm towel, then wrap in fresh dry cloth.\n- Skin-to-skin contact with the mother helps maintain the baby's body temperature.\n- Avoid bathing the newborn on the first day - the first bath should be postponed and done in a warm room with warm water.\n- Normal newborn body temperature is between 36.5°C and 37°C. Hypothermia (below 36°C) is dangerous and requires immediate warming.\n\nDanger Signs in a Newborn - Seek Care Immediately:\n- Poor breastfeeding or refusing to feed\n- The baby looks unwell/ill",
-    "chunk_id": 68
+    "chunk_id": 112
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "ESSENTIAL NEWBORN CARE",
     "chunk_text": "g or refusing to feed\n- The baby looks unwell/ill\n- Fever or the baby feels cold to touch\n- Fast or difficult breathing\n- Blood in the stool\n\nImmunization: The family should be advised on the national immunization schedule for the newborn, as recommended by their health provider.\n\nSource: Maternal Health Division, Department of Family Welfare, Ministry of Health & Family Welfare, Government of India. Guidelines for Ante-Natal Care and Skilled Attendance at Birth by ANMs/LHVs, 2005 (content remains part of current MoHFW maternal health guidance framework).",
-    "chunk_id": 69
+    "chunk_id": 113
   },
   {
     "doc_name": "maternal_child_health_guidelines.txt",
     "topic": "maternal_child_health",
     "section": "ESSENTIAL NEWBORN CARE",
     "chunk_text": "urrent MoHFW maternal health guidance framework).",
-    "chunk_id": 70
+    "chunk_id": 114
   },
   {
     "doc_name": "tb_public_faqs.txt",
     "topic": "tuberculosis",
     "section": "TUBERCULOSIS (TB) — FREQUENTLY ASKED QUESTIONS",
     "chunk_text": "TUBERCULOSIS (TB) — FREQUENTLY ASKED QUESTIONS\nCentral TB Division, National Tuberculosis Elimination Programme (NTEP)\nMinistry of Health & Family Welfare, Government of India\nTB Helpline (Nikshay Sampark): 1800-11-6666\n\n1. What is tuberculosis?\nTuberculosis (TB) is an infectious disease caused by the bacteria Mycobacterium tuberculosis. TB usually affects the lungs, but it can also affect other parts of the body, such as the brain, the kidneys, the spine, etc.\n\n2. How do I know if I have TB?\nSymptoms of TB are usually specific to the site affected by the bacteria. If you experience any symptoms associated with TB, you must visit a health centre and get yourself tested immediately.",
-    "chunk_id": 71
+    "chunk_id": 115
   },
   {
     "doc_name": "tb_public_faqs.txt",
     "topic": "tuberculosis",
     "section": "TUBERCULOSIS (TB) — FREQUENTLY ASKED QUESTIONS",
     "chunk_text": "ealth centre and get yourself tested immediately.\n\nSymptoms of Pulmonary TB (lung TB):\n- Persistent cough for two weeks or more\n- Chest pain\n- Shortness of breath\n- Blood in sputum\n\nSymptoms of Extra Pulmonary TB depend on the site/organ affected:\n- Brain TB - meningitis\n- Lymph node TB - enlarged lymph nodes\n- Bone TB - destruction of bones and joints\n- Abdominal TB - intestinal obstruction\n\nCommon symptoms across TB types:\n- Weight loss\n- Fatigue\n- Evening rise of temperature (fever)\n- Night sweats",
-    "chunk_id": 72
+    "chunk_id": 116
   },
   {
     "doc_name": "tb_public_faqs.txt",
     "topic": "tuberculosis",
     "section": "TUBERCULOSIS (TB) — FREQUENTLY ASKED QUESTIONS",
     "chunk_text": "vening rise of temperature (fever)\n- Night sweats\n\n3. What do I do if I notice symptoms of TB?\nIf you, or someone you know, is experiencing symptoms of TB, please visit your nearest health centre for a checkup. TB treatment is available free of cost at all government and identified private and NGO health facilities called treatment centres. It is useful to download the TB Aarogya Saathi app for basic clarifications and resources, or call the toll-free number 1800-11-6666 for counseling and support.",
-    "chunk_id": 73
+    "chunk_id": 117
   },
   {
     "doc_name": "tb_public_faqs.txt",
     "topic": "tuberculosis",
     "section": "TUBERCULOSIS (TB) — FREQUENTLY ASKED QUESTIONS",
     "chunk_text": "e number 1800-11-6666 for counseling and support.\n\n4. How is TB diagnosed?\nTB is diagnosed by demonstrating TB bacteria in a clinical specimen taken from the patient. Pulmonary TB is diagnosed through sputum smear microscopy and/or Chest X-Ray. In Extra-pulmonary TB, diagnosis is made based on clinical suspicion and special tests depending on the organ affected (e.g., FNAC for lymph node TB). NAAT (nucleic acid amplification test) is increasingly used - it is highly accurate and rapid, and also detects drug resistance to Rifampicin.",
-    "chunk_id": 74
+    "chunk_id": 118
   },
   {
     "doc_name": "tb_public_faqs.txt",
     "topic": "tuberculosis",
     "section": "TUBERCULOSIS (TB) — FREQUENTLY ASKED QUESTIONS",
     "chunk_text": ", and also detects drug resistance to Rifampicin.\n\n5. How do I locate a TB diagnostic centre in my district?\nDownload the TB Aarogya Saathi app and go to \"Health Facilities\" to find government and private sector TB health centres in your district, along with contact numbers. You can also call 1800-11-6666 for help.\n\n6. Is TB curable?\nTB is curable if the prescribed drugs are taken regularly for the complete duration.\n\n7. Is TB always infectious?\nMicrobiologically confirmed pulmonary TB patients (lung TB) are infectious. However, these patients stop being infectious once at least 2 weeks of Anti-TB medicines are taken - though it is important to complete the entire duration of medication. TB affecting other organs (not the lung) is not infectious. Wearing a mask potentially cuts transmission, so anyone with a cough of any duration (even if not yet tested) is encouraged to wear a mask.",
-    "chunk_id": 75
+    "chunk_id": 119
   },
   {
     "doc_name": "tb_public_faqs.txt",
     "topic": "tuberculosis",
     "section": "TUBERCULOSIS (TB) — FREQUENTLY ASKED QUESTIONS",
     "chunk_text": "if not yet tested) is encouraged to wear a mask.\n\n8. How does TB spread? Am I likely to spread the infection if I share food or shake hands with someone?\nTB spreads when a person with active lung TB talks, sings, coughs, or sneezes, releasing TB bacteria in the air near a susceptible individual. TB does NOT spread through handshakes, using public toilets, sharing food and utensils, or casual contact. TB patients can continue living their normal lives after treatment completion; they should cover their mouth and nose while coughing and sneezing as a practice.",
-    "chunk_id": 76
+    "chunk_id": 120
   },
   {
     "doc_name": "tb_public_faqs.txt",
     "topic": "tuberculosis",
     "section": "TUBERCULOSIS (TB) — FREQUENTLY ASKED QUESTIONS",
     "chunk_text": "d nose while coughing and sneezing as a practice.\n\n9. How long does it take to recover from TB?\nDuration depends on drug resistance. For drug-sensitive TB, treatment is generally 6-9 months. Patients with resistance to one or more drugs may need longer treatment - after diagnosis, patients undergo cascade testing to check resistance. Depending on resistance patterns, patients may be diagnosed with DR-TB, MDR-TB (Multi-Drug Resistant), pre-XDR, or XDR-TB (Extensively Drug-Resistant).\n\n10. I have TB. What kind of diet should I follow?",
-    "chunk_id": 77
+    "chunk_id": 121
   },
   {
     "doc_name": "tb_public_faqs.txt",
     "topic": "tuberculosis",
     "section": "TUBERCULOSIS (TB) — FREQUENTLY ASKED QUESTIONS",
     "chunk_text": "10. I have TB. What kind of diet should I follow?\nTB patients should consume a nutritionally rich and balanced diet with all nutrients in required proportions - for example, cereals (maize, rice, sorghum, millets), pulses (peas, beans, lentils), oil, sugar, egg, fish, etc.\n\n11. What kind of social support am I entitled to from the government, especially for nutrition needs?\nUnder the \"Nikshay Poshan Yojana,\" the Government of India provides 500 rupees each month to TB patients for the entire duration of their treatment as nutrition support.",
-    "chunk_id": 78
+    "chunk_id": 122
   },
   {
     "doc_name": "tb_public_faqs.txt",
     "topic": "tuberculosis",
     "section": "TUBERCULOSIS (TB) — FREQUENTLY ASKED QUESTIONS",
     "chunk_text": "duration of their treatment as nutrition support.\n\n12. Who can be affected by TB?\nAnyone can be affected, but certain conditions increase the likelihood of developing active TB disease:\n- Close prolonged contact with a person with Pulmonary TB\n- Being in an overcrowded environment\n- Smoking\n- HIV infection\n- Malnutrition\n- Diabetes\n- Patients on immunosuppressive drugs (anti-cancer, corticosteroids, etc.)\n- Certain lung diseases like silicosis\n\n13. Should a TB patient be dealt with differently within the household and/or community?",
-    "chunk_id": 79
+    "chunk_id": 123
   },
   {
     "doc_name": "tb_public_faqs.txt",
     "topic": "tuberculosis",
     "section": "TUBERCULOSIS (TB) — FREQUENTLY ASKED QUESTIONS",
     "chunk_text": "ifferently within the household and/or community?\nTB patients must be supported through their recovery and encouraged to complete treatment and eat a nutritious diet. There is no need to ostracize TB patients or spread unverifiable and incorrect information about the disease. With complete and correct treatment, TB is completely treatable.\n\n14. What do I do if my family member has TB?\nAs a caregiver, ensure the TB patient completes their prescribed treatment and takes a nutritious diet during and after treatment. If they have lung TB and you were in close prolonged contact with them, contact your nearest health centre for professional advice (findable via the \"Health Facilities\" section of the TB Aarogya Saathi app).",
-    "chunk_id": 80
+    "chunk_id": 124
   },
   {
     "doc_name": "tb_public_faqs.txt",
     "topic": "tuberculosis",
     "section": "TUBERCULOSIS (TB) — FREQUENTLY ASKED QUESTIONS",
     "chunk_text": "acilities\" section of the TB Aarogya Saathi app).\n\n15. What are the side effects of TB drugs?\nNot everyone suffers side effects. Some TB patients may have adverse reactions including nausea, vomiting, gastritis, itching, etc. In this case, the patient should contact their treatment provider and NOT stop treatment - incomplete treatment can lead to drug resistance.\n\n16. How are TB and COVID-19 related? Can one disease act as a risk factor for the other?\nTB and COVID-19 both primarily affect the lungs, though TB is bacterial and COVID-19 is viral. Many symptoms overlap. If you have symptoms such as cough, fever, and difficulty breathing, get tested for both COVID-19 and tuberculosis.",
-    "chunk_id": 81
+    "chunk_id": 125
   },
   {
     "doc_name": "tb_public_faqs.txt",
     "topic": "tuberculosis",
     "section": "TUBERCULOSIS (TB) — FREQUENTLY ASKED QUESTIONS",
     "chunk_text": "g, get tested for both COVID-19 and tuberculosis.\n\n17. How are TB and HIV related?\nHIV is the strongest risk factor for tuberculosis among adults, as it adversely affects the immune system. An HIV-positive person is 20-40 times more likely to develop TB disease once infected, compared to an HIV-negative person.\n\n18. Can TB be cured in HIV co-infected patients?\nYes, TB is curable in HIV-positive patients using the same medicines used for HIV-negative TB patients. However, HIV/TB co-infected patients require additional medications such as Antiretroviral Therapy (ART) and Co-trimoxazole preventive therapy (CPT) to prevent other opportunistic infections.",
-    "chunk_id": 82
+    "chunk_id": 126
   },
   {
     "doc_name": "tb_public_faqs.txt",
     "topic": "tuberculosis",
     "section": "TUBERCULOSIS (TB) — FREQUENTLY ASKED QUESTIONS",
     "chunk_text": "(CPT) to prevent other opportunistic infections.\n\n19. How is it assessed whether a patient is responding to TB treatment?\nFor pulmonary TB, response is assessed via follow-up sputum examinations/culture at regular intervals, and at the end of treatment to declare the patient cured. For extra-pulmonary TB, response is assessed through clinical improvement and follow-up investigations (X-rays, CT scans, etc.) depending on the site affected.\n\n20. Since treatment duration is long, what happens if a patient shifts their place of residence?",
-    "chunk_id": 83
+    "chunk_id": 127
   },
   {
     "doc_name": "tb_public_faqs.txt",
     "topic": "tuberculosis",
     "section": "TUBERCULOSIS (TB) — FREQUENTLY ASKED QUESTIONS",
     "chunk_text": "ens if a patient shifts their place of residence?\nThere is a \"Transferring Out\" provision to ensure continuity of treatment if a patient relocates anywhere in the country. The patient informs programme officials in the district where they were originally notified about the location change; details are automatically updated via the Ni-kshay system, and treatment/benefits continue at the nearest new treatment centre.\n\n21. I have a regular family physician. Can I go to them for guidance on TB?\nYes, you can consult any certified MBBS doctor for medical advice - they are best placed to diagnose and provide treatment. TB is diagnosed through appropriate sputum examinations and/or molecular diagnostic testing.",
-    "chunk_id": 84
+    "chunk_id": 128
   },
   {
     "doc_name": "tb_public_faqs.txt",
     "topic": "tuberculosis",
     "section": "TUBERCULOSIS (TB) — FREQUENTLY ASKED QUESTIONS",
     "chunk_text": "examinations and/or molecular diagnostic testing.\n\nSource: Central Tuberculosis Division, National Tuberculosis Elimination Programme (NTEP), Ministry of Health & Family Welfare, Government of India. https://tbcindia.mohfw.gov.in/faqs/",
-    "chunk_id": 85
+    "chunk_id": 129
   }
 ]
