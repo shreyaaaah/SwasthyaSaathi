@@ -53,9 +53,88 @@ def search_advisories(query: str, top_k: int = 3) -> List[Dict[str, Any]]:
             "topic": r.get("topic", "general"),
             "section": r.get("section", "General"),
             "snippet": r.get("chunk_text", "")[:350] + "...",
-            "score": r.get("score", 0.0)
+            "score": r.get("score", 0.0),
+            "source_type": "knowledge_base"
         })
     return cleaned
+
+TRUSTED_DOMAINS = [
+    "who.int", "mohfw.gov.in", "nhp.gov.in", "icmr.gov.in",
+    "ncvbdc.mohfw.gov.in", "tbcindia.mohfw.gov.in", "cdc.gov", "ncbi.nlm.nih.gov"
+]
+
+def web_search_health_authority(query: str, max_results: int = 3) -> List[Dict[str, Any]]:
+    """Live domain-restricted web search fallback for queries where local FAISS KB has no match."""
+    raw_results = []
+    try:
+        try:
+            from ddgs import DDGS
+        except ImportError:
+            from duckduckgo_search import DDGS
+
+        ddg = DDGS()
+        search_query = f"{query} site:who.int OR site:mohfw.gov.in OR site:nhp.gov.in OR site:icmr.gov.in OR site:ncvbdc.mohfw.gov.in OR site:tbcindia.mohfw.gov.in OR site:cdc.gov OR site:ncbi.nlm.nih.gov"
+        raw_results = list(ddg.text(search_query, max_results=max_results * 2))
+
+        if not raw_results:
+            fallback_query = f"{query} site:who.int OR site:cdc.gov OR site:mohfw.gov.in"
+            raw_results = list(ddg.text(fallback_query, max_results=max_results))
+    except Exception as e:
+        print(f"Web search error: {e}")
+        raw_results = []
+
+    if not raw_results:
+        return []
+
+    import requests
+    from bs4 import BeautifulSoup
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+
+    results = []
+    for item in raw_results:
+        if len(results) >= max_results:
+            break
+
+        url = item.get("href") or item.get("link") or ""
+        title = item.get("title") or "Public Health Guidance"
+        snippet = item.get("body") or item.get("snippet") or ""
+
+        if not url:
+            continue
+
+        page_text = ""
+        try:
+            resp = requests.get(url, headers=headers, timeout=4)
+            if resp.status_code == 200:
+                soup = BeautifulSoup(resp.text, "html.parser")
+                for element in soup(["script", "style", "nav", "header", "footer", "form", "aside"]):
+                    element.decompose()
+                main_elem = soup.find("main") or soup.find("article") or soup.find("body")
+                if main_elem:
+                    text_content = main_elem.get_text(separator=" ", strip=True)
+                    text_content = re.sub(r"\s+", " ", text_content)
+                    if len(text_content) > 100:
+                        page_text = text_content[:1500]
+        except Exception:
+            pass
+
+        final_snippet = page_text if page_text else snippet[:1500]
+
+        results.append({
+            "doc_name": title,
+            "title": title,
+            "source_url": url,
+            "section": "Live Web Search Result",
+            "snippet": final_snippet,
+            "content_snippet": final_snippet,
+            "score": 0.90,
+            "source_type": "live_search"
+        })
+
+    return results
 
 def check_myth(query: str) -> Dict[str, Any]:
     """Checks query against curated seed database of medical myths."""
@@ -182,6 +261,7 @@ def get_regional_alerts(state: str = "Punjab") -> Dict[str, Any]:
 
 TOOLS_MAP = {
     "search_advisories": search_advisories,
+    "web_search_health_authority": web_search_health_authority,
     "check_myth": check_myth,
     "get_session_history": get_session_history,
     "log_symptom": log_symptom,
@@ -194,12 +274,27 @@ GROQ_TOOLS_SCHEMA = [
         "type": "function",
         "function": {
             "name": "search_advisories",
-            "description": "Searches public health guidelines (dengue, TB, air pollution, flood health, maternal & child health) for verified clinical guidance.",
+            "description": "Searches public health guidelines (29 topics: dengue, TB, cardiac, diabetes, malaria, HIV, etc.) for verified clinical guidance.",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "query": {"type": "string", "description": "Health or medical topic query to search"},
                     "top_k": {"type": "integer", "description": "Number of top matching chunks to retrieve (default 3)"}
+                },
+                "required": ["query"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "web_search_health_authority",
+            "description": "Performs live web search restricted to trusted public health authority domains (WHO, MoHFW, NHP, CDC, ICMR) as a fallback when search_advisories has no direct match.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "The health query or topic to search on official health portals"},
+                    "max_results": {"type": "integer", "description": "Max search results to return (default 3)"}
                 },
                 "required": ["query"]
             }
@@ -326,7 +421,7 @@ def run_agent(user_id: str, query: str) -> Dict[str, Any]:
         "from MoHFW, ICMR, NHP, and WHO. Think of yourself as a trusted, caring friend who happens to know a lot "
         "about health — someone who gives real, helpful answers in plain language, not a form-filling machine.\n\n"
 
-        "You have tools: search_advisories, check_myth, get_session_history, log_symptom, triage_classify, get_regional_alerts.\n\n"
+        "You have tools: search_advisories, web_search_health_authority, check_myth, get_session_history, log_symptom, triage_classify, get_regional_alerts.\n\n"
 
         "TOOL SELECTION (call ALL relevant tools in your FIRST turn):\n"
         "- Symptoms or medical question → search_advisories + triage_classify + log_symptom\n"
@@ -334,13 +429,24 @@ def run_agent(user_id: str, query: str) -> Dict[str, Any]:
         "- Remedy/myth claim (turmeric, garlic, etc.) → add check_myth\n"
         "- Always include log_symptom to persist the interaction\n\n"
 
+        "FALLBACK SEARCH RULE:\n"
+        "- If search_advisories returns empty results due to strict confidence floor (score < 0.45), you MUST call "
+          "web_search_health_authority to search live trusted public health portals (WHO, MoHFW, NHP, CDC, ICMR) as a fallback "
+          "before concluding no information is available.\n\n"
+
         "TONE AND FORMAT RULES (apply these strictly when writing the final answer):\n"
         "- Write in flowing, natural sentences like a caring, knowledgeable person would speak — NOT as a clinical report.\n"
         "- No rigid sections with bold headers like 'Answer:', 'Sources:', 'Disclaimer:' — weave information naturally.\n"
         "- Only use bullet points when listing 3 or more genuinely distinct steps or items. Keep bullets tight, no sub-headers.\n"
-        "- Mention sources naturally within a sentence: 'According to NTEP guidelines...' or 'The NHP advises...'\n"
+        "- Mention sources naturally within a sentence: 'According to WHO guidelines...' or 'The MoHFW advises...'\n"
         "- If the person seems worried, acknowledge it briefly before giving the information.\n"
         "- Do not pad the answer with unnecessary section dividers, horizontal rules, or repeated disclaimers.\n\n"
+
+        "LIVE SEARCH ATTRIBUTION RULE:\n"
+        "- If your answer draws on a live web search result (from web_search_health_authority) rather than the pre-loaded knowledge base, "
+          "say so naturally in the response (e.g., 'According to WHO's website...' or 'Checking the latest guidance...') "
+          "so it's clear this wasn't pre-verified content. Only use search results that are genuinely relevant and from a trusted domain — "
+          "never add anything beyond what the search actually returned.\n\n"
 
         "SAFETY ELEMENTS — keep them but make them sound human:\n"
         "- Instead of a boilerplate disclaimer block, end naturally: 'Of course, I'm not a substitute for your doctor — "
@@ -352,12 +458,7 @@ def run_agent(user_id: str, query: str) -> Dict[str, Any]:
 
         "EMERGENCY EXCEPTION — for EMERGENCY triage, clarity beats warmth:\n"
         "- Be short, direct, and unambiguous. No fluff. Lead with the action ('Call 112 or 108 right now.').\n"
-        "- Still avoid sounding like a legal disclaimer or form letter — keep it human, just urgent.\n\n"
-
-        "UNGROUNDED QUERY (search_advisories returns no match above 0.45 score):\n"
-        "- Say naturally: 'I don't have a strong match in my health guidelines for this one' and offer what general "
-          "knowledge you can, while being clear it's not from a verified official source.\n"
-        "- Do not invent citations or pretend to have a guideline you don't have."
+        "- Still avoid sounding like a legal disclaimer or form letter — keep it human, just urgent."
     )
 
     messages = [
@@ -445,7 +546,14 @@ def run_agent(user_id: str, query: str) -> Dict[str, Any]:
             if fn_name == "search_advisories" and isinstance(tool_result, list):
                 # Only include sources meeting min_score >= 0.45
                 valid_sources = [s for s in tool_result if s.get("score", 0.0) >= 0.45]
+                for s in valid_sources:
+                    s["source_type"] = "knowledge_base"
                 sources_collected.extend(valid_sources)
+
+            if fn_name == "web_search_health_authority" and isinstance(tool_result, list):
+                for s in tool_result:
+                    s["source_type"] = "live_search"
+                sources_collected.extend(tool_result)
 
             if fn_name == "triage_classify" and isinstance(tool_result, dict):
                 triage_tag = tool_result.get("triage_tag", triage_tag)

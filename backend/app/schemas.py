@@ -6,6 +6,8 @@ class SourceMetadata(BaseModel):
     section: str
     snippet: str
     score: Optional[float] = None
+    source_type: Optional[str] = "knowledge_base"
+    source_url: Optional[str] = None
 
 class PatternResultSchema(BaseModel):
     pattern_detected: bool = False
