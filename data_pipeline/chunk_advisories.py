@@ -147,11 +147,24 @@ def main():
         for name, reason in excluded_files:
             print(f"  - {name}: {reason}")
 
-    # Exclude duplicates like 'selfcare (1).pdf'
+    # Ingestion Guard: check against SOURCES.md registry
+    sources_md_path = os.path.join(active_dir, "SOURCES.md")
+    allowed_sources = set()
+    if os.path.exists(sources_md_path):
+        with open(sources_md_path, "r", encoding="utf-8", errors="ignore") as sf:
+            for line in sf:
+                parts = [p.strip() for p in line.split("|") if p.strip()]
+                if parts and not parts[0].startswith("-") and not parts[0].startswith("File") and not parts[0].startswith("#"):
+                    allowed_sources.add(parts[0].lower())
+        print(f"Loaded {len(allowed_sources)} registered files from SOURCES.md")
+
     processed_files = []
     for f in pdf_files + txt_files:
         if "(1)" in f:
             print(f"Skipping duplicate file: {f}")
+            continue
+        if allowed_sources and f.lower() not in allowed_sources:
+            print(f"  [INGESTION GUARD REFUSED] File '{f}' is NOT listed in SOURCES.md — SKIPPING INGESTION!")
             continue
         processed_files.append(f)
 

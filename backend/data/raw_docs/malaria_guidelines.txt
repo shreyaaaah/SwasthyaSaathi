@@ -1,0 +1,62 @@
+MALARIA
+World Health Organization - Fact Sheet
+Last updated: 4 December 2025
+
+KEY FACTS
+
+Globally in 2024, there were an estimated 282 million malaria cases and 610,000 malaria deaths in 80 countries. The WHO African Region carries a disproportionately high share of the global malaria burden (95% of cases and deaths). Children under 5 accounted for about 75% of all malaria deaths in that region. Malaria is preventable and curable.
+
+OVERVIEW
+
+Malaria is a life-threatening disease spread to humans by some types of mosquitoes. It is mostly found in tropical countries. The infection is caused by a parasite and does NOT spread from person to person directly.
+
+Malaria mostly spreads through the bites of infected female Anopheles mosquitoes. Blood transfusion and contaminated needles may also transmit malaria (rarely). The first symptoms may be mild, similar to many febrile illnesses, and difficult to recognize as malaria. Left untreated, P. falciparum malaria can progress to severe illness and death within 24 hours.
+
+There are 5 Plasmodium parasite species that cause malaria in humans. P. falciparum is the deadliest and most prevalent in Africa; P. vivax is the dominant parasite in most countries outside sub-Saharan Africa (including India).
+
+SYMPTOMS
+
+The most common early symptoms are fever, headache, and chills. Symptoms usually start within 10-15 days of being bitten by an infected mosquito. Symptoms may be mild for some people, especially those who've had malaria before - because symptoms aren't always specific, getting tested early is important.
+
+Some types of malaria can cause severe illness and death. Infants, children under 5, pregnant women, travellers, and people with HIV/AIDS are at higher risk. Severe symptoms include:
+- Extreme tiredness and fatigue
+- Impaired consciousness
+- Multiple convulsions
+- Difficulty breathing
+- Dark or bloody urine
+- Jaundice (yellowing of eyes and skin)
+- Abnormal bleeding
+
+People with severe symptoms should get emergency care right away. Getting treatment early for mild malaria can stop the infection from becoming severe. Malaria during pregnancy can also cause premature delivery or a low birth weight baby.
+
+PREVENTION
+
+Malaria can be prevented by avoiding mosquito bites and, for travellers to endemic areas, by taking preventive medicines (chemoprophylaxis - consult a doctor before travel).
+
+Ways to lower the risk of mosquito bites:
+- Use mosquito nets when sleeping in places where malaria is present
+- Use mosquito repellents (containing DEET, IR3535, or Icaridin) after dusk
+- Use coils and vaporizers
+- Wear protective clothing
+- Use window screens
+
+Vector control (community-level): insecticide-treated nets (ITNs) and indoor residual spraying (IRS) are the two core interventions used globally to reduce mosquito populations and disease transmission.
+
+Vaccines: Since 2021, WHO has recommended the RTS,S/AS01 malaria vaccine for children in regions with moderate-to-high P. falciparum transmission; a second vaccine (R21/Matrix-M) was recommended in 2023. These are being rolled out in routine childhood immunization programmes in affected regions.
+
+DIAGNOSIS AND TREATMENT
+
+Early diagnosis and treatment reduces disease, prevents deaths, and helps reduce transmission. WHO recommends all suspected malaria cases be confirmed using parasite-based diagnostic testing (microscopy or a rapid diagnostic test) before starting treatment - malaria is a serious infection and always requires treatment with medicine.
+
+The choice of medicine depends on: the type of malaria parasite, whether the parasite is resistant to a particular medicine, the weight/age of the infected person, and whether the person is pregnant.
+
+Common treatments:
+- Artemisinin-based combination therapy (ACT) - the most effective treatment for P. falciparum malaria
+- Chloroquine - used for P. vivax infection only where the parasite remains sensitive to it
+- Primaquine - added to prevent relapses of P. vivax and P. ovale infections
+
+Most medicines are pills; some people need injectable medicine at a health centre or hospital for severe cases.
+
+Note: Antimalarial drug resistance (including partial artemisinin resistance) is an emerging concern being monitored by WHO in several countries - this underscores why parasite-based diagnostic confirmation before treatment matters, rather than treating based on symptoms alone.
+
+Source: World Health Organization (WHO). "Malaria" Fact Sheet. https://www.who.int/news-room/fact-sheets/detail/malaria

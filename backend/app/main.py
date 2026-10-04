@@ -92,7 +92,9 @@ def agentic_chat_endpoint(request: ChatRequest, db: Session = Depends(get_db)):
             doc_name=s.get("doc_name", "Guideline"),
             section=s.get("section", "General"),
             snippet=s.get("snippet", s.get("chunk_text", ""))[:300] + "...",
-            score=s.get("score")
+            score=s.get("score"),
+            source_type=s.get("source_type", "knowledge_base"),
+            source_url=s.get("source_url")
         )
         for s in raw_sources
     ]
@@ -115,7 +117,7 @@ def agentic_chat_endpoint(request: ChatRequest, db: Session = Depends(get_db)):
     return ChatResponse(
         answer=agent_output.get("answer", ""),
         sources=formatted_sources,
-        is_grounded=len(formatted_sources) > 0,
+        is_grounded=agent_output.get("is_grounded"),
         triage_tag=agent_output.get("triage_tag", "GENERAL_INFO"),
         tools_used=agent_output.get("tools_used", []),
         response_time_ms=agent_output.get("response_time_ms"),

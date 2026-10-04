@@ -25,7 +25,7 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     answer: str
     sources: List[SourceMetadata] = []
-    is_grounded: bool = True
+    is_grounded: Optional[bool] = None
     triage_tag: Optional[str] = "GENERAL_INFO"
     tools_used: List[str] = []
     response_time_ms: Optional[float] = None

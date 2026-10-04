@@ -50,3 +50,12 @@ yarn-error.log*
 .idea/
 .DS_Store
 Thumbs.db
+
+# Evaluation & Scratch logs
+eval_run_*.txt
+backend/eval_run_*.txt
+calibration_run.txt
+grep_uwin_output.txt
+table_parsing_output.txt
+scratch_*.py
+

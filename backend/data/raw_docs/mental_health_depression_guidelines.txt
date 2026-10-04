@@ -1,0 +1,70 @@
+DEPRESSIVE DISORDER (DEPRESSION) - MENTAL HEALTH AWARENESS
+World Health Organization - Fact Sheet
+Last updated: 11 September 2026
+
+IMPORTANT NOTE FOR CHATBOT IMPLEMENTATION: Any user message indicating suicidal thoughts, self-harm intent, or being in crisis should immediately surface a crisis helpline (e.g., India's KIRAN mental health helpline: 1800-599-0019, toll-free, 24/7) as a priority response, regardless of retrieval confidence score. This should be handled as a special, high-priority case in the triage system - not treated as routine informational RAG retrieval. This document provides general awareness information, not crisis intervention.
+
+KEY FACTS
+
+Depression is a common mental disorder. Globally, an estimated 5.2% of adults suffer from depression. More women are affected than men. Depression can lead to suicide. There is effective treatment for mild, moderate, and severe depression.
+
+OVERVIEW
+
+Depression is different from regular mood changes and everyday emotional responses. It involves a depressed mood or loss of pleasure/interest in activities for long periods of time. It can affect all aspects of life - relationships, school, work.
+
+Depression can happen to anyone. People who have experienced abuse, severe losses, or other stressful events are more likely to develop it. In 2023, approximately 322 million people worldwide had depression. Worldwide, more than 10% of pregnant women and women who have just given birth experience depression. In 2021, an estimated 727,000 people lost their lives to suicide globally - suicide is the third leading cause of death in people aged 15-29.
+
+Only about one third of people with depression receive mental health treatment even in high-income countries. Barriers include lack of investment in mental health care, lack of trained providers, and social stigma.
+
+SYMPTOMS AND PATTERNS
+
+During a depressive episode, a person experiences a depressed mood (feeling sad, irritable, empty) and/or a loss of pleasure or interest in activities. This is different from regular mood fluctuations - symptoms last most of the day, nearly every day, for at least two weeks.
+
+Other symptoms may include:
+- Poor concentration
+- Feelings of excessive guilt or low self-worth
+- Hopelessness about the future
+- Thoughts about dying or suicide
+- Disrupted sleep
+- Changes in appetite or weight
+- Feeling very tired or low in energy
+
+A depressive episode can be mild, moderate, or severe depending on the number/severity of symptoms and impact on daily functioning.
+
+CONTRIBUTING FACTORS
+
+Depression results from a complex interaction of social, psychological, and biological factors. Adverse life events (unemployment, bereavement, trauma) increase the likelihood of developing depression. It's closely linked to physical health - risk factors like physical inactivity and harmful alcohol use are shared with conditions like cardiovascular disease, diabetes, and respiratory diseases; people with these conditions may also experience depression related to managing their illness.
+
+DIAGNOSIS AND TREATMENT
+
+Effective treatments exist. Psychological treatments are typically the first line of treatment, and can be combined with antidepressant medicines for moderate-to-severe depression. Antidepressants are not usually needed for mild depression.
+
+Effective psychological treatments include:
+- Behavioural activation
+- Cognitive behavioural therapy (CBT)
+- Interpersonal psychotherapy
+- Problem-solving therapy
+
+Antidepressant medicines (e.g., SSRIs like fluoxetine) may be used for moderate-to-severe depression, guided by a healthcare provider. Antidepressants should NOT be used for depression in children, and are not the first-line treatment for adolescents, who need extra caution and specialist guidance.
+
+SELF-CARE (for mild symptoms, alongside professional support)
+
+- Try to keep doing activities you used to enjoy
+- Stay connected to friends and family
+- Exercise regularly, even a short walk
+- Stick to regular eating and sleeping habits as much as possible
+- Avoid or cut down on alcohol; don't use illicit drugs, which can worsen depression
+- Talk to someone you trust about your feelings
+- Seek help from a healthcare provider
+
+IF YOU HAVE THOUGHTS OF SUICIDE
+
+- Remember you are not alone - many people have gone through similar experiences and found help
+- Talk to someone you trust about how you feel
+- Talk to a health worker, such as a doctor or counsellor
+- Join a support group
+- If you are in immediate danger of harming yourself, contact emergency services or a crisis line immediately
+
+India-specific crisis resource: KIRAN Mental Health Helpline - 1800-599-0019 (toll-free, 24/7, multiple Indian languages)
+
+Source: World Health Organization (WHO). "Depressive disorder (depression)" Fact Sheet. https://www.who.int/news-room/fact-sheets/detail/depression

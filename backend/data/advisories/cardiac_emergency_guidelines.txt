@@ -1,0 +1,73 @@
+HEART ATTACK (ACUTE MYOCARDIAL INFARCTION)
+World Health Organization - Fact Sheet
+Last updated: 10 September 2026
+
+KEY FACTS
+
+A heart attack, or acute myocardial infarction, happens when blood flow to part of the heart muscle is suddenly cut off, most often by a clot forming on a ruptured fatty deposit inside a coronary artery. Ischaemic heart disease (IHD), also known as coronary heart disease (CHD), is the underlying condition behind most heart attacks and is the leading cause of death worldwide - responsible for 9 million deaths in 2021, around 13% of all deaths globally.
+
+Heart attack and stroke together account for 85% of all deaths from cardiovascular disease, and more than three quarters of these deaths occur in low- and middle-income countries.
+
+Most heart attacks can be prevented by controlling a small number of behavioural and metabolic risk factors: tobacco use, an unhealthy diet, physical inactivity, harmful use of alcohol, overweight and obesity, raised blood pressure, raised blood glucose, and raised blood lipids.
+
+Time lost is heart muscle lost. Recognizing symptoms early and reaching emergency care within the first hours substantially improves the chance of survival and recovery.
+
+OVERVIEW
+
+A heart attack occurs when one of the coronary arteries supplying blood to the heart muscle becomes blocked, usually by a blood clot forming where a fatty deposit (atherosclerotic plaque) has ruptured. Starved of oxygen, the affected section of heart muscle begins to die within minutes - this is why a heart attack is a medical emergency, not something that can wait until morning.
+
+A heart attack is part of what's called acute coronary syndrome (ACS), which also includes angina - a milder, usually temporary form of chest pain caused by reduced (not blocked) blood flow.
+
+Important distinction: A heart attack is NOT the same as a cardiac arrest, even though the two are often confused and can occur together. A heart attack is a circulation problem in one part of the heart. A cardiac arrest is an electrical malfunction that causes the heart to stop beating altogether. A heart attack can trigger a cardiac arrest, but many heart attacks do not.
+
+SYMPTOMS - WHAT TO WATCH FOR
+
+The classic warning sign is pain or discomfort in the centre of the chest, often described as pressure, tightness, or squeezing rather than a sharp pain. This may spread to one or both arms, the shoulders, jaw, neck, or back.
+
+Other common symptoms:
+- Shortness of breath
+- Nausea or vomiting
+- Light-headedness
+- Cold sweat
+- Pale skin
+
+Important: symptoms vary between individuals. Women, older people, and people with diabetes are more likely to have atypical presentations - breathlessness, fatigue, indigestion-like discomfort, or back/jaw pain without prominent chest pain. In some cases, particularly in people with diabetes-related nerve damage, a heart attack causes little or no pain at all - a "silent heart attack" often only discovered later through routine testing.
+
+Anyone experiencing these symptoms should seek emergency medical care immediately rather than waiting to see if they pass.
+
+CAUSES AND RISK FACTORS
+
+The underlying cause of nearly all heart attacks is atherosclerosis - a gradual build-up of fatty deposits along artery walls that can develop silently over decades before a plaque ruptures and triggers a clot.
+
+Behavioural risk factors: tobacco use, a diet high in salt/sugar/unhealthy fats, physical inactivity, harmful alcohol use. Air pollution is also an important environmental contributor.
+
+These behaviours tend to produce measurable "intermediate risk factors" over time: raised blood pressure, raised blood glucose, raised blood lipids, and overweight/obesity - each independently raises heart attack risk and can be identified and managed in primary care long before an event occurs.
+
+Age, sex, and family history also influence risk and cannot be modified. Social and economic conditions matter too - poverty, chronic stress, rapid urbanization, and limited access to healthy food and health services all affect how often modifiable risk factors go undetected and untreated.
+
+DIAGNOSIS
+
+A suspected heart attack is diagnosed using a combination of: the person's symptoms, an ECG (electrocardiogram) to detect characteristic changes in the heart's electrical activity, and a blood test for cardiac troponin (a protein released into the blood when heart muscle is damaged). Coronary angiography (using a thin catheter to image the coronary arteries directly) confirms the location and severity of blockage.
+
+TREATMENT
+
+The priority is restoring blood flow to the affected part of the heart as quickly as possible - typically through angioplasty (a catheter procedure to open the blocked artery, often with a stent placed to keep it open) where available, or clot-dissolving medicines (thrombolytics) where rapid angioplasty isn't accessible.
+
+Long-term treatment typically includes: aspirin and other antiplatelet drugs (to prevent further clotting), beta-blockers (to reduce the heart's workload), ACE inhibitors (to protect heart function), and statins (to lower cholesterol and stabilize remaining plaques). Some people need coronary artery bypass surgery. Structured cardiac rehabilitation (supervised exercise, risk factor management, psychological support) improves long-term outcomes but remains underused, especially in low-resource settings.
+
+PREVENTION
+
+Because atherosclerosis develops over many years, prevention works best when it starts early and continues throughout life:
+- Avoid tobacco use entirely
+- Eat a diet rich in fruit, vegetables, and whole grains; low in salt and saturated fat
+- Stay physically active
+- Limit alcohol
+- Treat raised blood pressure, diabetes, and raised blood lipids if present
+
+Well-implemented hypertension and cholesterol management in primary care is both effective and inexpensive relative to the cost of treating a heart attack once it occurs.
+
+WHO'S GLOBAL RESPONSE
+
+WHO considers prevention, early detection, and management of cardiovascular disease a public health priority. In 2016, WHO launched the Global HEARTS Initiative to help countries strengthen cardiovascular disease prevention and management through primary health care, covering healthy-lifestyle counselling, evidence-based treatment protocols, access to essential medicines, risk-based management, team-based care, and monitoring systems.
+
+Source: World Health Organization (WHO). "Heart Attack" Fact Sheet. https://www.who.int/news-room/fact-sheets/detail/heart-attack

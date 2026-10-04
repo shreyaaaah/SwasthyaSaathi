@@ -1,0 +1,89 @@
+ICMR GUIDELINES FOR MANAGEMENT OF TYPE 2 DIABETES 2018
+Indian Council of Medical Research, Ansari Nagar, New Delhi
+
+Note: This document was originally written for physicians and covers detailed drug dosing, insulin titration, and complication treatment protocols. The content below is limited to the patient-facing portions - what diabetes is, targets to understand, diet/lifestyle guidance, and self-care - since prescribing decisions (medication choice, dosing, insulin therapy) must be made by a doctor based on individual assessment, not dispensed through a chatbot.
+
+WHAT IS TYPE 2 DIABETES
+
+Diabetes mellitus is a condition of chronic high blood sugar (hyperglycaemia) resulting from problems with insulin secretion, insulin action, or both. India has the second largest number of people with diabetes in the world - an estimated 72.9 million people in 2017, projected to rise to 134.3 million by 2045. Type 2 diabetes accounts for over 90-95% of all diabetes cases and is strongly linked to lifestyle, urbanization, obesity, and genetic factors. Indians tend to develop diabetes at a lower BMI and at a younger age compared to other ethnic groups (the "Asian Indian phenotype").
+
+Symptoms of Diabetes: increased thirst and urination (polyuria, polydipsia), unexplained weight loss despite increased hunger, tiredness and weakness, generalized itching, recurrent infections (especially urinary/genital), and delayed wound healing. Importantly, more than half of all patients with diabetes have no symptoms at all - this is why screening matters even without symptoms.
+
+Who Should Be Screened: All individuals above 30 years of age, and at an earlier age for those with risk factors such as family history of diabetes, being overweight/obese, high blood pressure, high cholesterol, sedentary lifestyle, history of gestational diabetes, or history of heart/vascular disease.
+
+TARGETS FOR BLOOD SUGAR CONTROL (for understanding your own reports)
+
+| Measure | Ideal | Satisfactory | Needs Attention |
+|---|---|---|---|
+| Fasting Plasma Glucose | 80-110 mg/dl | 111-125 mg/dl | above 125 mg/dl |
+| 2-hour Post-meal Glucose | 120-140 mg/dl | 141-180 mg/dl | above 180 mg/dl |
+| HbA1c | below 7% | 7-8% | above 8% |
+| Blood Pressure | below 130/80 | below 140/90 | above 140/90 |
+
+These targets are general guidelines - your doctor will set individualized targets based on your age, other health conditions, and how long you've had diabetes.
+
+MONITORING AND FOLLOW-UP
+
+- Blood glucose (fasting and post-meal) should be checked at least monthly, more often if levels aren't in target range.
+- HbA1c should be checked every 6-12 months (every 3 months if not at target or during treatment changes).
+- A full check-up including foot examination should happen at every clinic visit, at minimum every 3 months.
+- An annual check-up should include: eye examination (retinal/fundus check), kidney function tests, ECG, cholesterol/lipid profile, and a detailed foot exam.
+- Self-monitoring of blood glucose with a home glucose monitor is recommended for everyone with diabetes, and is especially important for those on insulin.
+
+DIET (MEDICAL NUTRITION THERAPY)
+
+The diet should be individualized to your family's eating pattern, flexible, and varied - not a rigid one-size-fits-all plan. General principles:
+
+- Carbohydrates: About 55-60% of daily energy, preferably complex carbohydrates - whole grains, unpolished cereals, millets, legumes, and low-glycemic fruits. Refined sugar and sugary drinks should be minimized. Eating smaller, more frequent meals (around 6 small meals a day) is often recommended.
+- Fibre: A high-fibre diet is recommended - traditional Indian diets with whole grains, whole pulses (dal), green leafy vegetables, and fruits like papaya, guava, apple, pear, orange support this. Fruit juices are best avoided (whole fruit is preferred over juice).
+- Proteins: About 12-15% of daily energy from vegetable sources (pulses, soy, grams) and, if non-vegetarian, low-fat milk/curd, fish, and lean meats.
+- Fats: About 20-30% of daily energy. Use oils rich in monounsaturated fats (mustard, rice bran, groundnut, gingelly) in moderation; minimize saturated fats (ghee, butter, vanaspati, coconut oil, red meat) and avoid trans fats almost entirely.
+- Salt: Less than 5 g/day for the general population with diabetes; less than 3 g/day if you also have high blood pressure. Avoid pickles, packaged snacks, and processed/preserved foods which are high in hidden salt.
+- Alcohol: Best avoided. If consumed, only in moderation, and be aware it can cause low blood sugar (hypoglycaemia), especially on an empty stomach.
+- Sweeteners: Natural sweeteners like honey, jaggery, and fruit juice concentrates are best avoided. Approved artificial sweeteners (stevia, sucralose) can be used in moderation.
+- During illness ("sick days"): Continue eating - switch to easily digestible foods like thin soups, milk, buttermilk, or fresh lime juice if solid food is difficult to manage. Do not stop eating or skip medication without medical advice during illness.
+
+PHYSICAL ACTIVITY
+
+Regular exercise improves insulin sensitivity, helps manage weight, reduces heart disease risk, and improves overall wellbeing. Recommendation: about 150 minutes of aerobic activity (like brisk walking) per week, combined with resistance/strength training at least twice a week and flexibility exercises. If you're on medications that can cause low blood sugar, carry a quick-acting carbohydrate snack during exercise, especially if the session is longer than usual.
+
+Yoga is increasingly recognized as a helpful complementary practice for stress management and may benefit blood sugar control, though it should be learned under proper guidance and does not replace medical treatment.
+
+LIFESTYLE
+
+- Tobacco use (smoking or chewing) should be completely avoided - it significantly worsens diabetes complications.
+- Stress management through meditation, yoga, walking, exercise, or hobbies is genuinely beneficial for blood sugar control.
+
+MEDICATION - A GENERAL NOTE (not a substitute for your doctor's guidance)
+
+Type 2 diabetes is often managed with a combination of lifestyle changes and medication, and treatment must be individualized - what works for one person may not be right for another. Some people manage well with lifestyle changes alone in early stages; many will eventually need oral medication, and some will need insulin. Needing insulin is not a sign of failure - it simply reflects what your body needs at that stage, and your doctor will determine the right approach based on your blood sugar levels, symptoms, and overall health. Never start, stop, or change your diabetes medication dose without your doctor's guidance - this includes switching between brands or types of medication.
+
+Many people also use indigenous/herbal remedies (Ayurveda, other traditional systems) alongside conventional treatment. While some herbal products do have blood-sugar-lowering effects, they are not risk-free just because they're natural, and can interact with prescribed medication - always inform your doctor about anything else you're taking.
+
+WARNING SIGNS - HYPOGLYCAEMIA (LOW BLOOD SUGAR)
+
+If you're on medication (especially insulin or certain tablets) and experience hunger, sweating, trembling, palpitations, or confusion, this may be low blood sugar. If conscious, take oral glucose, sugar, or a sugary drink immediately. If someone with diabetes becomes unconscious or severely confused, this is a medical emergency - seek immediate medical help.
+
+WARNING SIGNS - SEVERE HIGH BLOOD SUGAR (Diabetic Emergencies)
+
+Symptoms like severe abdominal pain, breathlessness, vomiting, confusion, or significant dehydration in a person with diabetes can indicate a serious emergency (diabetic ketoacidosis or a hyperglycaemic crisis) - this requires immediate medical attention, not home management.
+
+COMPLICATIONS - WHY REGULAR CHECK-UPS MATTER
+
+Diabetes can affect the eyes, kidneys, nerves, heart, and feet over time - but early detection through regular screening can largely prevent or reduce this damage, since these complications often don't cause noticeable symptoms until they're advanced. This is why annual eye exams, kidney function tests, and foot checks are recommended even if you feel fine.
+
+Foot Care - Do's and Don'ts:
+DO: Inspect your feet daily (use a mirror if needed), wash feet daily in lukewarm water including between the toes, moisturize after drying, have feet checked at every clinic visit, inspect footwear daily for anything that could cause injury, change footwear regularly.
+DON'T: Walk barefoot, smoke or drink excess alcohol, expose feet to extreme temperatures, use hot water soaks, use chemical corn removers or blades on corns/calluses, wear new footwear for long periods without breaking it in, ignore any minor foot injury.
+
+COMORBID CONDITIONS
+
+Hypertension (High Blood Pressure): Very common alongside diabetes and significantly raises the risk of heart attack, stroke, and kidney disease. Blood pressure should be checked at every visit; a reading consistently above 140/90 mmHg needs treatment, guided by your doctor.
+
+Tuberculosis (TB): People with diabetes have a 2.5 to 3 times higher risk of developing TB, and diabetes is common among TB patients in India. If you have diabetes and develop a persistent cough, unexplained weight loss, or prolonged fever, mention this to your doctor so TB can be ruled out.
+
+DIABETES AND PREGNANCY
+
+All pregnant women in India should ideally be screened for gestational diabetes (diabetes that develops during pregnancy), typically via a glucose tolerance test at the first antenatal visit and again between 24-28 weeks. Diet and exercise are the first line of management; many women will need insulin if this isn't sufficient (oral medication is generally avoided in pregnancy). Since 50-70% of women with gestational diabetes go on to develop type 2 diabetes within 5-10 years after delivery, follow-up testing 6-8 weeks after delivery and annual screening afterward is important.
+
+Source: Indian Council of Medical Research (ICMR), Government of India. ICMR Guidelines for Management of Type 2 Diabetes, 2018.
