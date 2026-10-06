@@ -16,6 +16,13 @@ class Settings(BaseSettings):
     RAW_DOCS_DIR: str = os.getenv("RAW_DOCS_DIR", os.path.join(BASE_DIR, "data", "raw_docs")).strip()
     EMBEDDING_MODEL_NAME: str = os.getenv("EMBEDDING_MODEL_NAME", "all-MiniLM-L6-v2").strip()
     GROQ_MODEL_NAME: str = os.getenv("GROQ_MODEL_NAME", "qwen/qwen3.8-27b").strip()
+    ALLOWED_ORIGINS: str = os.getenv("ALLOWED_ORIGINS", "*").strip()
+
+    @property
+    def parsed_origins(self) -> list[str]:
+        if self.ALLOWED_ORIGINS == "*":
+            return ["*"]
+        return [o.strip() for o in self.ALLOWED_ORIGINS.split(",") if o.strip()]
     
     @property
     def formatted_db_url(self) -> str:

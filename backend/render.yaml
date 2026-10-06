@@ -4,12 +4,14 @@ services:
     name: swasthya-saathi-backend
     env: python
     region: singapore
-    buildCommand: pip install -r requirements.txt && python app/rag/ingest.py
+    buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: GROQ_API_KEY
         sync: false
       - key: DATABASE_URL
+        sync: false
+      - key: ALLOWED_ORIGINS
         sync: false
       - key: VECTOR_STORE_DIR
         value: ./data/vector_store
