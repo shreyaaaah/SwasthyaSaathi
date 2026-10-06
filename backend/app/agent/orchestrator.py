@@ -86,7 +86,7 @@ def _get_cross_encoder():
             _cross_encoder = None
     return _cross_encoder
 
-CE_SKIP_THRESHOLD = 0.0   # Max-CE < 0 → skip KB entirely, no sufficiency check
+CE_SKIP_THRESHOLD = -9.5   # Max-CE < -9.5 → noise/irrelevant match from FAISS, skip KB entirely
 
 
 def specificity_gate(query: str, raw_chunks: List[Dict[str, Any]], faiss_floor: float = 0.45,
@@ -95,15 +95,10 @@ def specificity_gate(query: str, raw_chunks: List[Dict[str, Any]], faiss_floor: 
     Two-stage specificity gate:
     Stage 1 — FAISS floor: drop all chunks with cosine score < faiss_floor.
     Stage 2 — Cross-encoder rerank: score (query, chunk) for ALL valid chunks.
-              If max CE score < 0: KB lacks specificity completely → skip KB and sufficiency.
-              If max CE score >= 0: KB partially relevant → run sufficiency check.
+              If max CE score < -9.5: KB lacks specificity completely → skip KB.
+              If max CE score >= -9.5: KB relevant → evaluate sufficiency.
               If CE model is unavailable, fails closed (passed=False).
-
-    Prints:
-      - The exact string passed to model.encode() for FAISS embedding (encode_query_str)
-      - The exact (query, chunk) pair strings passed to CE.predict()
     """
-    # Print the exact string passed to encode() for FAISS embedding
     embed_str = encode_query_str if encode_query_str is not None else query
     print(f"  [FAISS ENCODE STRING] Exact string passed to model.encode(): {repr(embed_str)}")
 
@@ -133,8 +128,8 @@ def specificity_gate(query: str, raw_chunks: List[Dict[str, Any]], faiss_floor: 
         }
 
     try:
-        pairs = [(query, c.get("chunk_text", c.get("snippet", ""))[:512]) for c in valid]
-        # Print the exact strings passed to CE.predict()
+        ce_query = encode_query_str if encode_query_str is not None else query
+        pairs = [(ce_query, c.get("chunk_text", c.get("snippet", ""))[:512]) for c in valid]
         for i, (q_str, chunk_str) in enumerate(pairs):
             print(f"  [CE PAIR {i}] query={repr(q_str[:80])} | chunk={repr(chunk_str[:80])}")
         scores = ce.predict(pairs)
@@ -161,15 +156,13 @@ def specificity_gate(query: str, raw_chunks: List[Dict[str, Any]], faiss_floor: 
             "valid_chunks": valid
         }
 
-    # CE < 0: skip KB entirely (hard skip - no sufficiency check)
     skip_kb = max_ce_score < CE_SKIP_THRESHOLD
-    # CE >= 0: run sufficiency check, may still fallback
     passed = not skip_kb
 
     reason = (
-        f"Max-CE={max_ce_score:.4f} < 0 — KB entirely off-topic → skip KB, go straight to web"
+        f"Max-CE={max_ce_score:.4f} < {CE_SKIP_THRESHOLD} — KB off-topic → skip KB, go straight to web"
         if skip_kb else
-        f"Max-CE={max_ce_score:.4f} >= 0 — KB partially relevant → run sufficiency check"
+        f"Max-CE={max_ce_score:.4f} >= {CE_SKIP_THRESHOLD} — KB relevant → run sufficiency check"
     )
     print(f"  [CE-GATE] FAISS top1={faiss_top1:.4f} | Max-CE={max_ce_score:.4f} | passed={passed} | skip_kb={skip_kb}")
     return {
@@ -618,8 +611,90 @@ def extract_pdf_content(content_bytes: bytes, filename: str) -> tuple:
     return text, clean_title
 
 
+def _fetch_single_url(item: Dict[str, Any], query: str, headers: Dict[str, str], timeout: int = 4) -> Dict[str, Any]:
+    url = item.get("href") or item.get("link") or ""
+    title = item.get("title") or "Public Health Guidance"
+    snippet = item.get("body") or item.get("snippet") or ""
+
+    t_start = time.time()
+    page_text = ""
+    page_date = None
+    http_status = None
+    content_type = None
+    bytes_len = 0
+    content_source = "search_snippet"
+
+    try:
+        import requests
+        from bs4 import BeautifulSoup
+        resp = requests.get(url, headers=headers, timeout=(3.0, 3.0), allow_redirects=True, stream=True)
+        dt_fetch = round((time.time() - t_start) * 1000, 2)
+        http_status = resp.status_code
+        content_type = resp.headers.get("Content-Type", "")
+
+        content_bytes = bytearray()
+        for chunk_bytes in resp.iter_content(chunk_size=16384):
+            content_bytes.extend(chunk_bytes)
+            if len(content_bytes) > 2 * 1024 * 1024:
+                break
+        resp.close()
+        bytes_len = len(content_bytes)
+
+        print(f"  [WEB FETCH LOG] URL: {url} | Status: {http_status} | Time: {dt_fetch}ms | Content-Type: {content_type} | Bytes: {bytes_len}")
+
+        if resp.status_code == 200:
+            if "application/pdf" in content_type.lower() or url.lower().endswith(".pdf"):
+                print(f"  [WEB FETCH LOG] PDF detected ({bytes_len} bytes) — using search snippet instead of parsing.")
+                page_text = snippet
+                content_source = "search_snippet"
+            else:
+                html_text = bytes(content_bytes).decode("utf-8", errors="ignore")
+                soup = BeautifulSoup(html_text, "html.parser")
+                page_date = extract_page_date(soup)
+                parsed_tables = parse_html_tables(soup)
+
+                for element in soup(["script", "style", "nav", "header", "footer", "form", "aside"]):
+                    element.decompose()
+                main_elem = soup.find("main") or soup.find("article") or soup.find("body")
+                if main_elem:
+                    text_content = main_elem.get_text(separator=" ", strip=True)
+                    text_content = re.sub(r"\s+", " ", text_content)
+                    if parsed_tables:
+                        tbl_str = "\n\nPARSED TABLES:\n" + repr(parsed_tables[:2])[:600]
+                        text_content += tbl_str
+                    if len(text_content) > 100:
+                        page_text = text_content
+                        content_source = "page_fetch"
+    except Exception as e:
+        dt_fetch = round((time.time() - t_start) * 1000, 2)
+        print(f"  [WEB FETCH LOG] Failed/Timed-out ({dt_fetch}ms) for {url}: {e}")
+
+    if page_text:
+        reranked_snippet = extract_passages_and_rerank(query, page_text, top_k_passages=3)
+        final_snippet = reranked_snippet[:1000] if reranked_snippet else page_text[:1000]
+    else:
+        final_snippet = snippet[:1000]
+        content_source = "search_snippet"
+
+    return {
+        "doc_name": title,
+        "title": title,
+        "source_url": url,
+        "page_date": page_date,
+        "http_status": http_status,
+        "content_type": content_type,
+        "bytes_len": bytes_len,
+        "content_source": content_source,
+        "section": "Live Web Search Result",
+        "snippet": final_snippet,
+        "content_snippet": final_snippet,
+        "score": 0.90,
+        "source_type": "live_search"
+    }
+
+
 def web_search_health_authority(query: str, max_results: int = 3) -> List[Dict[str, Any]]:
-    """Live domain-restricted web search fallback with strict URL allowlist filter, passage reranking, and date extraction."""
+    """Live domain-restricted web search fallback with parallelized HTTP fetching, URL allowlist filter, passage reranking, and date extraction."""
     raw_results = []
     try:
         try:
@@ -645,9 +720,6 @@ def web_search_health_authority(query: str, max_results: int = 3) -> List[Dict[s
     if not raw_results:
         return []
 
-    import requests
-    from bs4 import BeautifulSoup
-
     headers = {
         "User-Agent": (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -661,91 +733,34 @@ def web_search_health_authority(query: str, max_results: int = 3) -> List[Dict[s
         "Upgrade-Insecure-Requests": "1"
     }
 
-    results = []
+    allowed_items = []
     for item in raw_results:
-        if len(results) >= max_results:
+        url = item.get("href") or item.get("link") or ""
+        if url and is_url_allowed(url):
+            allowed_items.append(item)
+        else:
+            print(f"  [ALLOWLIST FILTER] Dropped disallowed or non-books URL: {url}")
+        if len(allowed_items) >= max_results:
             break
 
-        url = item.get("href") or item.get("link") or ""
-        title = item.get("title") or "Public Health Guidance"
-        snippet = item.get("body") or item.get("snippet") or ""
+    if not allowed_items:
+        return []
 
-        if not url or not is_url_allowed(url):
-            print(f"  [ALLOWLIST FILTER] Dropped disallowed or non-books URL: {url}")
-            continue
+    t_parallel_fetch_start = time.time()
+    results = []
+    with ThreadPoolExecutor(max_workers=min(len(allowed_items), 5)) as fetch_executor:
+        futures = [fetch_executor.submit(_fetch_single_url, item, query, headers, 4) for item in allowed_items]
+        for fut in futures:
+            try:
+                res = fut.result()
+                if res:
+                    results.append(res)
+            except Exception as e:
+                print(f"  [WEB PARALLEL FETCH ERROR]: {e}")
 
-        page_text = ""
-        page_date = None
-        http_status = None
-        content_type = None
-        bytes_len = 0
-        content_source = "search_snippet"
-
-        try:
-            resp = requests.get(url, headers=headers, timeout=10, allow_redirects=True)
-            http_status = resp.status_code
-            content_type = resp.headers.get("Content-Type", "")
-            bytes_len = len(resp.content)
-
-            print(f"  [WEB FETCH LOG] URL: {url} | Status: {http_status} | Content-Type: {content_type} | Bytes: {bytes_len}")
-
-            if resp.status_code == 200:
-                if "application/pdf" in content_type.lower() or url.lower().endswith(".pdf"):
-                    filename = url.split("/")[-1]
-                    pdf_text, pdf_title = extract_pdf_content(resp.content, filename)
-                    if pdf_text:
-                        page_text = pdf_text
-                        title = pdf_title
-                        content_source = "page_fetch"
-                else:
-                    soup = BeautifulSoup(resp.text, "html.parser")
-                    page_date = extract_page_date(soup)
-
-                    # Column-aware table parsing
-                    parsed_tables = parse_html_tables(soup)
-
-                    for element in soup(["script", "style", "nav", "header", "footer", "form", "aside"]):
-                        element.decompose()
-                    main_elem = soup.find("main") or soup.find("article") or soup.find("body")
-                    if main_elem:
-                        text_content = main_elem.get_text(separator=" ", strip=True)
-                        text_content = re.sub(r"\s+", " ", text_content)
-                        if parsed_tables:
-                            tbl_str = "\n\nPARSED TABLES:\n" + repr(parsed_tables[:2])[:600]
-                            text_content += tbl_str
-                        if len(text_content) > 100:
-                            page_text = text_content
-                            content_source = "page_fetch"
-        except Exception as e:
-            print(f"  [WEB FETCH LOG] Failed to fetch {url}: {e}")
-
-        # Passage splitting and reranking
-        if page_text:
-            reranked_snippet = extract_passages_and_rerank(query, page_text, top_k_passages=3)
-            final_snippet = reranked_snippet[:1000] if reranked_snippet else page_text[:1000]
-        else:
-            final_snippet = snippet[:1000]
-            content_source = "search_snippet"
-
-        print(f"  [FETCH REPR (First 300 chars)]: {repr(final_snippet[:300])}")
-
-        results.append({
-            "doc_name": title,
-            "title": title,
-            "source_url": url,
-            "page_date": page_date,
-            "http_status": http_status,
-            "content_type": content_type,
-            "bytes_len": bytes_len,
-            "content_source": content_source,
-            "section": "Live Web Search Result",
-            "snippet": final_snippet,
-            "content_snippet": final_snippet,
-            "score": 0.90,
-            "source_type": "live_search"
-        })
-
-    return results
+    dt_parallel_fetch = round((time.time() - t_parallel_fetch_start) * 1000, 2)
+    print(f"  [WEB PARALLEL FETCH COMPLETE] Parallel fetched {len(results)} URLs in {dt_parallel_fetch}ms")
+    return results[:max_results]
 
 
 # ---------------------------------------------------------------------------
@@ -1130,7 +1145,7 @@ def verify_grounding(client: Groq, active_model: str, answer_to_audit: str,
                 auditor_model,
                 messages=[{"role": "user", "content": audit_prompt}],
                 temperature=0.0,
-                max_tokens=1500
+                max_tokens=4096
             )
             served_model = getattr(res, "model", auditor_model)
             raw = res.choices[0].message.content or ""
@@ -1342,7 +1357,22 @@ def run_agent(user_id: str, query: str) -> Dict[str, Any]:
         print(f"  [SESSION HISTORY] Fetched {len(valid_history)} valid logs for user '{user_id}' in {dt_hist}ms")
 
         if valid_history:
-            prev_topics = " ".join([h.get("query_text", "") for h in valid_history[:2]])
+            query_words = set(re.findall(r"\w+", query.lower())) - {
+                "what", "should", "i", "do", "about", "the", "mentioned", "earlier",
+                "my", "how", "can", "help", "is", "a", "an", "for", "have", "had", "good", "immunity"
+            }
+            matching_history = []
+            for h in valid_history:
+                q_text = h.get("query_text", "")
+                h_words = set(re.findall(r"\w+", q_text.lower()))
+                if query_words and (query_words & h_words):
+                    matching_history.append(q_text)
+
+            if matching_history:
+                prev_topics = " ".join(matching_history[:1])
+            else:
+                prev_topics = valid_history[0].get("query_text", "")
+
             retrieval_query = f"{query} {prev_topics}"
             print(f"  [RECALL ENRICH] Original query: '{query}' -> Retrieval query: '{retrieval_query}'")
 
@@ -1387,18 +1417,33 @@ def run_agent(user_id: str, query: str) -> Dict[str, Any]:
     # 2. CE-HEURISTIC SUFFICIENCY GATE + PARALLEL WEB SEARCH + PARALLEL TRIAGE
     # -------------------------------------------------------------------------
     # FIX (Latency): sufficiency_check was a full Groq LLM call (~8-15s).
-    # Replaced with CE-score heuristic: max_ce > 1.5 = KB sufficient.
-    # This eliminates one sequential Groq call from every query, saving 8-15s.
-    # Threshold 1.5 validated against calibration_run.txt.
+    # Threshold -8.0 tuned for MS-MARCO Cross-Encoder score range (-8.0+ indicates relevant KB match).
     # -------------------------------------------------------------------------
-    CE_SUFFICIENT_THRESHOLD = 1.5
+    CE_SUFFICIENT_THRESHOLD = -8.0
     suff_result = None
     triage_tag = "GENERAL_INFO"
     missing_facts = []
 
+    # Check if a cleaned symptom query improves max_ce before falling back to web
+    if max_ce is None or max_ce < CE_SUFFICIENT_THRESHOLD:
+        stop_words = ["i have had a", "i have a", "for 3 days", "for a few days", "what should i do about", "i mentioned earlier"]
+        clean_q = query.lower()
+        for sw in stop_words:
+            clean_q = clean_q.replace(sw, "")
+        clean_q = clean_q.strip()
+        if clean_q and clean_q != query.lower():
+            retry_chunks = search_advisories(clean_q, top_k=5)
+            retry_gate = specificity_gate(query, retry_chunks, faiss_floor=0.45, encode_query_str=clean_q)
+            retry_ce = retry_gate.get("max_ce_score")
+            print(f"  [RETRY CLEAN QUERY] '{clean_q}' -> Retry Max-CE={retry_ce}")
+            if retry_ce is not None and retry_ce > (max_ce or -99):
+                max_ce = retry_ce
+                gate_result = retry_gate
+                skip_kb = retry_gate.get("skip_kb", False)
+
     if skip_kb or max_ce is None:
-        # CE < 0: hard skip — go straight to web search
-        print(f"  [GATE] Max-CE={max_ce} < 0 → hard skip KB, go straight to web.")
+        # CE < -9.5: hard skip — go straight to web search
+        print(f"  [GATE] Max-CE={max_ce} < {CE_SKIP_THRESHOLD} → hard skip KB, go straight to web.")
         fallback_fired = True
         t_fb_start = time.time()
         with ThreadPoolExecutor(max_workers=2) as executor:

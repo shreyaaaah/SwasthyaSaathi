@@ -7,7 +7,7 @@ import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
 BASE_URL = "http://localhost:8000"
-USER_ID = "convo_recall_user_102"
+USER_ID = "convo_recall_user_final_4"
 
 messages = [
     "I have had a cough for 3 days.",
