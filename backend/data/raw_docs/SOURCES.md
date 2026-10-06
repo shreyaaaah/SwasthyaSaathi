@@ -25,10 +25,8 @@ for every file in this directory. The ingestion script must refuse any file not 
 | infection.pdf | WHO | https://www.who.int/publications/i/item/9789241550086 | 2026-09-19 | 2d6fb222e2efc95e | WHO Infection Prevention Guidelines |
 | low hameoglobin.pdf | WHO | https://www.who.int/news-room/fact-sheets/detail/anaemia | 2026-09-19 | 315a402cb68eaa89 | WHO Anaemia Guidelines |
 | malaria.pdf | WHO | https://www.who.int/news-room/fact-sheets/detail/malaria | 2026-09-19 | 41c1cb923973ab0d | WHO Malaria Guidelines |
-| malaria_guidelines.txt | WHO | https://www.who.int/news-room/fact-sheets/detail/malaria | 2026-09-19 | 2af5fafae75eb0cb | WHO Malaria Fact Sheet |
 | maternal_child_health_guidelines.txt | MoHFW / WHO | https://nhmmeghalaya.nic.in/guidelines/gfac.pdf | 2026-09-19 | 8e6bae45af8800ed | RMNCH+A Guidelines MoHFW |
 | mengitis.pdf | WHO | https://www.who.int/news-room/fact-sheets/detail/meningitis | 2026-09-19 | 3151468d2e1b9729 | WHO Meningitis Fact Sheet |
-| mental_health_depression_guidelines.txt | MoHFW / WHO | https://www.who.int/news-room/fact-sheets/detail/depression | 2026-09-19 | ee2c5b1f7b4561ce | National Mental Health Programme Guidelines |
 | mentalhealth at work.pdf | WHO / ILO | https://www.who.int/publications/i/item/9789240053052 | 2026-09-19 | fabbc1aae233c14b | WHO Guidelines on Mental Health at Work |
 | phuenomia and diahria.pdf | WHO / UNICEF | https://www.who.int/publications/i/item/9789241505239 | 2026-09-19 | 12876606e78ede37 | GAPPD Pneumonia and Diarrhoea Plan |
 | selfcare (1).pdf | WHO | https://www.who.int/publications/i/item/9789240052192 | 2026-09-19 | 2e0ac99bb06799d4 | WHO Self-Care Interventions Guideline |
