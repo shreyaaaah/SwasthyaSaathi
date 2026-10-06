@@ -24,7 +24,7 @@ if BACKEND_DIR not in sys.path:
 from groq import Groq
 from app.config import settings
 from app.db import SessionLocal, init_db
-from app.models import SymptomLog
+from app.models import Conversation, SymptomLog
 from app.rag.retriever import get_retriever
 
 # Thread pool for asynchronous non-blocking DB logging
@@ -786,20 +786,34 @@ def check_myth(query: str) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 def get_session_history(user_id: str, limit: int = 5) -> List[Dict[str, Any]]:
-    """Queries symptom_logs table in Neon/PostgreSQL for user history using connection pool."""
+    """Queries Conversation and SymptomLog tables in Neon/PostgreSQL for user history using connection pool."""
     db = SessionLocal()
     try:
-        logs = db.query(SymptomLog).filter(SymptomLog.user_id == user_id).order_by(SymptomLog.created_at.desc()).limit(limit).all()
         history = []
-        for l in logs:
+        # First query Conversation records (written by /chat endpoint)
+        convs = db.query(Conversation).filter(Conversation.user_id == user_id).order_by(Conversation.timestamp.desc()).limit(limit).all()
+        for c in convs:
             history.append({
-                "id": l.id,
-                "user_id": l.user_id,
-                "query_text": l.query_text,
-                "topic": l.topic,
-                "triage_tag": l.triage_tag,
-                "created_at": l.created_at.isoformat() if l.created_at else None
+                "id": c.id,
+                "user_id": c.user_id,
+                "query_text": c.query,
+                "response_text": c.response,
+                "triage_tag": c.triage_tag,
+                "created_at": c.timestamp.isoformat() if c.timestamp else None
             })
+        
+        # Fall back to SymptomLog table if Conversation table is empty for this user
+        if not history:
+            logs = db.query(SymptomLog).filter(SymptomLog.user_id == user_id).order_by(SymptomLog.created_at.desc()).limit(limit).all()
+            for l in logs:
+                history.append({
+                    "id": l.id,
+                    "user_id": l.user_id,
+                    "query_text": l.query_text,
+                    "response_text": "",
+                    "triage_tag": l.triage_tag,
+                    "created_at": l.created_at.isoformat() if l.created_at else None
+                })
         return history
     except Exception as e:
         return [{"error": f"Failed to fetch session history: {str(e)}"}]
@@ -1246,6 +1260,25 @@ def is_comparison_query(query: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
+# Session history recall detection
+# ---------------------------------------------------------------------------
+_RECALL_KEYWORDS = [
+    r"\bmentioned\b", r"\bearlier\b", r"\bbefore\b", r"\bprevious\b",
+    r"\blast time\b", r"\bwhat (i|we) said\b", r"\bwhat about the\b",
+    r"\bmy (cough|fever|pain|symptoms|condition) (i mentioned|earlier|before)\b",
+    r"\bfollowing up\b", r"\bfollow.?up\b", r"\brecall\b"
+]
+
+def _query_references_history(query: str) -> bool:
+    """Returns True if query appears to reference a prior turn or past symptom."""
+    q = query.lower()
+    for pattern in _RECALL_KEYWORDS:
+        if re.search(pattern, q):
+            return True
+    return False
+
+
+# ---------------------------------------------------------------------------
 # Model verification
 # ---------------------------------------------------------------------------
 
@@ -1293,72 +1326,125 @@ def run_agent(user_id: str, query: str) -> Dict[str, Any]:
     sources_collected = []
     fallback_fired = False
 
+    # 0. SESSION HISTORY CHECK (Pre-retrieval so history can enrich retrieval query if needed)
+    session_history_context = ""
+    is_recall_query = _query_references_history(query)
+    retrieval_query = query
+    print(f"  [RECALL DETECT] is_recall={is_recall_query} | query={repr(query[:80])}")
+
+    if is_recall_query:
+        t_hist_start = time.time()
+        history_items = get_session_history(user_id=user_id, limit=5)
+        dt_hist = round((time.time() - t_hist_start) * 1000, 2)
+        timing_breakdown.append({"step": "DB get_session_history", "duration_ms": dt_hist})
+
+        valid_history = [h for h in history_items if "error" not in h and h.get("query_text")]
+        print(f"  [SESSION HISTORY] Fetched {len(valid_history)} valid logs for user '{user_id}' in {dt_hist}ms")
+
+        if valid_history:
+            prev_topics = " ".join([h.get("query_text", "") for h in valid_history[:2]])
+            retrieval_query = f"{query} {prev_topics}"
+            print(f"  [RECALL ENRICH] Original query: '{query}' -> Retrieval query: '{retrieval_query}'")
+
+            chronological = list(reversed(valid_history[:5]))
+            lines = []
+            for h in chronological:
+                q_text = h.get('query_text', '')
+                r_text = h.get('response_text', '')
+                if r_text:
+                    r_snippet = r_text[:250].replace("\n", " ") + "..." if len(r_text) > 250 else r_text.replace("\n", " ")
+                    lines.append(f"User: \"{q_text}\"\nAssistant: \"{r_snippet}\"")
+                else:
+                    lines.append(f"User: \"{q_text}\"")
+
+            session_history_context = (
+                "\n\nPAST CONVERSATION HISTORY WITH THIS USER:\n"
+                + "\n---\n".join(lines)
+                + "\n---\n"
+                "INSTRUCTION FOR THIS RECALL QUERY: The user's query references information from the past conversation history above. "
+                "Identify what symptom or condition they previously discussed (e.g., cough, fever, pain) and answer their current question directly, "
+                "combining the past history with any reference sources provided below. "
+                "Do NOT state that you lack memory or access to past messages."
+            )
+            print(f"  [SESSION HISTORY] Injected context ({len(valid_history)} turns)")
+        else:
+            print(f"  [SESSION HISTORY] No prior logs found for user '{user_id}'.")
+
     # 1. RETRIEVAL & SPECIFICITY GATE
     t_ret_start = time.time()
-    raw_chunks = search_advisories(query, top_k=5)
+    raw_chunks = search_advisories(retrieval_query, top_k=5)
     dt_ret = round((time.time() - t_ret_start) * 1000, 2)
     timing_breakdown.append({"step": "Parallel Tools Execution (search_advisories)", "duration_ms": dt_ret})
 
     t_gate_start = time.time()
-    gate_result = specificity_gate(query, raw_chunks, faiss_floor=0.45, encode_query_str=query)
+    gate_result = specificity_gate(query, raw_chunks, faiss_floor=0.45, encode_query_str=retrieval_query)
     dt_gate = round((time.time() - t_gate_start) * 1000, 2)
     timing_breakdown.append({"step": "CE Specificity Gate", "duration_ms": dt_gate})
 
     max_ce = gate_result.get("max_ce_score")
     skip_kb = gate_result.get("skip_kb", False)
 
-    # 2. PARALLEL SUFFICIENCY CHECK & LIVE SEARCH (or hard skip)
+    # 2. CE-HEURISTIC SUFFICIENCY GATE + PARALLEL WEB SEARCH + PARALLEL TRIAGE
+    # -------------------------------------------------------------------------
+    # FIX (Latency): sufficiency_check was a full Groq LLM call (~8-15s).
+    # Replaced with CE-score heuristic: max_ce > 1.5 = KB sufficient.
+    # This eliminates one sequential Groq call from every query, saving 8-15s.
+    # Threshold 1.5 validated against calibration_run.txt.
+    # -------------------------------------------------------------------------
+    CE_SUFFICIENT_THRESHOLD = 1.5
     suff_result = None
     triage_tag = "GENERAL_INFO"
     missing_facts = []
 
     if skip_kb or max_ce is None:
-        # CE < 0: hard skip — no sufficiency check, go straight to web search
-        print(f"  [GATE] Max-CE={max_ce} < 0 → hard skip KB and sufficiency check.")
+        # CE < 0: hard skip — go straight to web search
+        print(f"  [GATE] Max-CE={max_ce} < 0 → hard skip KB, go straight to web.")
         fallback_fired = True
         t_fb_start = time.time()
-        live_res = web_search_health_authority(query=query, max_results=3)
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            fut_web = executor.submit(web_search_health_authority, retrieval_query, 3)
+            fut_triage = executor.submit(triage_classify, query, "")
+            live_res = fut_web.result()
+            triage_res = fut_triage.result()
         dt_fb = round((time.time() - t_fb_start) * 1000, 2)
-        timing_breakdown.append({"step": "Live Web Search & Rerank", "duration_ms": dt_fb})
+        timing_breakdown.append({"step": "Parallel (Web Search + Triage) [skip_kb]", "duration_ms": dt_fb})
+        if isinstance(triage_res, dict) and "triage_tag" in triage_res:
+            triage_tag = triage_res["triage_tag"]
         for s in live_res:
             s["source_type"] = "live_search"
         sources_collected.extend(live_res)
     else:
-        # CE >= 0: run sufficiency check and live web search in parallel
+        # CE >= 0: use CE score to determine sufficiency (no extra Groq call)
+        kb_is_sufficient = (max_ce is not None and max_ce >= CE_SUFFICIENT_THRESHOLD)
+        print(f"  [CE-SUFFICIENCY] max_ce={max_ce:.4f} | threshold={CE_SUFFICIENT_THRESHOLD} | kb_sufficient={kb_is_sufficient}")
+
         t_parallel_start = time.time()
-        with ThreadPoolExecutor(max_workers=3) as executor:
-            fut_suff = executor.submit(
-                sufficiency_check, client, active_model, query, gate_result["valid_chunks"]
-            )
+        with ThreadPoolExecutor(max_workers=2) as executor:
             fut_triage = executor.submit(
                 triage_classify, query,
                 "\n".join([c.get("snippet", "") for c in gate_result["valid_chunks"]])
             )
-            fut_web = executor.submit(web_search_health_authority, query, 3)
+            if not kb_is_sufficient:
+                fut_web = executor.submit(web_search_health_authority, retrieval_query, 3)
 
-            suff_result = fut_suff.result()
             triage_res = fut_triage.result()
-            live_res_parallel = fut_web.result()
+            live_res_parallel = fut_web.result() if not kb_is_sufficient else []
 
         dt_parallel = round((time.time() - t_parallel_start) * 1000, 2)
-        timing_breakdown.append({"step": "Parallel (Sufficiency + Live Search + Triage)", "duration_ms": dt_parallel})
+        timing_breakdown.append({"step": "Parallel (Triage + optional Web Search)", "duration_ms": dt_parallel})
 
         if isinstance(triage_res, dict) and "triage_tag" in triage_res:
             triage_tag = triage_res["triage_tag"]
 
-        if suff_result.get("is_sufficient", False):
-            # KB is sufficient — use KB sources, no web fallback
+        if kb_is_sufficient:
             sources_collected.extend(gate_result["valid_chunks"])
-            print(f"  [SUFFICIENCY] KB is sufficient. Using KB chunks only.")
+            print(f"  [SUFFICIENCY] KB sufficient (CE heuristic). Using KB chunks only.")
         else:
-            # KB not sufficient — use web results
-            missing_facts = suff_result.get("missing_facts", [])
-            gate_result["reason"] += f" | Sufficiency check failed: {suff_result.get('reason')} (missing: {missing_facts})"
             fallback_fired = True
             for s in live_res_parallel:
                 s["source_type"] = "live_search"
             sources_collected.extend(live_res_parallel)
-            print(f"  [SUFFICIENCY] KB insufficient. Using web fallback.")
+            print(f"  [SUFFICIENCY] KB insufficient (CE heuristic). Using web fallback.")
 
     # 3. SINGLE GENERATION CALL
     system_prompt = (
@@ -1381,8 +1467,8 @@ def run_agent(user_id: str, query: str) -> Dict[str, Any]:
         "- You may mention recommended drug names (e.g., Doxycycline, Ampicillin), but ALL dosages, schedules, and durations MUST be stated as 'as prescribed by a doctor'.\n\n"
 
         "SELF-CONTAINMENT RULE (STRICT):\n"
-        "- NEVER reference previous answers, earlier context, or prior turns ('as I mentioned', 'what I shared above').\n"
-        "- Each answer must be fully self-contained.\n\n"
+        "- Each answer must be self-contained so that a user reading only this response gets complete, safe guidance.\n"
+        "- If conversation history is provided above, address the user's recall query directly using that context without saying you lack memory of past interactions.\n\n"
 
         "LOOK-ALIKE DISEASES RULE (STRICT MANDATORY — COMPARISON QUERIES ONLY):\n"
         "- Whenever answering questions comparing similar/look-alike diseases (such as Chikungunya vs Dengue), "
@@ -1416,12 +1502,16 @@ def run_agent(user_id: str, query: str) -> Dict[str, Any]:
     missing_short = missing_facts[:3] if missing_facts else []
     missing_str = f"\nMissing Facts (do not state/speculate on these): {missing_short}" if missing_short else ""
 
-    user_msg_content = f"User Query: {query}\n\nRetrieved Reference Sources:\n{context_str}{missing_str}"
+    user_msg_content = (
+        f"User Query: {query}\n\nRetrieved Reference Sources:\n{context_str}{missing_str}"
+        f"{session_history_context}"
+    )
 
     generator_messages = [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_msg_content}
     ]
+    print(f"  [GENERATOR MESSAGES] system_len={len(system_prompt)} user_len={len(user_msg_content)} history_injected={bool(session_history_context)}")
 
     t_gen_start = time.time()
     gen_response = safe_chat_completion(
