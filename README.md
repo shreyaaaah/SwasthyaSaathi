@@ -1,3 +1,9 @@
+---
+title: SwasthyaSaathi API
+sdk: docker
+app_port: 7860
+---
+
 # SwasthyaSaathi (स्वास्थ्य साथी) — Core RAG Public Health Chatbot
 
 SwasthyaSaathi is an end-to-end grounded RAG (Retrieval-Augmented Generation) public health chatbot designed to answer citizen health queries strictly based on official guidelines from the **Ministry of Health and Family Welfare (MoHFW)**, **ICMR**, **NHP**, and **WHO**.
