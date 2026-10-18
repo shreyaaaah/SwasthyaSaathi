@@ -119,13 +119,15 @@ def specificity_gate(query: str, raw_chunks: List[Dict[str, Any]], faiss_floor: 
     if ce is None:
         # No CE model available (e.g. sentence-transformers not installed).
         # Fail open: FAISS floor already passed, so treat KB as relevant.
+        # Return max_ce_score=0.0 (not None) so run_agent doesn't hard-skip KB
+        # at the `if skip_kb or max_ce is None` check (line ~1447).
         print(f"  [CE-GATE] CE unavailable → fail open. FAISS top1={faiss_top1:.4f}")
         return {
             "passed": True,
             "skip_kb": False,
             "reason": f"FAISS floor passed ({faiss_top1:.4f} >= {faiss_floor}); CE unavailable → FAISS-only decision",
             "faiss_top1": faiss_top1,
-            "max_ce_score": None,
+            "max_ce_score": 0.0,   # synthetic: above both CE_SKIP and CE_SUFFICIENT thresholds
             "chunk_ce_scores": [],
             "valid_chunks": valid
         }
