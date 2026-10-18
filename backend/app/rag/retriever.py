@@ -47,15 +47,22 @@ class FAISSRetriever:
                     print(f"Error loading vectorizer.pkl: {e}")
 
             if self.fallback_embedder is None:
+                # fastembed requires the full HuggingFace model name (e.g. sentence-transformers/all-MiniLM-L6-v2)
+                fe_model_name = self.model_name
+                if "/" not in fe_model_name:
+                    fe_model_name = f"sentence-transformers/{fe_model_name}"
                 try:
-                    print(f"Loading embedding model {self.model_name} via fastembed (ONNX)...")
-                    self.model = TextEmbedding(model_name=self.model_name)
+                    print(f"Loading embedding model {fe_model_name} via fastembed (ONNX)...")
+                    self.model = TextEmbedding(model_name=fe_model_name)
                 except Exception as e:
-                    print(f"Could not load fastembed model ({e}). Initializing TF-IDF embedder...")
-                    from data_pipeline.embed_and_index import FallbackEmbedder
-                    self.fallback_embedder = FallbackEmbedder(dim=self.index.d)
-                    all_texts = [m.get("chunk_text", "") for m in self.metadata]
-                    self.fallback_embedder.fit_encode(all_texts)
+                    print(f"Could not load fastembed model ({e}). Trying TF-IDF fallback...")
+                    try:
+                        from data_pipeline.embed_and_index import FallbackEmbedder
+                        self.fallback_embedder = FallbackEmbedder(dim=self.index.d)
+                        all_texts = [m.get("chunk_text", "") for m in self.metadata]
+                        self.fallback_embedder.fit_encode(all_texts)
+                    except ImportError:
+                        print("data_pipeline not available in this environment; no TF-IDF fallback.")
 
             print(f"Vector store ready. {self.index.ntotal} vectors loaded.")
         else:
