@@ -12,6 +12,13 @@ from app.rag.retriever import get_retriever
 from app.agent.orchestrator import run_agent, get_session_history
 from app.agent.pattern_engine import detect_symptom_patterns
 
+# Limit PyTorch to 1 thread on CPU-only deploys to reduce RSS significantly
+try:
+    import torch
+    torch.set_num_threads(1)
+except Exception:
+    pass
+
 app = FastAPI(
     title="SwasthyaSaathi Agentic API",
     description="Public Health Agentic Chatbot grounded in MoHFW, ICMR, NHP, and WHO guidelines.",
@@ -31,6 +38,14 @@ app.add_middleware(
 def on_startup():
     init_db()
     print("Database tables initialized successfully.")
+    # Pre-warm the retriever so the embedding model is loaded at startup
+    # rather than on the first request (avoids sudden memory spike on Render).
+    try:
+        retriever = get_retriever()
+        count = retriever.index.ntotal if retriever.index is not None else 0
+        print(f"Retriever pre-warmed: {count} vectors loaded.")
+    except Exception as e:
+        print(f"Retriever pre-warm failed (non-fatal): {e}")
 
 @app.get("/")
 def root():
