@@ -117,10 +117,13 @@ def specificity_gate(query: str, raw_chunks: List[Dict[str, Any]], faiss_floor: 
     faiss_top1 = valid[0].get("score", 0.0)
     ce = _get_cross_encoder()
     if ce is None:
+        # No CE model available (e.g. sentence-transformers not installed).
+        # Fail open: FAISS floor already passed, so treat KB as relevant.
+        print(f"  [CE-GATE] CE unavailable → fail open. FAISS top1={faiss_top1:.4f}")
         return {
-            "passed": False,
-            "skip_kb": True,
-            "reason": f"FAISS floor passed ({faiss_top1:.4f} >= {faiss_floor}); CE model unavailable → fail closed",
+            "passed": True,
+            "skip_kb": False,
+            "reason": f"FAISS floor passed ({faiss_top1:.4f} >= {faiss_floor}); CE unavailable → FAISS-only decision",
             "faiss_top1": faiss_top1,
             "max_ce_score": None,
             "chunk_ce_scores": [],

@@ -6,10 +6,10 @@ from typing import List, Dict, Any
 from app.config import settings
 
 try:
-    from sentence_transformers import SentenceTransformer
+    from fastembed import TextEmbedding
     import faiss
 except ImportError:
-    SentenceTransformer = None
+    TextEmbedding = None
     faiss = None
 
 class FAISSRetriever:
@@ -48,10 +48,10 @@ class FAISSRetriever:
 
             if self.fallback_embedder is None:
                 try:
-                    print(f"Loading embedding model {self.model_name}...")
-                    self.model = SentenceTransformer(self.model_name)
+                    print(f"Loading embedding model {self.model_name} via fastembed (ONNX)...")
+                    self.model = TextEmbedding(model_name=self.model_name)
                 except Exception as e:
-                    print(f"Could not load SentenceTransformer ({e}). Initializing TF-IDF embedder...")
+                    print(f"Could not load fastembed model ({e}). Initializing TF-IDF embedder...")
                     from data_pipeline.embed_and_index import FallbackEmbedder
                     self.fallback_embedder = FallbackEmbedder(dim=self.index.d)
                     all_texts = [m.get("chunk_text", "") for m in self.metadata]
@@ -77,7 +77,8 @@ class FAISSRetriever:
         # Encode query
         if self.model is not None:
             try:
-                query_vector = self.model.encode([query], convert_to_numpy=True)
+                # fastembed.embed() returns a generator of numpy arrays
+                query_vector = np.array(list(self.model.embed([query])))
             except Exception:
                 if self.fallback_embedder is not None:
                     query_vector = self.fallback_embedder.encode([query])
