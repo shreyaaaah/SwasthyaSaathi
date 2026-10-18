@@ -27,8 +27,13 @@ class Settings(BaseSettings):
     @property
     def formatted_db_url(self) -> str:
         url = self.DATABASE_URL
+        # Neon / older Heroku-style shorthand
         if url.startswith("postgres://"):
             url = url.replace("postgres://", "postgresql://", 1)
+        # SQLAlchemy 2.x defaults to psycopg3 for plain postgresql://.
+        # We ship psycopg2-binary, so pin the dialect explicitly.
+        if url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+psycopg2://", 1)
         return url
 
 settings = Settings()
