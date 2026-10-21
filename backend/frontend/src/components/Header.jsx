@@ -1,8 +1,9 @@
 import React from 'react';
-import { Activity, ShieldCheck, Database, Cpu } from 'lucide-react';
+import { Activity, ShieldCheck, Database } from 'lucide-react';
 
 const Header = ({ status }) => {
-  const isOnline = status && status.vector_store_ready;
+  const apiOnline = status?.status !== 'offline' && Boolean(status);
+  const indexReady = Boolean(status?.vector_store_ready);
 
   return (
     <header className="glass-card my-3 p-4 flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-700/50">
@@ -16,42 +17,40 @@ const Header = ({ status }) => {
               SwasthyaSaathi
             </h1>
             <span className="text-xs px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30 font-mono">
-              v1.0 Core RAG
+              Health information
             </span>
           </div>
           <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
             <ShieldCheck className="w-3.5 h-3.5 text-teal-400" />
-            Grounded Public Health Assistant (MoHFW, ICMR, NHP, WHO)
+            Public health guidance from MoHFW, ICMR, NHP and WHO
           </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-3 text-xs">
+      <div className="flex flex-wrap items-center justify-center gap-3 text-xs">
         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700">
           <Database className="w-3.5 h-3.5 text-emerald-400" />
           <span className="text-slate-300">FAISS Index:</span>
           <span className="font-semibold text-emerald-300 font-mono">
-            {status?.vectors_count || 0} chunks
-          </span>
-        </div>
-
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700">
-          <Cpu className="w-3.5 h-3.5 text-cyan-400" />
-          <span className="text-slate-300">LLM:</span>
-          <span className="font-semibold text-cyan-300 font-mono">
-            Groq API
+            {indexReady ? `${status.vectors_count || 0} chunks` : 'Unavailable'}
           </span>
         </div>
 
         <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700">
-          <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-400 pulse-glow' : 'bg-amber-400'}`}></span>
+          <span className={`w-2 h-2 rounded-full ${apiOnline ? 'bg-emerald-400' : 'bg-red-400'}`}></span>
           <span className="text-slate-300 font-medium">
-            {isOnline ? 'System Ready' : 'Indexing'}
+            {statusLabel(status)}
           </span>
         </div>
       </div>
     </header>
   );
 };
+
+function statusLabel(status) {
+  if (!status) return 'Checking service';
+  if (status.status === 'offline') return 'Service offline';
+  return status.vector_store_ready ? 'API online · guidelines available' : 'API online · guidelines unavailable';
+}
 
 export default Header;

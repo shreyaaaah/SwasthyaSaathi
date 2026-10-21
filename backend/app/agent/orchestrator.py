@@ -23,12 +23,7 @@ if BACKEND_DIR not in sys.path:
 
 from groq import Groq
 from app.config import settings
-from app.db import SessionLocal, init_db
-from app.models import Conversation, SymptomLog
 from app.rag.retriever import get_retriever
-
-# Thread pool for asynchronous non-blocking DB logging
-bg_executor = ThreadPoolExecutor(max_workers=5)
 
 # ===========================================================================
 # MODEL CHOICE EXPLANATION
@@ -100,7 +95,6 @@ def specificity_gate(query: str, raw_chunks: List[Dict[str, Any]], faiss_floor: 
               If CE model is unavailable, fails closed (passed=False).
     """
     embed_str = encode_query_str if encode_query_str is not None else query
-    print(f"  [FAISS ENCODE STRING] Exact string passed to model.encode(): {repr(embed_str)}")
 
     valid = [c for c in raw_chunks if c.get("score", 0.0) >= faiss_floor]
     if not valid:
@@ -135,8 +129,6 @@ def specificity_gate(query: str, raw_chunks: List[Dict[str, Any]], faiss_floor: 
     try:
         ce_query = encode_query_str if encode_query_str is not None else query
         pairs = [(ce_query, c.get("chunk_text", c.get("snippet", ""))[:512]) for c in valid]
-        for i, (q_str, chunk_str) in enumerate(pairs):
-            print(f"  [CE PAIR {i}] query={repr(q_str[:80])} | chunk={repr(chunk_str[:80])}")
         scores = ce.predict(pairs)
         chunk_ce_scores = []
         for idx, (c, sc) in enumerate(zip(valid, scores)):
@@ -806,69 +798,15 @@ def check_myth(query: str) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 def get_session_history(user_id: str, limit: int = 5) -> List[Dict[str, Any]]:
-    """Queries Conversation and SymptomLog tables in Neon/PostgreSQL for user history using connection pool."""
-    db = SessionLocal()
-    try:
-        history = []
-        # First query Conversation records (written by /chat endpoint)
-        convs = db.query(Conversation).filter(Conversation.user_id == user_id).order_by(Conversation.timestamp.desc()).limit(limit).all()
-        for c in convs:
-            history.append({
-                "id": c.id,
-                "user_id": c.user_id,
-                "query_text": c.query,
-                "response_text": c.response,
-                "triage_tag": c.triage_tag,
-                "created_at": c.timestamp.isoformat() if c.timestamp else None
-            })
-        
-        # Fall back to SymptomLog table if Conversation table is empty for this user
-        if not history:
-            logs = db.query(SymptomLog).filter(SymptomLog.user_id == user_id).order_by(SymptomLog.created_at.desc()).limit(limit).all()
-            for l in logs:
-                history.append({
-                    "id": l.id,
-                    "user_id": l.user_id,
-                    "query_text": l.query_text,
-                    "response_text": "",
-                    "triage_tag": l.triage_tag,
-                    "created_at": l.created_at.isoformat() if l.created_at else None
-                })
-        return history
-    except Exception as e:
-        return [{"error": f"Failed to fetch session history: {str(e)}"}]
-    finally:
-        db.close()
-
-
-def _async_db_log(user_id: str, query_text: str, topic: str, triage_tag: str):
-    """Background worker for non-blocking DB symptom logging."""
-    db = SessionLocal()
-    try:
-        log_entry = SymptomLog(
-            user_id=user_id,
-            query_text=query_text,
-            topic=topic or "general",
-            triage_tag=triage_tag or "GENERAL_INFO"
-        )
-        db.add(log_entry)
-        db.commit()
-    except Exception as e:
-        db.rollback()
-        print(f"Async DB log error: {e}")
-    finally:
-        db.close()
+    """History is disabled until authenticated per-user access is implemented."""
+    return []
 
 
 def log_symptom(user_id: str, query_text: str, topic: str, triage_tag: str) -> Dict[str, Any]:
-    """Schedules background insertion into symptom_logs table for zero blocking latency."""
-    bg_executor.submit(_async_db_log, user_id, query_text, topic, triage_tag)
+    """Symptom persistence is disabled until authenticated per-user access exists."""
     return {
-        "status": "success",
-        "message": "Symptom log scheduled asynchronously",
-        "user_id": user_id,
-        "topic": topic,
-        "triage_tag": triage_tag
+        "status": "disabled",
+        "message": "Personal health history is not stored by this service."
     }
 
 
@@ -928,8 +866,6 @@ TOOLS_MAP = {
     "search_advisories": search_advisories,
     "web_search_health_authority": web_search_health_authority,
     "check_myth": check_myth,
-    "get_session_history": get_session_history,
-    "log_symptom": log_symptom,
     "triage_classify": triage_classify,
     "get_regional_alerts": get_regional_alerts
 }
@@ -976,38 +912,6 @@ GROQ_TOOLS_SCHEMA = [
                     "query": {"type": "string", "description": "The health claim or myth to check"}
                 },
                 "required": ["query"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "get_session_history",
-            "description": "Fetches past symptom logs and previous user interactions for context continuity.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "user_id": {"type": "string", "description": "User identifier"},
-                    "limit": {"type": "integer", "description": "Max history items to return (default 5)"}
-                },
-                "required": ["user_id"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "log_symptom",
-            "description": "Logs the current interaction, topic, and triage level into the database.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "user_id": {"type": "string", "description": "User identifier"},
-                    "query_text": {"type": "string", "description": "Original query text"},
-                    "topic": {"type": "string", "description": "Topic e.g. dengue, tuberculosis, maternal_child_health, general"},
-                    "triage_tag": {"type": "string", "description": "Triage classification (EMERGENCY, CONSULT_SOON, SELF_CARE, GENERAL_INFO)"}
-                },
-                "required": ["user_id", "query_text", "topic", "triage_tag"]
             }
         }
     },
@@ -1189,7 +1093,6 @@ def verify_grounding(client: Groq, active_model: str, answer_to_audit: str,
                 served_model = getattr(res, "model", auditor_model)
 
             print(f"  [AUDIT FAILED] Attempt {attempt} | Model: '{served_model}' | Finish Reason: '{finish_reason}'")
-            print(f"  [AUDIT RAW CONTENT]: {repr(raw_content[:300])}")
             print(f"  [AUDIT ERROR]: {e}")
             if attempt == 2:
                 print("  [AUDIT] Both attempts failed — setting is_fully_grounded = null (unverified)")
@@ -1332,13 +1235,12 @@ def run_agent(user_id: str, query: str) -> Dict[str, Any]:
     - Testing caveat only for comparison queries
     - Latency targets: <10s if draft passes audit, <20s with regen
     """
-    init_db()
     overall_start = time.time()
     active_model = settings.GROQ_MODEL_NAME
     client = Groq(api_key=settings.GROQ_API_KEY)
 
     is_comparison = is_comparison_query(query)
-    print(f"\n[ORCHESTRATOR START] Model: '{active_model}' | User: '{user_id}' | Query: '{query}'")
+    print(f"\n[ORCHESTRATOR START] Model: '{active_model}'")
     print(f"  [QUERY TYPE] comparison={is_comparison}")
     _verify_model_available(client, active_model)
 
@@ -1350,7 +1252,7 @@ def run_agent(user_id: str, query: str) -> Dict[str, Any]:
     session_history_context = ""
     is_recall_query = _query_references_history(query)
     retrieval_query = query
-    print(f"  [RECALL DETECT] is_recall={is_recall_query} | query={repr(query[:80])}")
+    print(f"  [RECALL DETECT] is_recall={is_recall_query}")
 
     if is_recall_query:
         t_hist_start = time.time()
@@ -1379,7 +1281,6 @@ def run_agent(user_id: str, query: str) -> Dict[str, Any]:
                 prev_topics = valid_history[0].get("query_text", "")
 
             retrieval_query = f"{query} {prev_topics}"
-            print(f"  [RECALL ENRICH] Original query: '{query}' -> Retrieval query: '{retrieval_query}'")
 
             chronological = list(reversed(valid_history[:5]))
             lines = []
@@ -1642,11 +1543,6 @@ def run_agent(user_id: str, query: str) -> Dict[str, Any]:
             else:
                 final_answer += f"\n\n{DOCTOR_NOTE}"
             print(f"  [DOCTOR NOTE] Appended treatment authority note for treatment query.")
-
-    # 8. OPTIONAL SYMPTOM LOGGING
-    personal_keywords = ["i have", "my baby", "my child", "i am", "my fever", "suffering from", "pain in my"]
-    if any(k in query.lower() for k in personal_keywords):
-        bg_executor.submit(log_symptom, user_id, query, "general", triage_tag)
 
     total_duration = round((time.time() - overall_start) * 1000, 2)
     is_grounded_val = final_audit.get("is_fully_grounded")

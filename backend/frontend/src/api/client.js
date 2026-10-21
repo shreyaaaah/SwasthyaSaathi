@@ -9,11 +9,11 @@ const apiClient = axios.create({
   },
 });
 
-export const sendChatMessage = async (query, userId = 'user_001') => {
+export const sendChatMessage = async (query) => {
   try {
     const response = await apiClient.post('/chat', {
       query,
-      user_id: userId,
+      user_id: 'anonymous',
     });
     return response.data;
   } catch (error) {
@@ -21,7 +21,7 @@ export const sendChatMessage = async (query, userId = 'user_001') => {
     if (error.response && error.response.data && error.response.data.detail) {
       throw new Error(error.response.data.detail);
     }
-    throw new Error('Unable to connect to SwasthyaSaathi backend. Please ensure the server is running on port 8000.');
+    throw new Error('Unable to connect to the health information service. Please try again shortly.');
   }
 };
 
@@ -30,27 +30,7 @@ export const fetchHealthStatus = async () => {
     const response = await apiClient.get('/health');
     return response.data;
   } catch (error) {
-    return { status: 'offline', vector_store_ready: false, vectors_count: 0 };
-  }
-};
-
-export const fetchUserHistory = async (userId = 'user_001') => {
-  try {
-    const response = await apiClient.get(`/api/history/${userId}`);
-    return response.data;
-  } catch (error) {
-    console.error('API Error fetching user history:', error);
-    return [];
-  }
-};
-
-export const fetchUserPatterns = async (userId = 'user_001') => {
-  try {
-    const response = await apiClient.get(`/api/patterns/${userId}`);
-    return response.data;
-  } catch (error) {
-    console.error('API Error fetching user patterns:', error);
-    return { pattern_detected: false };
+    return { status: 'offline', api_available: false, vector_store_ready: false, vectors_count: 0 };
   }
 };
 
