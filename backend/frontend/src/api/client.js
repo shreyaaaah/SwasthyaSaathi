@@ -9,11 +9,12 @@ const apiClient = axios.create({
   },
 });
 
-export const sendChatMessage = async (query) => {
+export const sendChatMessage = async (query, conversationHistory = []) => {
   try {
     const response = await apiClient.post('/chat', {
       query,
       user_id: 'anonymous',
+      conversation_history: conversationHistory,
     });
     return response.data;
   } catch (error) {

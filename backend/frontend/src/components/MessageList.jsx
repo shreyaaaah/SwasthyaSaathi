@@ -40,7 +40,7 @@ const MessageList = ({ messages, isLoading }) => (
           </div>
           {!isUser && msg.triage_tag && <TriageBanner tag={msg.triage_tag} />}
           <div className="whitespace-pre-wrap text-sm leading-relaxed">{msg.text}</div>
-          {!isUser && <SourceCitations sources={msg.sources} isGrounded={msg.is_grounded} />}
+          {!isUser && (msg.sources?.length > 0 || msg.is_grounded === false) && <SourceCitations sources={msg.sources} isGrounded={msg.is_grounded} />}
         </div>
       </div>;
     })}

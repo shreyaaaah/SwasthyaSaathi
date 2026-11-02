@@ -1,5 +1,5 @@
-from typing import List, Optional
-from pydantic import BaseModel
+from typing import List, Literal, Optional
+from pydantic import BaseModel, Field
 
 class SourceMetadata(BaseModel):
     doc_name: str
@@ -18,9 +18,14 @@ class PatternResultSchema(BaseModel):
     latest_triage: Optional[str] = None
     topic: Optional[str] = None
 
+class ConversationTurn(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(max_length=2000)
+
 class ChatRequest(BaseModel):
-    query: str
+    query: str = Field(min_length=1, max_length=2000)
     user_id: Optional[str] = "anonymous"
+    conversation_history: List[ConversationTurn] = Field(default_factory=list, max_length=8)
 
 class ChatResponse(BaseModel):
     answer: str

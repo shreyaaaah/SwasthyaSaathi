@@ -65,7 +65,11 @@ def agentic_chat_endpoint(request: ChatRequest):
         raise HTTPException(status_code=400, detail="Query string cannot be empty.")
     
     user_id = request.user_id or "anonymous"
-    agent_output = run_agent(user_id=user_id, query=request.query)
+    agent_output = run_agent(
+        user_id=user_id,
+        query=request.query,
+        conversation_history=[turn.model_dump() for turn in request.conversation_history]
+    )
 
     # Format sources for API response
     raw_sources = agent_output.get("sources", [])

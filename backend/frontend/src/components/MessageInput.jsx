@@ -55,7 +55,7 @@ const MessageInput = ({ onSend, isLoading }) => {
       <button type="button" onClick={startVoiceInput} disabled={isLoading || isListening} aria-label="Start voice input" title="Start voice input" className="p-3 rounded-xl border bg-slate-800 hover:bg-slate-700 text-teal-300 border-slate-600 disabled:opacity-50">
         {isListening ? <MicOff aria-hidden="true" className="w-4 h-4" /> : <Mic aria-hidden="true" className="w-4 h-4" />}
       </button>
-      <input type="text" value={input} onChange={(event) => setInput(event.target.value)} placeholder={isListening ? 'Listening… speak now' : 'Ask a health question…'} disabled={isLoading} aria-label="Ask a health question" className="min-w-0 flex-1 bg-slate-950/80 border border-slate-600 focus:border-teal-400 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/30" />
+      <input type="text" maxLength={2000} value={input} onChange={(event) => setInput(event.target.value)} placeholder={isListening ? 'Listening… speak now' : 'Ask a health question…'} disabled={isLoading} aria-label="Ask a health question" className="min-w-0 flex-1 bg-slate-950/80 border border-slate-600 focus:border-teal-400 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/30" />
       <button type="submit" disabled={!input.trim() || isLoading} className="px-4 py-3 rounded-xl bg-gradient-to-r from-teal-400 to-emerald-400 hover:from-teal-300 hover:to-emerald-300 text-slate-950 font-bold text-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
         <span>Send</span><Send aria-hidden="true" className="w-4 h-4" />
       </button>

@@ -25,7 +25,11 @@ function App() {
     setMessages((prev) => [...prev, { sender: 'user', text: userQuery }]);
     setIsLoading(true);
     try {
-      const response = await sendChatMessage(userQuery);
+      const conversationHistory = messages.slice(-6).map((message) => ({
+        role: message.sender === 'user' ? 'user' : 'assistant',
+        content: message.text
+      }));
+      const response = await sendChatMessage(userQuery, conversationHistory);
       setMessages((prev) => [...prev, {
         sender: 'bot',
         text: response.answer,
