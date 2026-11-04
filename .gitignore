@@ -59,3 +59,6 @@ grep_uwin_output.txt
 table_parsing_output.txt
 scratch_*.py
 
+# Local patent/invention work product; do not publish
+docs/private/
+

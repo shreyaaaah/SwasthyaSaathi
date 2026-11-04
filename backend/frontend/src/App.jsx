@@ -5,10 +5,11 @@ import { sendChatMessage, fetchHealthStatus } from './api/client';
 
 const INITIAL_WELCOME_MESSAGE = {
   sender: 'bot',
-  text: `Namaste! I can help you find general health information from public health guidance. Tell me what you would like to know, or choose a prompt below.\n\nI cannot diagnose or replace a clinician. If someone may be in immediate danger, contact local emergency services now.`,
+  text: 'Namaste! What health question can I help with?',
   sources: [],
   is_grounded: true,
-  triage_tag: 'GENERAL_INFO',
+  triage_tag: null,
+  answer_mode: 'SOCIAL',
   tools_used: []
 };
 
@@ -36,7 +37,10 @@ function App() {
         sources: response.sources || [],
         is_grounded: response.is_grounded,
         triage_tag: response.triage_tag || 'GENERAL_INFO',
-        tools_used: response.tools_used || []
+        tools_used: response.tools_used || [],
+        answer_mode: response.answer_mode,
+        gate_scores: response.gate_scores,
+        emergency_contact: response.emergency_contact
       }]);
     } catch (error) {
       setMessages((prev) => [...prev, {
@@ -58,7 +62,7 @@ function App() {
         <Header status={healthStatus} />
         <ChatWindow messages={messages} onSendMessage={handleSendMessage} isLoading={isLoading} />
         <p className="px-2 py-2 text-center text-[11px] text-slate-400">
-          Health information only. This app does not save chats to its own database. Your question and up to six recent turns are sent to the AI service; if web search is used, the question may also go to a search provider and health source websites. Avoid sharing identifying details.
+          Health information only. Full chats are not saved. For answers using trusted websites or general information, a normalized topic is retained to help improve the guidance library. Your question and up to six recent turns may go to the AI service; web searches may also be sent to a search provider and health websites. Avoid sharing identifying details.
         </p>
       </main>
     </div>

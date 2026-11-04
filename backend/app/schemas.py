@@ -25,3 +25,9 @@ class ChatResponse(BaseModel):
     triage_tag: Optional[str] = "GENERAL_INFO"
     tools_used: List[str] = []
     response_time_ms: Optional[float] = None
+    gate_decision: Optional[str] = None
+    refusal_type: Optional[str] = None
+    answer_mode: Optional[str] = None
+    gate_scores: Optional[dict] = None
+    intent: Optional[str] = None
+    emergency_contact: Optional[str] = None

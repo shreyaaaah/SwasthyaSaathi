@@ -8,6 +8,9 @@ const authorityFor = (url = '', title = '') => {
   if (value.includes('icmr')) return 'Indian Council of Medical Research';
   if (value.includes('nhp.gov.in') || value.includes('national health portal')) return 'National Health Portal (India)';
   if (value.includes('cdc.gov')) return 'U.S. Centers for Disease Control and Prevention';
+  if (value.includes('nhs.uk')) return 'National Health Service (UK)';
+  if (value.includes('medlineplus.gov')) return 'MedlinePlus (U.S. National Library of Medicine)';
+  if (value.includes('nih.gov')) return 'U.S. National Institutes of Health';
   return '';
 };
 

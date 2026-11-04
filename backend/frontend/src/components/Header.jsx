@@ -4,6 +4,7 @@ import { Activity, ShieldCheck, Database } from 'lucide-react';
 const Header = ({ status }) => {
   const apiOnline = status?.status !== 'offline' && Boolean(status);
   const retrievalReady = Boolean(status?.retrieval_ready);
+  const showDiagnostics = new URLSearchParams(window.location.search).get('debug') === '1';
 
   return (
     <header className="glass-card my-3 p-4 flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-700/50">
@@ -27,8 +28,8 @@ const Header = ({ status }) => {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-center gap-3 text-xs">
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700">
+      {showDiagnostics && <div className="flex flex-wrap items-center justify-center gap-3 text-[10px] text-slate-500">
+        <div className="flex items-center gap-1.5">
           <Database className="w-3.5 h-3.5 text-emerald-400" />
           <span className="text-slate-300">Retrieval:</span>
           <span className={`font-semibold font-mono ${retrievalReady ? 'text-emerald-300' : 'text-amber-300'}`}>
@@ -36,13 +37,13 @@ const Header = ({ status }) => {
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700">
+        <div className="flex items-center gap-1.5">
           <span className={`w-2 h-2 rounded-full ${apiOnline ? 'bg-emerald-400' : 'bg-red-400'}`}></span>
           <span className="text-slate-300 font-medium">
             {statusLabel(status)}
           </span>
         </div>
-      </div>
+      </div>}
     </header>
   );
 };
