@@ -58,7 +58,7 @@ function App() {
         <Header status={healthStatus} />
         <ChatWindow messages={messages} onSendMessage={handleSendMessage} isLoading={isLoading} />
         <p className="px-2 py-2 text-center text-[11px] text-slate-400">
-          Health information only. Chats are not saved as personal history, but are sent to service providers to generate answers. Avoid sharing names or other identifying details.
+          Health information only. This app does not save chats to its own database. Your question and up to six recent turns are sent to the AI service; if web search is used, the question may also go to a search provider and health source websites. Avoid sharing identifying details.
         </p>
       </main>
     </div>

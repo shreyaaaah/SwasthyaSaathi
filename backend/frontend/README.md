@@ -1,16 +1,15 @@
-# React + Vite
+# SwasthyaSaathi frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React 19 + Vite chat UI for the SwasthyaSaathi FastAPI service.
 
-Currently, two official plugins are available:
+## Development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```powershell
+npm install
+$env:VITE_API_BASE_URL = "http://localhost:8000"
+npm run dev
+```
 
-## React Compiler
+The UI defaults to `http://localhost:8000` when `VITE_API_BASE_URL` is not set. Use `npm run build` to produce the production bundle in `dist/` and `npm run preview` to serve it locally.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+Voice input uses the browser's speech recognition API when available. The browser may send audio to its configured speech service.

@@ -3,7 +3,7 @@ import { Activity, ShieldCheck, Database } from 'lucide-react';
 
 const Header = ({ status }) => {
   const apiOnline = status?.status !== 'offline' && Boolean(status);
-  const indexReady = Boolean(status?.vector_store_ready);
+  const retrievalReady = Boolean(status?.retrieval_ready);
 
   return (
     <header className="glass-card my-3 p-4 flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-700/50">
@@ -30,9 +30,9 @@ const Header = ({ status }) => {
       <div className="flex flex-wrap items-center justify-center gap-3 text-xs">
         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700">
           <Database className="w-3.5 h-3.5 text-emerald-400" />
-          <span className="text-slate-300">FAISS Index:</span>
-          <span className="font-semibold text-emerald-300 font-mono">
-            {indexReady ? `${status.vectors_count || 0} chunks` : 'Unavailable'}
+          <span className="text-slate-300">Retrieval:</span>
+          <span className={`font-semibold font-mono ${retrievalReady ? 'text-emerald-300' : 'text-amber-300'}`}>
+            {retrievalReady ? `${status.vectors_count || 0} chunks` : 'Unavailable'}
           </span>
         </div>
 
@@ -50,7 +50,9 @@ const Header = ({ status }) => {
 function statusLabel(status) {
   if (!status) return 'Checking service';
   if (status.status === 'offline') return 'Service offline';
-  return status.vector_store_ready ? 'API online · guidelines available' : 'API online · guidelines unavailable';
+  if (status.status === 'degraded' && !status.embedding_model_ready) return 'API online · search model unavailable';
+  if (status.status === 'degraded' && !status.source_corpus_ready) return 'API online · knowledge base needs reindexing';
+  return status.retrieval_ready ? 'API online · guidelines available' : 'API online · guidelines unavailable';
 }
 
 export default Header;

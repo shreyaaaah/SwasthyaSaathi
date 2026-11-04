@@ -60,7 +60,7 @@ const MessageInput = ({ onSend, isLoading }) => {
         <span>Send</span><Send aria-hidden="true" className="w-4 h-4" />
       </button>
     </form>
-    <p className="mt-2 text-[11px] text-slate-300">Voice input may be processed by your browser’s speech recognition service. Messages are not saved to a personal history.</p>
+    <p className="mt-2 text-[11px] text-slate-300">Voice input may be processed by your browser’s speech recognition service. The app does not keep a personal chat history.</p>
     {voiceError && <p role="status" className="mt-1 text-xs text-amber-200">{voiceError}</p>}
   </div>;
 };

@@ -30,8 +30,8 @@ export const fetchHealthStatus = async () => {
   try {
     const response = await apiClient.get('/health');
     return response.data;
-  } catch (error) {
-    return { status: 'offline', api_available: false, vector_store_ready: false, vectors_count: 0 };
+  } catch {
+    return { status: 'offline', api_available: false, vector_store_ready: false, embedding_model_ready: false, source_corpus_ready: false, unindexed_documents: [], retrieval_ready: false, vectors_count: 0 };
   }
 };
 

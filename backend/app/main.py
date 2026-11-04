@@ -6,13 +6,6 @@ from app.schemas import ChatRequest, ChatResponse, SourceMetadata
 from app.rag.retriever import get_retriever
 from app.agent.orchestrator import run_agent
 
-# Limit PyTorch to 1 thread on CPU-only deploys to reduce RSS significantly
-try:
-    import torch
-    torch.set_num_threads(1)
-except Exception:
-    pass
-
 app = FastAPI(
     title="SwasthyaSaathi Agentic API",
     description="Public Health Agentic Chatbot grounded in MoHFW, ICMR, NHP, and WHO guidelines.",
@@ -50,11 +43,19 @@ def root():
 @app.get("/health")
 def health_check():
     retriever = get_retriever()
-    is_ready = retriever.index is not None and retriever.index.ntotal > 0
+    vector_store_ready = retriever.index is not None and retriever.index.ntotal > 0
+    embedding_ready = retriever.embedding_ready
+    missing_source_documents = retriever.missing_source_documents
+    corpus_ready = not missing_source_documents
+    is_ready = vector_store_ready and embedding_ready and corpus_ready
     return {
-        "status": "healthy" if is_ready else "unindexed",
-        "vector_store_ready": is_ready,
-        "vectors_count": retriever.index.ntotal if is_ready else 0
+        "status": "healthy" if is_ready else ("degraded" if vector_store_ready else "unindexed"),
+        "vector_store_ready": vector_store_ready,
+        "embedding_model_ready": embedding_ready,
+        "source_corpus_ready": corpus_ready,
+        "unindexed_documents": missing_source_documents,
+        "retrieval_ready": is_ready,
+        "vectors_count": retriever.index.ntotal if vector_store_ready else 0
     }
 
 @app.post("/chat", response_model=ChatResponse)

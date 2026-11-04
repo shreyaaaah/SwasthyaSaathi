@@ -11,7 +11,6 @@ else:
 
 class Settings(BaseSettings):
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "").strip()
-    DATABASE_URL: str = os.getenv("DATABASE_URL", f"sqlite:///{os.path.join(BASE_DIR, 'swasthya.db')}").strip()
     VECTOR_STORE_DIR: str = os.getenv("VECTOR_STORE_DIR", os.path.join(BASE_DIR, "data", "vector_store")).strip()
     RAW_DOCS_DIR: str = os.getenv("RAW_DOCS_DIR", os.path.join(BASE_DIR, "data", "raw_docs")).strip()
     EMBEDDING_MODEL_NAME: str = os.getenv("EMBEDDING_MODEL_NAME", "all-MiniLM-L6-v2").strip()
@@ -23,17 +22,4 @@ class Settings(BaseSettings):
         if self.ALLOWED_ORIGINS == "*":
             return ["*"]
         return [o.strip() for o in self.ALLOWED_ORIGINS.split(",") if o.strip()]
-    
-    @property
-    def formatted_db_url(self) -> str:
-        url = self.DATABASE_URL
-        # Neon / older Heroku-style shorthand
-        if url.startswith("postgres://"):
-            url = url.replace("postgres://", "postgresql://", 1)
-        # SQLAlchemy 2.x defaults to psycopg3 for plain postgresql://.
-        # We ship psycopg2-binary, so pin the dialect explicitly.
-        if url.startswith("postgresql://"):
-            url = url.replace("postgresql://", "postgresql+psycopg2://", 1)
-        return url
-
 settings = Settings()

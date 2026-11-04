@@ -4,6 +4,7 @@ import pickle
 import numpy as np
 from typing import List, Dict, Any
 from app.config import settings
+from app.rag.source_registry import read_source_registry
 
 try:
     from fastembed import TextEmbedding
@@ -21,6 +22,19 @@ class FAISSRetriever:
         self.model = None
         self.fallback_embedder = None
         self._load_store()
+
+    @property
+    def embedding_ready(self) -> bool:
+        return self.model is not None or self.fallback_embedder is not None
+
+    @property
+    def missing_source_documents(self) -> list[str]:
+        try:
+            registered = set(read_source_registry(settings.RAW_DOCS_DIR))
+        except Exception:
+            return ["source registry unavailable"]
+        indexed = {item.get("doc_name") for item in self.metadata}
+        return sorted(registered - indexed)
 
     def _load_store(self):
         index_bin = os.path.join(self.vector_store_dir, "faiss_index.bin")

@@ -2,8 +2,6 @@ DEPRESSIVE DISORDER (DEPRESSION) - MENTAL HEALTH AWARENESS
 World Health Organization - Fact Sheet
 Last updated: 11 September 2026
 
-IMPORTANT NOTE FOR CHATBOT IMPLEMENTATION: Any user message indicating suicidal thoughts, self-harm intent, or being in crisis should immediately surface a crisis helpline (e.g., India's KIRAN mental health helpline: 1800-599-0019, toll-free, 24/7) as a priority response, regardless of retrieval confidence score. This should be handled as a special, high-priority case in the triage system - not treated as routine informational RAG retrieval. This document provides general awareness information, not crisis intervention.
-
 KEY FACTS
 
 Depression is a common mental disorder. Globally, an estimated 5.2% of adults suffer from depression. More women are affected than men. Depression can lead to suicide. There is effective treatment for mild, moderate, and severe depression.

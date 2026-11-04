@@ -9,15 +9,6 @@ class SourceMetadata(BaseModel):
     source_type: Optional[str] = "knowledge_base"
     source_url: Optional[str] = None
 
-class PatternResultSchema(BaseModel):
-    pattern_detected: bool = False
-    pattern_type: str = "none"
-    description: str = ""
-    recommended_action: str = ""
-    occurrences_count: int = 0
-    latest_triage: Optional[str] = None
-    topic: Optional[str] = None
-
 class ConversationTurn(BaseModel):
     role: Literal["user", "assistant"]
     content: str = Field(max_length=2000)
@@ -34,18 +25,3 @@ class ChatResponse(BaseModel):
     triage_tag: Optional[str] = "GENERAL_INFO"
     tools_used: List[str] = []
     response_time_ms: Optional[float] = None
-    pattern: Optional[PatternResultSchema] = None
-
-class IngestResponse(BaseModel):
-    status: str
-    documents_indexed: int
-    chunks_created: int
-    vector_store_path: str
-
-class SymptomLogSchema(BaseModel):
-    id: int
-    user_id: str
-    query_text: str
-    topic: Optional[str] = None
-    triage_tag: Optional[str] = None
-    created_at: Optional[str] = None

@@ -4,163 +4,104 @@ sdk: docker
 app_port: 7860
 ---
 
-# SwasthyaSaathi (स्वास्थ्य साथी) — Core RAG Public Health Chatbot
+# SwasthyaSaathi
 
-SwasthyaSaathi is an end-to-end grounded RAG (Retrieval-Augmented Generation) public health chatbot designed to answer citizen health queries strictly based on official guidelines from the **Ministry of Health and Family Welfare (MoHFW)**, **ICMR**, **NHP**, and **WHO**.
+SwasthyaSaathi is a public health information chatbot. It searches a locally indexed set of health references and can use web search over an allowlist of health authority sites when the local passages do not cover a question. Answers are informational and do not replace care from a clinician.
 
-This codebase mirrors the **KrishiRAG** architecture pattern.
+## Current capabilities
 
----
+- React and Vite chat interface, including English voice input where the browser supports it.
+- FastAPI endpoints: `GET /`, `GET /health`, and `POST /chat` (`/api/chat` and `/api/query` are aliases).
+- FAISS semantic retrieval, a cross-encoder relevance gate when available, an evidence sufficiency check, and an official-source web fallback.
+- Emergency triage tags, answer grounding review, source citations, and limited in-session follow-up context.
+- No application database or account history. The current question and up to six recent turns are sent to the AI service. When web search is used, the query may be sent to the search provider and source websites. Browser voice recognition may be processed by the browser provider.
 
-## 🏗️ Architecture Overview
+The former database-backed longitudinal profile was not connected to the chat API and has been removed. Conversations are not retained by the API.
 
-```
-                        +----------------------------+
-                        |   MoHFW / ICMR / WHO Docs  |
-                        |   (PDFs / Text Guidelines) |
-                        +--------------+-------------+
-                                       |
-                                       v
-                        +----------------------------+
-                        |    Ingestion Script        |
-                        | (ingest.py ~500 tok chunk) |
-                        +--------------+-------------+
-                                       |
-                                       v
-                        +----------------------------+
-                        | Local FAISS Vector Store   |
-                        | + metadata.json sidecar    |
-                        +--------------+-------------+
-                                       |
-User Query ---> Pre-Retrieval Hook ---> Vector Search (top-k) ---> Groq LLM (Grounded System Prompt) ---> Post-Gen Hook ---> Response + Citations
-                     |                                                                                        |
-                     v                                                                                        v
-              [Myth Check Hook]                                                                        [Triage Tag Hook]
-                                                                                                              |
-                                                                                                              v
-                                                                                                   Neon PostgreSQL (conversations DB)
-```
+## Local setup
 
----
+Requirements: Python 3.10 or newer and Node.js 18 or newer.
 
-## 🔌 Extension Points (Decoupled Hooks)
+### Backend
 
-This pass implements the core grounded Q&A chatbot while leaving three clean extension points ready for upcoming features:
-
-1. **Pre-Retrieval Hook (`app/rag/hooks.py` -> `pre_retrieval_hook`)**:
-   - Executes before FAISS vector retrieval.
-   - Designed for pre-processing query expansion or running myth-check detection to flag medical misinformation prior to RAG retrieval.
-
-2. **Post-Generation Hook (`app/rag/hooks.py` -> `post_generation_hook`)**:
-   - Executes after Groq LLM grounded answer generation.
-   - Designed for attaching medical triage urgency tags (`EMERGENCY`, `ROUTINE_CONSULT`, `HOME_CARE`) or applying safety disclaimers.
-
-3. **`conversations` PostgreSQL Database Table**:
-   - Created on startup in `app/models.py`.
-   - Stores `id`, `user_id`, `query`, `response`, `sources`, `triage_tag`, and `timestamp`.
-   - Allows adding multi-turn session memory in future passes without database schema migrations.
-
----
-
-## ⚡ Quick Start (Local Setup)
-
-### 1. Prerequisites
-- Python 3.10+
-- Node.js 18+
-
-### 2. Backend Setup
-```bash
+```powershell
 cd backend
-
-# Create & activate virtual environment (optional)
-python -m venv venv
-# On Windows: venv\Scripts\activate
-# On Linux/Mac: source venv/bin/activate
-
-# Install dependencies
+python -m venv .venv
+.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-
-# Configure Environment Variables
-cp .env.example .env
-# Edit .env and add your GROQ_API_KEY and DATABASE_URL
-```
-
-### 3. Run Document Ingestion (Build FAISS Vector Store)
-```bash
-python app/rag/ingest.py
-```
-*Outputs `index.faiss` and `metadata.json` into `backend/data/vector_store/`.*
-
-### 4. Start FastAPI Backend Server
-```bash
+Copy-Item .env.example .env
+# Set GROQ_API_KEY in backend/.env
+python -m app.rag.ingest
 uvicorn app.main:app --reload --port 8000
 ```
-Backend API will be available at: `http://localhost:8000` (Docs at `http://localhost:8000/docs`).
 
-### 5. Start React Frontend
-```bash
-cd ../frontend
+Ingestion verifies that every source document is registered in `data/raw_docs/SOURCES.md` and that its SHA-256 prefix matches before building the FAISS index. The embedding model is downloaded by FastEmbed on first use. Ingestion writes both canonical runtime files (`faiss_index.bin`, `chunk_metadata.json`) and compatibility aliases (`index.faiss`, `metadata.json`) into `backend/data/vector_store/`.
+
+### Frontend
+
+```powershell
+cd backend/frontend
 npm install
+$env:VITE_API_BASE_URL = "http://localhost:8000"
 npm run dev
 ```
-Frontend will be available at: `http://localhost:5173`.
 
----
+Vite prints the local URL. For a production build, run `npm run build` from `backend/frontend`.
 
-## 🌐 Cloud Deployment (Render + Vercel + Neon)
+## Configuration
 
-### 1. Database (Neon PostgreSQL)
-- Create a free PostgreSQL project at [Neon.tech](https://neon.tech).
-- Copy the connection string: `postgresql://user:pass@ep-xyz.neon.tech/swasthya_db?sslmode=require`.
+Copy `backend/.env.example` to `backend/.env` and set:
 
-### 2. Backend Deployment (Render.com)
-- Connect repository to **Render Web Service**.
-- Use the included `backend/render.yaml` configuration:
-  - **Build Command**: `pip install -r requirements.txt && python app/rag/ingest.py`
-  - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-- Environment Variables:
-  - `GROQ_API_KEY`: Your Groq API key.
-  - `DATABASE_URL`: Your Neon PostgreSQL connection string.
+- `GROQ_API_KEY`: required for answer generation, triage, sufficiency checks, and grounding review.
+- `ALLOWED_ORIGINS`: comma-separated frontend origins; `*` is the development default.
+- `VECTOR_STORE_DIR`, `RAW_DOCS_DIR`, and `EMBEDDING_MODEL_NAME`: optional paths and model overrides.
 
-### 3. Frontend Deployment (Vercel)
-- Connect `frontend` folder to **Vercel**.
-- Build command: `npm run build`
-- Output Directory: `dist`
-- Environment Variable: `VITE_API_BASE_URL` = `https://your-render-backend-url.onrender.com`.
+The API does not write conversations to a database. Chat turns provided for follow-up are request data and remain in memory for that request only.
 
----
+`GET /health` reports vector count, embedding-model readiness, and whether every registered source document is present in the index. A missing embedding model or stale index is reported as `degraded`, not healthy.
 
-## 📋 API Specifications
+## Source maintenance
 
-### `POST /chat`
-- **Request Body**:
-  ```json
-  {
-    "query": "What are the early warning signs of Dengue fever?",
-    "user_id": "user_123"
-  }
-  ```
-- **Response**:
-  ```json
-  {
-    "answer": "Primary symptoms of Dengue include high fever (104°F), severe headache, retro-orbital pain, and joint pain...",
-    "sources": [
-      {
-        "doc_name": "dengue_prevention_guidelines.txt",
-        "section": "SECTION 2: Clinical Symptoms and Warning Signs",
-        "snippet": "High fever with sudden onset, severe headache...",
-        "score": 0.7307
-      }
-    ],
-    "is_grounded": true,
-    "triage_tag": "GENERAL_HEALTH_INFO"
-  }
-  ```
+`backend/data/raw_docs/SOURCES.md` records each document's publisher, source URL, review/fetch date, and SHA-256 prefix. Update it whenever a file is replaced or added. Check local registry and hashes with:
 
-### `GET /health`
-- Returns vector index status and chunk counts.
+```powershell
+cd backend
+python verify_sources.py
+python verify_sources.py --check-index
+```
 
----
+`--check-index` checks that every registered document is present in the committed FAISS metadata. If it reports missing documents, rebuild with `python -m app.rag.ingest`. Add `--check-urls` to make a best-effort live HTTP status check for registered URLs. A failed URL check needs human review because publishers may move or block automated requests; it does not silently rewrite local source files.
 
-## 🛡️ License & Disclaimers
-This application provides informational public health guidance derived from official MoHFW/WHO guidelines and does not replace professional clinical diagnosis.
+## Quality checks
+
+Run the deterministic checks before a release:
+
+```powershell
+cd backend
+python -m unittest discover -s . -p "test_quality*.py"
+python verify_sources.py
+python verify_sources.py --check-index
+python -m compileall -q app
+cd frontend
+npm run lint
+npm run build
+```
+
+The separate `backend/run_eval_suite.py` is a live, networked LLM evaluation that makes multiple model calls and performs source requests. It requires configured credentials and is intentionally not part of the fast deterministic check.
+
+## Deployment
+
+The root `Dockerfile` builds the FastAPI service on port 7860 and preloads the FastEmbed ONNX embedding model. Configure `GROQ_API_KEY` and `ALLOWED_ORIGINS` in the deployment environment. The Vercel frontend uses `VITE_API_BASE_URL` for the deployed API URL. `backend/render.yaml` provides a Render Python service configuration; set the same environment variables there.
+
+## API example
+
+`POST /chat`
+
+```json
+{
+  "query": "What are warning signs of severe dengue?",
+  "conversation_history": []
+}
+```
+
+The response includes an answer, sources, grounding state, triage tag, tools used, and response time.

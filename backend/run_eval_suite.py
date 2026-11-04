@@ -2,7 +2,8 @@
 run_eval_suite.py — Evaluation Suite v16:
   1. Calibration: generate table from loop, print code, restore 4 orig queries,
      print doc + first 200 chars for IN-KB, explain 28 queries vs rows & N/A row,
-     add 10 near-miss queries per class, report false skips & false passes.
+     add 10 near-miss queries per class, report runtime hard skips and candidates
+     that require factual sufficiency review (the CE score alone is not a verdict).
   2. Assertions: print final Q1-Q4 answers in full + passages sent to generator.
      Assertion evidence from final answer: Q1 WHO symptom paragraph, Q3 no false "most people develop symptoms" claim,
      Q4 pregnancy ampicillin/doxycycline rules if NCDC passage present.
@@ -208,7 +209,7 @@ code_snippet = """
 def run_calibration_loop(calibration_queries):
     results = []
     for cat, query in calibration_queries:
-        chunks = search_advisories(query, top_k=5)
+        chunks = search_advisories(query, top_k=12)
         gate = specificity_gate(query, chunks, faiss_floor=0.45, encode_query_str=query)
         max_ce = gate.get("max_ce_score")
         best_chunk = gate.get("valid_chunks", [{}])[0] if gate.get("valid_chunks") else {}
@@ -261,12 +262,12 @@ CALIBRATION_QUERIES_28 = [
 print(f"{'Cat':<7} | {'Max-CE':>8} | {'Query':<45} | Top Matching Document & Answer Chunk (First 200 Chars)")
 print("-" * 120)
 
-false_skips = []  # IN-KB with CE < 0
-false_passes = [] # OUT-KB with CE >= 0
+runtime_hard_skips = []  # IN-KB below the production CE skip threshold
+out_of_scope_review = []  # OUT-KB candidates passed to evidence sufficiency review
 calib_results = []
 
 for cat, q in CALIBRATION_QUERIES_28:
-    chunks = search_advisories(q, top_k=5)
+    chunks = search_advisories(q, top_k=12)
     gate = specificity_gate(q, chunks, faiss_floor=0.45, encode_query_str=q)
     max_ce = gate.get("max_ce_score")
     max_ce_str = f"{max_ce:8.4f}" if max_ce is not None else "    N/A "
@@ -285,23 +286,23 @@ for cat, q in CALIBRATION_QUERIES_28:
         "top_snippet": top_snippet
     })
     
-    if cat == "IN-KB" and (max_ce is None or max_ce < 0.0):
-        false_skips.append((q, max_ce))
-    elif cat == "OUT-KB" and max_ce is not None and max_ce >= 0.0:
-        false_passes.append((q, max_ce))
+    if cat == "IN-KB" and (max_ce is None or max_ce < CE_SKIP_THRESHOLD):
+        runtime_hard_skips.append((q, max_ce))
+    elif cat == "OUT-KB" and max_ce is not None and max_ce >= CE_SKIP_THRESHOLD:
+        out_of_scope_review.append((q, max_ce))
 
 print("\n--- EXPLANATION OF 28 QUERIES vs ROWS SHOWN & N/A ROWS ---")
 print("1. '28 Queries': Total evaluation benchmark dataset (14 IN-KB near-misses + 14 OUT-KB near-misses).")
 print("2. 'N/A Rows': Occurs when 0 retrieved chunks pass the FAISS cosine floor (0.45). Cross-Encoder reranking is skipped, returning Max-CE = N/A.")
 print("3. 'IN-KB Chunk Printing': For every IN-KB query, the top document name and first 200 characters of the answering chunk are shown above.\n")
 
-print(f"--- FALSE SKIPS (IN-KB with CE < 0): {len(false_skips)} ---")
-for q, sc in false_skips:
+print(f"--- IN-KB HARD SKIPS (CE < {CE_SKIP_THRESHOLD}): {len(runtime_hard_skips)} ---")
+for q, sc in runtime_hard_skips:
     sc_str = f"{sc:.4f}" if sc is not None else "N/A"
     print(f"  - Query: \"{q}\" (Max-CE = {sc_str})")
 
-print(f"\n--- FALSE PASSES (OUT-KB with CE >= 0): {len(false_passes)} ---")
-for q, sc in false_passes:
+print(f"\n--- OUT-KB CANDIDATES SENT TO SUFFICIENCY REVIEW: {len(out_of_scope_review)} ---")
+for q, sc in out_of_scope_review:
     print(f"  - Query: \"{q}\" (Max-CE = {sc:.4f})")
 print("\n")
 

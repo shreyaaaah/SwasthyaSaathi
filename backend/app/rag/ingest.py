@@ -1,9 +1,10 @@
 import os
 import json
 import re
-import pickle
 from typing import List, Dict, Any
 import numpy as np
+from app.config import settings
+from app.rag.source_registry import validate_source_registry
 
 try:
     import pypdf
@@ -11,42 +12,17 @@ except ImportError:
     pypdf = None
 
 try:
-    from sentence_transformers import SentenceTransformer
+    from fastembed import TextEmbedding
     import faiss
 except ImportError:
-    SentenceTransformer = None
+    TextEmbedding = None
     faiss = None
 
 # Default paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DEFAULT_RAW_DOCS_DIR = os.path.join(BASE_DIR, "data", "raw_docs")
 DEFAULT_VECTOR_STORE_DIR = os.path.join(BASE_DIR, "data", "vector_store")
-MODEL_NAME = "all-MiniLM-L6-v2"
-
-class FallbackEmbedder:
-    """Fallback TF-IDF + Hashing embedder when HuggingFace / online transformer is unreachable."""
-    def __init__(self, dim=384):
-        from sklearn.feature_extraction.text import TfidfVectorizer
-        self.dim = dim
-        self.vectorizer = TfidfVectorizer(max_features=dim, stop_words="english")
-        self.is_fitted = False
-
-    def fit_encode(self, texts: List[str]) -> np.ndarray:
-        matrix = self.vectorizer.fit_transform(texts).toarray()
-        if matrix.shape[1] < self.dim:
-            pad_width = self.dim - matrix.shape[1]
-            matrix = np.pad(matrix, ((0, 0), (0, pad_width)), mode='constant')
-        self.is_fitted = True
-        return matrix.astype(np.float32)
-
-    def encode(self, texts: List[str], **kwargs) -> np.ndarray:
-        if not self.is_fitted:
-            return self.fit_encode(texts)
-        matrix = self.vectorizer.transform(texts).toarray()
-        if matrix.shape[1] < self.dim:
-            pad_width = self.dim - matrix.shape[1]
-            matrix = np.pad(matrix, ((0, 0), (0, pad_width)), mode='constant')
-        return matrix.astype(np.float32)
+MODEL_NAME = settings.EMBEDDING_MODEL_NAME
 
 def extract_text_from_file(file_path: str) -> str:
     """Extract plain text from .txt, .md, or .pdf files."""
@@ -108,9 +84,10 @@ def build_and_save_index(raw_docs_dir: str = None, vector_store_dir: str = None)
     
     os.makedirs(vector_store_dir, exist_ok=True)
     os.makedirs(raw_docs_dir, exist_ok=True)
+    registry = validate_source_registry(raw_docs_dir)
 
     all_chunks = []
-    doc_files = [f for f in os.listdir(raw_docs_dir) if f.endswith((".txt", ".md", ".pdf"))]
+    doc_files = sorted(registry)
     
     if not doc_files:
         print(f"No documents found in {raw_docs_dir}")
@@ -129,21 +106,11 @@ def build_and_save_index(raw_docs_dir: str = None, vector_store_dir: str = None)
     print(f"Extracted {len(all_chunks)} chunks across {len(doc_files)} documents.")
     texts_to_embed = [c["chunk_text"] for c in all_chunks]
 
-    model = None
-    use_fallback = False
-    
-    try:
-        print(f"Attempting to load SentenceTransformer: {MODEL_NAME}...")
-        model = SentenceTransformer(MODEL_NAME, local_files_only=False)
-        embeddings = model.encode(texts_to_embed, show_progress_bar=False, convert_to_numpy=True)
-    except Exception as e:
-        print(f"Could not load HuggingFace online model ({e}). Using local TF-IDF fallback embedder...")
-        use_fallback = True
-        embedder = FallbackEmbedder(dim=384)
-        embeddings = embedder.fit_encode(texts_to_embed)
-        vectorizer_path = os.path.join(vector_store_dir, "vectorizer.pkl")
-        with open(vectorizer_path, "wb") as f:
-            pickle.dump(embedder, f)
+    if TextEmbedding is None or faiss is None:
+        raise RuntimeError("fastembed and faiss-cpu are required to build the vector store")
+    model_name = MODEL_NAME if "/" in MODEL_NAME else f"sentence-transformers/{MODEL_NAME}"
+    model = TextEmbedding(model_name=model_name)
+    embeddings = np.asarray(list(model.embed(texts_to_embed)), dtype=np.float32)
 
     # Normalize vectors for cosine similarity
     faiss.normalize_L2(embeddings)
@@ -153,8 +120,8 @@ def build_and_save_index(raw_docs_dir: str = None, vector_store_dir: str = None)
     index.add(embeddings.astype(np.float32))
 
     # Save FAISS index
-    index_path = os.path.join(vector_store_dir, "index.faiss")
-    faiss.write_index(index, index_path)
+    for index_name in ("faiss_index.bin", "index.faiss"):
+        faiss.write_index(index, os.path.join(vector_store_dir, index_name))
 
     # Save metadata sidecar
     metadata_sidecar = []
@@ -166,19 +133,18 @@ def build_and_save_index(raw_docs_dir: str = None, vector_store_dir: str = None)
             "chunk_text": chunk["chunk_text"]
         })
 
-    metadata_path = os.path.join(vector_store_dir, "metadata.json")
-    with open(metadata_path, "w", encoding="utf-8") as f:
-        json.dump(metadata_sidecar, f, indent=2, ensure_ascii=False)
+    for metadata_name in ("chunk_metadata.json", "metadata.json"):
+        with open(os.path.join(vector_store_dir, metadata_name), "w", encoding="utf-8") as f:
+            json.dump(metadata_sidecar, f, indent=2, ensure_ascii=False)
 
-    print(f"Saved FAISS index to: {index_path} (Fallback: {use_fallback})")
-    print(f"Saved Metadata sidecar to: {metadata_path}")
+    print(f"Saved FAISS index and metadata to: {vector_store_dir}")
 
     return {
         "status": "success",
         "documents_indexed": len(doc_files),
         "chunks_created": len(all_chunks),
         "vector_store_path": vector_store_dir,
-        "is_fallback_embedding": use_fallback
+        "is_fallback_embedding": False
     }
 
 if __name__ == "__main__":
