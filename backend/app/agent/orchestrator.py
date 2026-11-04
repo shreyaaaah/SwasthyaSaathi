@@ -588,7 +588,7 @@ def safe_chat_completion(client: Groq, active_model: str, **kwargs):
 # ---------------------------------------------------------------------------
 
 def extract_passages_and_rerank(query: str, raw_text: str, top_k_passages: int = 3) -> str:
-    """Splits text into ~800-char passages and reranks using CrossEncoder."""
+    """Splits text into ~800-char passages and reranks a bounded relevant subset."""
     if not raw_text.strip():
         return ""
 
@@ -608,18 +608,40 @@ def extract_passages_and_rerank(query: str, raw_text: str, top_k_passages: int =
     if not passages:
         return raw_text[:1500]
 
+    # Authority pages can produce thousands of passages. Rerank a lexical
+    # shortlist so response latency stays bounded without losing query matches.
+    query_terms = {
+        term for term in re.findall(r"[a-z0-9]+", query.casefold())
+        if len(term) > 2 and term not in {"what", "when", "where", "which", "with", "from", "that", "this", "the", "are", "for", "and", "you", "your", "how", "does"}
+    }
+    indexed_passages = list(enumerate(passages))
+    if len(indexed_passages) > 24:
+        if query_terms:
+            indexed_passages.sort(
+                key=lambda item: (
+                    -sum(term in item[1].casefold() for term in query_terms),
+                    item[0],
+                )
+            )
+        indexed_passages = indexed_passages[:24]
+    candidate_passages = [passage for _, passage in indexed_passages]
+    if len(passages) > len(candidate_passages):
+        print(f"  [WEB RERANK] Shortlisted {len(candidate_passages)} of {len(passages)} page passages.")
+
     ce = _get_cross_encoder()
     if not ce:
-        return "\n\n---\n\n".join(passages[:top_k_passages])
+        return "\n\n---\n\n".join(candidate_passages[:top_k_passages])
 
     try:
-        pairs = [(query, p[:512]) for p in passages]
+        pairs = [(query, p[:512]) for p in candidate_passages]
+        rerank_started = time.time()
         scores = ce.predict(pairs)
-        ranked = sorted(zip(scores, passages), key=lambda x: x[0], reverse=True)
+        print(f"  [WEB RERANK] Scored {len(pairs)} passages in {round((time.time() - rerank_started) * 1000, 2)}ms.")
+        ranked = sorted(zip(scores, candidate_passages), key=lambda x: x[0], reverse=True)
         top_passages = [p for _, p in ranked[:top_k_passages]]
         return "\n\n---\n\n".join(top_passages)
     except Exception:
-        return "\n\n---\n\n".join(passages[:top_k_passages])
+        return "\n\n---\n\n".join(candidate_passages[:top_k_passages])
 
 
 def _extract_pdf_columns(page) -> str:
@@ -759,7 +781,7 @@ def _fetch_single_url(item: Dict[str, Any], query: str, headers: Dict[str, str],
         content_bytes = bytearray()
         for chunk_bytes in resp.iter_content(chunk_size=16384):
             content_bytes.extend(chunk_bytes)
-            if len(content_bytes) > 2 * 1024 * 1024:
+            if len(content_bytes) > 512 * 1024:
                 break
         resp.close()
         bytes_len = len(content_bytes)
@@ -834,7 +856,7 @@ def web_search_health_authority(query: str, max_results: int = 3) -> List[Dict[s
         except ImportError:
             from duckduckgo_search import DDGS
 
-        ddg = DDGS()
+        ddg = DDGS(timeout=3)
         site_filter = " OR ".join(f"site:{host}" for host in settings.parsed_web_hosts)
         search_query = f"{query} {site_filter}"
         raw_results = list(ddg.text(search_query, max_results=max_results * 3))
