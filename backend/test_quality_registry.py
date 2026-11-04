@@ -10,7 +10,8 @@ from pathlib import Path
 
 from app.rag.source_registry import SourceRegistryError, validate_source_registry
 from app.agent.orchestrator import (
-    is_self_harm_crisis, run_agent, specificity_gate, sufficiency_check, verify_grounding,
+    enforce_source_backed_fences, is_self_harm_crisis, is_url_allowed, run_agent,
+    specificity_gate, sufficiency_check, verify_grounding,
 )
 from fastapi import HTTPException
 from app.main import agentic_chat_endpoint, health_check
@@ -63,6 +64,74 @@ class SourceRegistryTests(unittest.TestCase):
 
 
 class SafetyAndEvidenceTests(unittest.TestCase):
+    @patch("app.agent.orchestrator.Groq", side_effect=AssertionError("social fast path must not call model"))
+    def test_greeting_and_thanks_are_natural_without_sources_or_triage(self, groq):
+        for query in ("hi", "thank u so much"):
+            with self.subTest(query=query):
+                result = run_agent("anonymous", query)
+                self.assertEqual(result["answer_mode"], "SOCIAL")
+                self.assertFalse(result["sources"])
+                self.assertIsNone(result["triage_tag"])
+                self.assertNotIn("guideline", result["answer"].casefold())
+
+    @patch("app.agent.orchestrator.record_answer_metadata")
+    @patch("app.agent.orchestrator.record_refusal")
+    @patch("app.agent.orchestrator.safe_chat_completion")
+    @patch("app.agent.orchestrator._verify_model_available")
+    @patch("app.agent.orchestrator.Groq", return_value=object())
+    @patch("app.agent.orchestrator.triage_classify", return_value={"triage_tag": "GENERAL_INFO"})
+    @patch("app.agent.orchestrator.web_search_health_authority", return_value=[])
+    @patch("app.agent.orchestrator.search_advisories", return_value=[])
+    @patch("app.agent.orchestrator.specificity_gate", return_value={
+        "passed": False, "skip_kb": True, "reason": "no local evidence", "faiss_top1": 0,
+        "max_ce_score": None, "chunk_ce_scores": [], "valid_chunks": [], "decision": "GENERAL",
+        "refusal_type": None, "signals": {"faiss_top1": 0, "cross_encoder_max": None},
+    })
+    def test_uncovered_health_query_gets_general_answer_without_cold_refusal(
+        self, _gate, _search, _web, _triage, _groq, _verify, completion, _gap, _metadata,
+    ):
+        response = SimpleNamespace(model="test-model", choices=[SimpleNamespace(
+            message=SimpleNamespace(content="Chickenpox commonly causes an itchy rash with fluid-filled blisters. Seek care for severe symptoms."),
+            finish_reason="stop",
+        )])
+        completion.return_value = response
+        result = run_agent("anonymous", "give me the symptoms of chickenpox")
+        self.assertEqual(result["answer_mode"], "GENERAL")
+        self.assertIn("Chickenpox", result["answer"])
+        self.assertTrue(result["answer"].strip())
+        self.assertFalse(result["sources"])
+        self.assertNotIn("provided reference sources", result["answer"].casefold())
+        self.assertIsNone(result.get("refusal_type"))
+
+    @patch("app.agent.orchestrator.record_answer_metadata")
+    @patch("app.agent.orchestrator.Groq", side_effect=AssertionError("emergency path must not call model"))
+    def test_chest_pain_emergency_leads_with_urgent_care(self, _groq, _record_metadata):
+        result = run_agent("anonymous", "chest pain and sweating")
+        self.assertEqual(result["triage_tag"], "EMERGENCY")
+        self.assertIn("call", result["answer"].casefold())
+        self.assertIn(settings.EMERGENCY_NUMBER, result["answer"])
+        self.assertTrue(result["sources"])
+
+    def test_source_backed_fence_removes_unsupported_dose(self):
+        answer, edited = enforce_source_backed_fences(
+            "Rest and drink fluids. Take 500 mg every day.", []
+        )
+        self.assertTrue(edited)
+        self.assertNotIn("500 mg", answer)
+        self.assertIn("Rest and drink fluids", answer)
+
+    def test_source_backed_fence_keeps_exactly_supported_dose(self):
+        answer, edited = enforce_source_backed_fences(
+            "Take 500 mg.", [{"snippet": "The verified source says 500 mg."}]
+        )
+        self.assertFalse(edited)
+        self.assertEqual(answer, "Take 500 mg.")
+
+    def test_web_allowlist_checks_host_boundaries_and_scheme(self):
+        self.assertTrue(is_url_allowed("https://www.who.int/health"))
+        self.assertFalse(is_url_allowed("https://who.int.attacker.example/health"))
+        self.assertFalse(is_url_allowed("file://who.int/etc/passwd"))
+
     def test_current_self_harm_intent_is_flagged(self):
         self.assertTrue(is_self_harm_crisis("I want to kill myself tonight"))
         self.assertTrue(is_self_harm_crisis("I took too many pills"))
@@ -95,15 +164,18 @@ class SafetyAndEvidenceTests(unittest.TestCase):
         result = verify_grounding(None, "qwen/qwen3.8-27b", "Supported answer.", [{"doc_name": "WHO", "snippet": "Supported fact."}], generator_served_model="qwen/qwen3.8-27b")
         self.assertTrue(result["is_fully_grounded"])
 
+    @patch("app.agent.orchestrator.record_answer_metadata")
     @patch("app.agent.orchestrator.Groq", side_effect=AssertionError("crisis path must not call model"))
-    def test_crisis_answer_returns_without_model_call(self, groq):
+    def test_crisis_answer_returns_without_model_call(self, groq, _record_metadata):
         result = run_agent("anonymous", "I might hurt myself tonight")
         self.assertEqual(result["triage_tag"], "EMERGENCY")
         self.assertTrue(result["trace"]["crisis_fast_path"])
         self.assertEqual(len(result["sources"]), 2)
 
+    @patch("app.agent.orchestrator.record_answer_metadata")
+    @patch("app.agent.orchestrator.record_refusal")
     @patch("app.agent.orchestrator.Groq", side_effect=AssertionError("medication refusal path must not call model"))
-    def test_dose_request_uses_safety_fence_without_model_call(self, groq):
+    def test_dose_request_uses_safety_fence_without_model_call(self, groq, _record_gap, _record_metadata):
         result = run_agent("anonymous", "What dose of medicine should I take?")
         self.assertTrue(result["trace"]["medication_safety_fast_path"])
         self.assertIn("doctor or pharmacist", result["answer"])

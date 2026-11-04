@@ -5,7 +5,7 @@ services:
     env: python
     rootDir: backend
     region: singapore
-    buildCommand: pip install -r requirements.txt && python -c "from fastembed import TextEmbedding; TextEmbedding('sentence-transformers/all-MiniLM-L6-v2')" && python -m app.rag.ingest && python verify_sources.py --check-index
+    buildCommand: pip install -r requirements.txt && python -c "from fastembed import TextEmbedding; TextEmbedding('sentence-transformers/all-MiniLM-L6-v2')" && python -c "from sentence_transformers import CrossEncoder; CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')" && python -m app.rag.ingest && python verify_sources.py --check-index
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: GROQ_API_KEY
@@ -20,5 +20,17 @@ services:
         value: all-MiniLM-L6-v2
       - key: INTEGRITY_MODE
         value: strict
+      - key: GATE_FAISS_FLOOR
+        value: "0.45"
+      - key: GATE_GLOBAL_THRESHOLD
+        value: "-9.5"
+      - key: GATE_MIN_CLUSTER_SAMPLES
+        value: "12"
+      - key: ENABLE_CONTENT_VERIFIER
+        value: "true"
       - key: DATABASE_URL
+        sync: false
+      - key: ADMIN_TOKEN
+        sync: false
+      - key: GAPS_HASH_SALT
         sync: false

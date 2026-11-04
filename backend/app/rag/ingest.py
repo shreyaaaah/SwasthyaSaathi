@@ -150,3 +150,5 @@ def build_and_save_index(raw_docs_dir: str = None, vector_store_dir: str = None)
 if __name__ == "__main__":
     result = build_and_save_index()
     print("Ingestion Result:", result)
+    if result.get("status") != "success" or int(result.get("chunks_created", 0)) <= 0:
+        raise SystemExit("Ingestion did not create a valid non-empty index; failing the build.")

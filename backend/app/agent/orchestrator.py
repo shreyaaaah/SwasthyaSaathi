@@ -297,11 +297,41 @@ def verify_content_fences(client: Groq, active_model: str, query: str, draft: st
         except Exception as exc:
             print(f"  [CONTENT FENCE VERIFIER] Unavailable; applying deterministic fallback: {exc}")
 
-    unsafe_specificity = re.search(r"\b\d+(?:\.\d+)?\s*(?:mg|mcg|ml|mL|g|tablets?|percent|%)\b", draft, re.I)
+    unsafe_specificity = re.search(r"\b\d+(?:\.\d+)?\s*(?:mg|mcg|µg|ml|mL|g|tablets?|percent|%)\b", draft, re.I)
     if unsafe_specificity:
         safe = "I can share general information, but exact doses, schedules, and numeric medical advice need a verified source and advice from a clinician or pharmacist."
         return {"answer": remove_internal_leaks(safe), "edited": True, "verifier": "deterministic_fallback"}
     return {"answer": remove_internal_leaks(draft), "edited": False, "verifier": "deterministic_fallback"}
+
+
+_RESTRICTED_CLAIM_PATTERNS = (
+    re.compile(r"\b\d+(?:\.\d+)?\s*(?:mg|mcg|µg|ml|mL|g|tablets?|capsules?|drops?|percent|%|mmhg|mmol/?l|mg/?dl|bpm|°?celsius|°c)\b", re.I),
+    re.compile(r"\b\d+(?:\.\d+)?\s+(?:days?|weeks?|months?|years?|people|patients|cases|children|adults)\b", re.I),
+    re.compile(r"\b\d{2,3}\s*/\s*\d{2,3}\b"),
+    re.compile(r"\b(?:take|give|use)\b[^.!?]{0,100}\b(?:once|twice|daily|every\s+\d+\s+hours?|\d+\s+times?)\b", re.I),
+    re.compile(r"\b(?:WHO|ICMR|MoHFW|NHS|CDC)\b[^.!?]{0,100}\b(?:recommends?|advises?|guideline|recommends?)\b", re.I),
+    re.compile(r"\b\d+(?:\.\d+)?\s*(?:in\s+\d+|per\s+cent|percent|%)\b", re.I),
+    re.compile(r"\b(?:guaranteed|completely safe|always|never|cannot cause)\b", re.I),
+)
+
+
+def enforce_source_backed_fences(answer: str, sources: List[Dict[str, Any]]) -> tuple[str, bool]:
+    """Remove numeric/dose/guideline claims unless the source text contains them."""
+    evidence = " ".join(" ".join(str(source.get(key) or "") for key in ("snippet", "content_snippet", "chunk_text"))
+                        for source in sources).casefold()
+    sentences = re.split(r"(?<=[.!?])\s+", answer.strip())
+    kept = []
+    edited = False
+    for sentence in sentences:
+        matches = [match.group(0) for pattern in _RESTRICTED_CLAIM_PATTERNS for match in pattern.finditer(sentence)]
+        if matches and any(claim.casefold() not in evidence for claim in matches):
+            edited = True
+            continue
+        kept.append(sentence)
+    cleaned = " ".join(kept).strip()
+    if edited and not cleaned:
+        cleaned = "I can share general information, but exact doses, schedules, and numeric medical advice need a verified source and advice from a clinician or pharmacist."
+    return cleaned, edited
 
 
 # ---------------------------------------------------------------------------
@@ -339,7 +369,9 @@ ALLOWED_HOSTS = settings.parsed_web_hosts
 def is_url_allowed(url: str) -> bool:
     try:
         parsed = urllib.parse.urlparse(url)
-        host = parsed.netloc.lower().split(":")[0]
+        if parsed.scheme.casefold() not in {"http", "https"} or not parsed.hostname:
+            return False
+        host = parsed.hostname.casefold().rstrip(".")
         allowed = any(host == h or host.endswith("." + h) for h in ALLOWED_HOSTS)
         if not allowed:
             return False
@@ -699,7 +731,8 @@ def _fetch_single_url(item: Dict[str, Any], query: str, headers: Dict[str, str],
     try:
         import requests
         from bs4 import BeautifulSoup
-        resp = requests.get(url, headers=headers, timeout=(3.0, 3.0), allow_redirects=True, stream=True)
+        # Do not follow redirects: the redirected host has not passed the allowlist.
+        resp = requests.get(url, headers=headers, timeout=(3.0, 3.0), allow_redirects=False, stream=True)
         dt_fetch = round((time.time() - t_start) * 1000, 2)
         http_status = resp.status_code
         content_type = resp.headers.get("Content-Type", "")
@@ -1467,6 +1500,11 @@ def run_agent(
     # Safety fence for exact dosing: give useful next steps without inventing a dose.
     if _is_medication_advice_request(query):
         response_time = round((time.time() - overall_start) * 1000, 2)
+        try:
+            record_refusal(query, "general", {}, user_id=user_id)
+            record_answer_metadata(user_id, query, "GENERAL", None, verifier="deterministic_medication_safety")
+        except Exception as exc:
+            print(f"  [ANSWER METADATA] Could not record medication safety metadata: {exc}")
         return {
             "model_used": None,
             "answer": ("I can help with general care, but I can’t safely give an exact dose without a verified source "
@@ -1742,6 +1780,12 @@ def run_agent(
             "auditor_model": active_model if fence_verification.get("verifier") == "enabled" else None,
         }
     final_answer = remove_internal_leaks(final_answer)
+    final_answer, deterministic_fence_edited = enforce_source_backed_fences(final_answer, sources_collected)
+    if deterministic_fence_edited and fence_verification is None:
+        fence_verification = {"edited": True, "verifier": "deterministic_source_fence"}
+    elif deterministic_fence_edited and fence_verification is not None:
+        fence_verification["edited"] = True
+        fence_verification["deterministic_source_fence_edited"] = True
     try:
         record_answer_metadata(
             user_id, query, answer_mode, gate_scores,
