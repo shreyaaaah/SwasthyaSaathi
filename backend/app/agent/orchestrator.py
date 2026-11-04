@@ -29,7 +29,10 @@ from app.rag.coverage import build_covered_registry
 from app.rag.auto_calibrate import load_thresholds, manifest_hash, recalibrate_from_evaluation_set
 from app.rag.gaps import record_refusal, record_answer_metadata
 from app.rag.intent import Intent, classify_intent, is_immediate_emergency, social_reply
-from app.rag.prompts import HEALTH_ASSISTANT_SYSTEM, CONTENT_FENCE_VERIFIER, remove_internal_leaks
+from app.rag.prompts import (
+    HEALTH_ASSISTANT_SYSTEM, CONTENT_FENCE_VERIFIER,
+    limit_follow_up_questions, remove_internal_leaks,
+)
 
 # ===========================================================================
 # MODEL CHOICE EXPLANATION
@@ -276,6 +279,15 @@ def sufficiency_check(client: Groq, active_model: str, query: str, valid_chunks:
 def verify_content_fences(client: Groq, active_model: str, query: str, draft: str,
                           sources: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Apply the configured second-pass general/mixed health-content verifier."""
+    if not sources:
+        # GENERAL mode is explicitly allowed to share safe educational guidance.
+        # Sending an empty evidence block to the source-based verifier made it
+        # refuse useful answers solely because retrieval/web returned nothing.
+        return {
+            "answer": remove_internal_leaks(draft),
+            "edited": False,
+            "verifier": "general_no_source_scope",
+        }
     if settings.ENABLE_CONTENT_VERIFIER:
         evidence = "\n\n".join(
             f"{source.get('doc_name') or source.get('title')}: {source.get('snippet', '')[:500]}"
@@ -312,6 +324,7 @@ _RESTRICTED_CLAIM_PATTERNS = (
     re.compile(r"\b(?:WHO|ICMR|MoHFW|NHS|CDC)\b[^.!?]{0,100}\b(?:recommends?|advises?|guideline|recommends?)\b", re.I),
     re.compile(r"\b\d+(?:\.\d+)?\s*(?:in\s+\d+|per\s+cent|percent|%)\b", re.I),
     re.compile(r"\b(?:guaranteed|completely safe|always|never|cannot cause)\b", re.I),
+    re.compile(r"\b(?:take|give|start|stop|apply|use|try)\b[^.!?]{0,80}\b(?:medicine|medication|drug|antibiotic|antihistamine|painkiller|pain reliever|steroid|antifungal|antiviral|tablet|capsule|medicated cream|medicated ointment|paracetamol|acetaminophen|ibuprofen|aspirin)\b", re.I),
 )
 
 
@@ -1279,7 +1292,7 @@ def _regenerate_constrained(client: Groq, active_model: str, query: str,
         f"Reference sources (ONLY use facts from these):\n{source_text}\n\n"
         "Rewrite the answer in the same conversational tone, removing or replacing all unsupported "
         "claims. ONLY include information explicitly present in the reference sources. "
-        "Never prescribe, recommend, or name specific medicines or doses. If the user gave a vague personal symptom report, ask concise relevant follow-up questions. "
+        "Never prescribe, recommend, or name specific medicines or doses. If clarification is essential, ask at most one concise follow-up question and never list questions. "
         "For traditional remedies, only mention source-supported non-drug supportive practices, make no cure claims, and do not give herbal recipes or amounts. "
         "IMPORTANT FORMATTING RULES:\n"
         "- Do NOT use markdown tables (no | --- | columns).\n"
@@ -1694,10 +1707,17 @@ def run_agent(
     missing_short = missing_facts[:3] if missing_facts else []
     missing_str = f"\nMissing Facts (do not state/speculate on these): {missing_short}" if missing_short else ""
 
-    user_msg_content = (
-        f"User Query: {query}\n\nRetrieved Reference Sources:\n{context_str}{missing_str}"
-        f"{session_history_context}"
-    )
+    if context_str:
+        source_context = f"Retrieved Reference Sources:\n{context_str}{missing_str}"
+    else:
+        source_context = (
+            "This response is in GENERAL mode. No official excerpts are available for this turn, "
+            "but you should still answer with concise, safe general-health information, common "
+            "non-medicine care, and relevant warning signs. Do not mention missing or empty sources, "
+            "and do not refuse solely because no excerpt was retrieved. Do not provide a diagnosis, "
+            "medicine recommendation, dose, or protocol."
+        )
+    user_msg_content = f"User Query: {query}\n\n{source_context}{session_history_context}"
 
     generator_messages = [
         {"role": "system", "content": system_prompt},
@@ -1780,6 +1800,7 @@ def run_agent(
             "audit_summary": "General/mixed answer passed through content-fence verification.",
             "auditor_model": active_model if fence_verification.get("verifier") == "enabled" else None,
         }
+    final_answer = limit_follow_up_questions(final_answer, maximum=1)
     final_answer = remove_internal_leaks(final_answer)
     final_answer, deterministic_fence_edited = enforce_source_backed_fences(final_answer, sources_collected)
     if deterministic_fence_edited and fence_verification is None:

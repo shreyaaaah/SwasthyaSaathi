@@ -11,8 +11,9 @@ from pathlib import Path
 from app.rag.source_registry import SourceRegistryError, validate_source_registry
 from app.agent.orchestrator import (
     enforce_source_backed_fences, is_self_harm_crisis, is_url_allowed, run_agent,
-    specificity_gate, sufficiency_check, verify_grounding,
+    specificity_gate, sufficiency_check, verify_content_fences, verify_grounding,
 )
+from app.rag.prompts import limit_follow_up_questions
 from fastapi import HTTPException
 from app.main import agentic_chat_endpoint, health_check
 from app.schemas import ChatRequest
@@ -64,6 +65,31 @@ class SourceRegistryTests(unittest.TestCase):
 
 
 class SafetyAndEvidenceTests(unittest.TestCase):
+    def test_response_keeps_at_most_one_follow_up_question(self):
+        response = (
+            "For now, avoid licking or picking at the area. "
+            "Could you tell me a bit more about what you are experiencing? "
+            "1. When did it start, and has it been getting worse? "
+            "2. Is there swelling or blistering? 3. Did you start a new product?"
+        )
+        limited = limit_follow_up_questions(response)
+        self.assertEqual(limited.count("?"), 1)
+        self.assertTrue(limited.rstrip().endswith("?"))
+        self.assertIn("When did it start?", limited)
+        self.assertNotIn("tell me a bit more", limited.casefold())
+        self.assertNotIn("Is there swelling", limited)
+        self.assertNotIn("Did you start", limited)
+
+    @patch("app.agent.orchestrator.safe_chat_completion", side_effect=AssertionError("empty-source verifier must not erase general guidance"))
+    def test_empty_sources_preserve_general_answer_and_hide_pipeline_details(self, completion):
+        draft = "Keep the area clean. The reference sources are empty. Seek care if symptoms worsen."
+        result = verify_content_fences(None, "test-model", "dry lips", draft, [])
+        self.assertIn("Keep the area clean.", result["answer"])
+        self.assertIn("Seek care if symptoms worsen.", result["answer"])
+        self.assertNotIn("reference sources", result["answer"].casefold())
+        self.assertEqual(result["verifier"], "general_no_source_scope")
+        completion.assert_not_called()
+
     @patch("app.agent.orchestrator.Groq", side_effect=AssertionError("social fast path must not call model"))
     def test_greeting_and_thanks_are_natural_without_sources_or_triage(self, groq):
         for query in ("hi", "thank u so much"):
@@ -119,6 +145,14 @@ class SafetyAndEvidenceTests(unittest.TestCase):
         self.assertTrue(edited)
         self.assertNotIn("500 mg", answer)
         self.assertIn("Rest and drink fluids", answer)
+
+    def test_source_backed_fence_removes_unverified_medicine_recommendation(self):
+        answer, edited = enforce_source_backed_fences(
+            "Keep the area clean. Take an antibiotic for it.", []
+        )
+        self.assertTrue(edited)
+        self.assertIn("Keep the area clean", answer)
+        self.assertNotIn("antibiotic", answer.casefold())
 
     def test_source_backed_fence_keeps_exactly_supported_dose(self):
         answer, edited = enforce_source_backed_fences(
