@@ -176,7 +176,7 @@ class SafetyAndEvidenceTests(unittest.TestCase):
     @patch("app.agent.orchestrator.record_refusal")
     @patch("app.agent.orchestrator.Groq", side_effect=AssertionError("medication refusal path must not call model"))
     def test_dose_request_uses_safety_fence_without_model_call(self, groq, _record_gap, _record_metadata):
-        result = run_agent("anonymous", "What dose of medicine should I take?")
+        result = run_agent("anonymous", "what dose of paracetamol for a 1 year old")
         self.assertTrue(result["trace"]["medication_safety_fast_path"])
         self.assertIn("doctor or pharmacist", result["answer"])
         self.assertNotIn("mg", result["answer"])

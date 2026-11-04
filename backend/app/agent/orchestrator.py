@@ -1355,7 +1355,8 @@ def _is_medication_advice_request(query: str) -> bool:
         r"\b(?:meds?|medicines?|medications?|drugs?|tablets?|pills?|syrups?|antibiotics?|painkillers?)\s+for\b",
         r"\b(?:should|can|could|may)\s+i\s+(?:take|use|start|stop)\b",
         r"\bwhat should i take\b",
-        r"\b(?:dose|dosage)\b.{0,80}\b(?:medicine|medication|drug|tablet|pill|syrup)\b"
+        r"\b(?:dose|dosage)\b.{0,80}\b(?:of|for|medicine|medication|drug|tablet|pill|syrup|paracetamol|acetaminophen|ibuprofen|amoxicillin)\b",
+        r"\bhow many\b.{0,80}\b(?:drops?|tablets?|pills?|ml|mg|medicine|syrup)\b",
     )
     return any(re.search(pattern, q) for pattern in patterns)
 
