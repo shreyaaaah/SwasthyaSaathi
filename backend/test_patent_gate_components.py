@@ -14,10 +14,36 @@ from app.rag.coverage import detect_uncovered_condition
 from app.rag.gaps import normalize_topic, ranked_gaps, record_refusal
 from app.rag.gate import decide
 from app.rag.integrity import filter_authorized_chunks
+from app.rag.intent import Intent, classify_intent, is_immediate_emergency
 from eval.generate_dataset import build_dataset
 
 
 class GateComponentTests(unittest.TestCase):
+    def test_multilingual_social_and_health_examples_route_without_llm(self):
+        examples = {
+            "hi": Intent.GREETING, "hello": Intent.GREETING, "hey there": Intent.GREETING,
+            "namaste": Intent.GREETING, "sat sri akal": Intent.GREETING,
+            "thanks": Intent.THANKS, "thank u so much": Intent.THANKS,
+            "tnx bro": Intent.THANKS, "ok bye": Intent.GOODBYE,
+            "mujhe bukhar hai": Intent.HEALTH, "give me the symptoms of chickenpox": Intent.HEALTH,
+            "im having temperature": Intent.HEALTH,
+            "temperature started 3 days ago, shivering and fluid filled pimples all over my body": Intent.HEALTH,
+            "symptoms of dengue": Intent.HEALTH, "what is the capital of France": Intent.OFF_TOPIC,
+        }
+        for query, expected in examples.items():
+            with self.subTest(query=query):
+                self.assertEqual(classify_intent(query), expected)
+        self.assertEqual(classify_intent("what about children?", [{"role": "user", "content": "dengue"}]), Intent.HEALTH)
+
+    def test_emergency_pattern_detects_chest_pain_and_sweating(self):
+        self.assertTrue(is_immediate_emergency("chest pain and sweating"))
+
+    def test_paracetamol_child_dose_is_health_and_not_answered_by_gate_as_grounded(self):
+        result = classify_intent("what dose of paracetamol for a 1 year old")
+        self.assertEqual(result, Intent.HEALTH)
+        gate = decide("what dose of paracetamol for a 1 year old", [], uncovered_registry=[])
+        self.assertEqual(gate["decision"], "GENERAL")
+
     def test_known_uncovered_condition_detected(self):
         found = detect_uncovered_condition("Can you explain chikungunya symptoms?")
         self.assertEqual(found["id"], "chikungunya")

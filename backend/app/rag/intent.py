@@ -50,7 +50,7 @@ def classify_intent(query: str, history: Sequence[dict] | None = None) -> Intent
         return Intent.HEALTH
     # Exact trivial off-topic patterns are handled warmly. Ambiguous questions
     # default to the conversational health route rather than a cold refusal.
-    if re.search(r"\b(?:capital of|weather in|write code|python function|stock price|football score|recipe for)\b", text, re.I):
+    if re.search(r"\b(?:capital of|weather in|write code|python function|stock price|football score|recipe for|(?:write|create|make)\s+(?:a\s+)?(?:python|javascript|code|program)|sort function)\b", text, re.I):
         return Intent.OFF_TOPIC
     if len(text.split()) <= 2:
         return Intent.UNSURE

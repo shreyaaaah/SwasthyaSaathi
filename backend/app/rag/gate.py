@@ -7,6 +7,7 @@ from typing import Any
 
 from app.config import settings
 from app.rag.coverage import detect_uncovered_condition
+from app.rag.intent import Intent, classify_intent
 
 
 class GateDecision(StrEnum):
@@ -43,7 +44,7 @@ def decide(
     covered_entity = False
     if covered_registry:
         covered_entity = any(len(label) > 3 and f" {label} " in normalized_query for label in covered_registry)
-    health_intent = covered_entity or any(token in query.casefold() for token in (
+    health_intent = classify_intent(query) == Intent.HEALTH or covered_entity or any(token in query.casefold() for token in (
         "symptom", "disease", "health", "fever", "pain", "infection", "treatment", "medicine", "medical",
         "bimari", "bukhar", "dard", "lakshan", "ilaj", "ilaaj", "swasthya", "sehat",
     ))
