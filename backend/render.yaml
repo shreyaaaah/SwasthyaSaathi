@@ -3,8 +3,9 @@ services:
   - type: web
     name: swasthya-saathi-backend
     env: python
+    rootDir: backend
     region: singapore
-    buildCommand: pip install -r requirements.txt && python -c "from fastembed import TextEmbedding; TextEmbedding('sentence-transformers/all-MiniLM-L6-v2')"
+    buildCommand: pip install -r requirements.txt && python -c "from fastembed import TextEmbedding; TextEmbedding('sentence-transformers/all-MiniLM-L6-v2')" && python -m app.rag.ingest && python verify_sources.py --check-index
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: GROQ_API_KEY
@@ -17,3 +18,7 @@ services:
         value: ./data/raw_docs
       - key: EMBEDDING_MODEL_NAME
         value: all-MiniLM-L6-v2
+      - key: INTEGRITY_MODE
+        value: strict
+      - key: DATABASE_URL
+        sync: false

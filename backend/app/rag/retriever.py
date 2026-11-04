@@ -5,6 +5,7 @@ import numpy as np
 from typing import List, Dict, Any
 from app.config import settings
 from app.rag.source_registry import read_source_registry
+from app.rag.integrity import check_integrity, filter_authorized_chunks
 
 try:
     from fastembed import TextEmbedding
@@ -21,6 +22,8 @@ class FAISSRetriever:
         self.metadata = []
         self.model = None
         self.fallback_embedder = None
+        self.integrity_report = {"ok": False, "issues": ["not checked"]}
+        self.authorized_documents: set[str] = set()
         self._load_store()
 
     @property
@@ -37,6 +40,12 @@ class FAISSRetriever:
         return sorted(registered - indexed)
 
     def _load_store(self):
+        self.integrity_report = check_integrity(settings.RAW_DOCS_DIR, self.vector_store_dir)
+        self.authorized_documents = set(self.integrity_report.get("authorized_documents", []))
+        if not self.integrity_report["ok"] and settings.INTEGRITY_MODE == "strict":
+            raise RuntimeError("Source/index integrity check failed: " + "; ".join(self.integrity_report["issues"]))
+        if not self.integrity_report["ok"]:
+            print("[INTEGRITY WARNING] " + "; ".join(self.integrity_report["issues"]))
         index_bin = os.path.join(self.vector_store_dir, "faiss_index.bin")
         index_faiss = os.path.join(self.vector_store_dir, "index.faiss")
         index_path = index_bin if os.path.exists(index_bin) else index_faiss
@@ -128,8 +137,9 @@ class FAISSRetriever:
                 item = dict(self.metadata[idx])
                 item["score"] = round(float_score, 4)
                 results.append(item)
-
-        return results
+        if self.authorized_documents:
+            return filter_authorized_chunks(results, self.authorized_documents)
+        return []
 
 retriever_instance = None
 

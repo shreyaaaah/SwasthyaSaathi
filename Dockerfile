@@ -17,6 +17,9 @@ RUN python -c "from fastembed import TextEmbedding; TextEmbedding('sentence-tran
 # Copy the backend application code (including the committed vector store)
 COPY --chown=user backend/ .
 
+# Rebuild and validate the index from the shipped authorized sources at image build time.
+RUN python -m app.rag.ingest && python verify_sources.py --check-index
+
 EXPOSE 7860
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860"]

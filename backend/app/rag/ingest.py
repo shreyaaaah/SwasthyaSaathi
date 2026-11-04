@@ -52,8 +52,8 @@ def chunk_document(doc_name: str, content: str, chunk_size: int = 500, chunk_ove
     for line in lines:
         stripped = line.strip()
         if stripped.isupper() and len(stripped) > 5 or stripped.startswith("SECTION") or stripped.startswith("#"):
-            if stripped.startswith("DOCUMENT:"):
-                doc_name = stripped.replace("DOCUMENT:", "").strip()
+            # Keep source identity bound to the filename authorized by SOURCES.md.
+            # Document text is untrusted and must not be able to rewrite provenance.
             current_section = re.sub(r"^[#\s]+", "", stripped)
         
         current_buffer += line + "\n"

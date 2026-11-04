@@ -1,0 +1,19 @@
+{
+  "calibration_count": 190,
+  "clusters": {
+    "__global__": {
+      "samples": 190.0,
+      "threshold": -10.000001,
+      "youden_j": 0.0
+    }
+  },
+  "global": {
+    "samples": 190.0,
+    "threshold": -10.000001,
+    "youden_j": 0.0
+  },
+  "manifest_hash": "8e54f7f903272f135527bd604a1aef741fec83cceeb4c7115ae0125f647a2a45",
+  "seed": 20261104,
+  "test_count": 82,
+  "version": 1
+}
