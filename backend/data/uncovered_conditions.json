@@ -33,7 +33,7 @@
     {"id":"hookworm","label":"Hookworm disease","aliases":["hookworm"]},
     {"id":"roundworm","label":"Roundworm infection","aliases":["roundworm","ascariasis"]},
     {"id":"scabies","label":"Scabies","aliases":["scabies"]},
-    {"id":"chickenpox","label":"Chickenpox","aliases":["chickenpox","varicella"]},
+    {"id":"chickenpox","label":"Chickenpox","aliases":["chickenpox","chicken pox","varicella"]},
     {"id":"shingles","label":"Shingles","aliases":["shingles","herpes zoster"]},
     {"id":"mpox","label":"Mpox","aliases":["mpox","monkeypox"]},
     {"id":"measles_rubella","label":"Measles-rubella","aliases":["measles rubella"]},
@@ -60,7 +60,6 @@
     {"id":"acute_flaccid_paralysis","label":"Acute flaccid paralysis","aliases":["acute flaccid paralysis"]},
     {"id":"avian_influenza","label":"Avian influenza","aliases":["avian influenza","bird flu"]},
     {"id":"hantavirus","label":"Hantavirus disease","aliases":["hantavirus"]},
-    {"id":"chickenpox","label":"Chickenpox","aliases":["chickenpox","chicken pox","varicella"]},
     {"id":"jaundice","label":"Jaundice","aliases":["jaundice","yellow eyes"]},
     {"id":"urinary_tract_infection","label":"Urinary tract infection","aliases":["uti","urinary tract infection","urine infection"]},
     {"id":"asthma","label":"Asthma","aliases":["asthma","wheezing"]}
