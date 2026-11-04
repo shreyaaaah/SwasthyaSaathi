@@ -970,6 +970,14 @@ def is_self_harm_crisis(query: str) -> bool:
     return any(re.search(pattern, text) for pattern in patterns)
 
 
+def _is_educational_question(query: str) -> bool:
+    normalized = re.sub(r"\br\b", "are", query.casefold())
+    return bool(re.match(
+        r"^\s*(what is|what are|explain|define|meaning of|causes of|symptoms of|how does|how can|why does|can .* (cause|have|get|experience|mean)|does .* cause|is .* (a|an|the)|are .* (a|an|the))\b",
+        normalized,
+    ))
+
+
 def triage_classify(query: str, retrieved_context: str, conversation_context: str = "") -> Dict[str, Any]:
     """Fast classification of medical urgency into EMERGENCY, CONSULT_SOON, SELF_CARE, or GENERAL_INFO."""
     q_low = query.lower()
@@ -978,11 +986,7 @@ def triage_classify(query: str, retrieved_context: str, conversation_context: st
         return {"triage_tag": "EMERGENCY", "confidence": 100, "reason": "Explicit self-harm risk or possible overdose."}
 
     # Avoid interpreting an educational question as a current emergency report.
-    normalized_question = re.sub(r"\br\b", "are", q_low)
-    educational_question = bool(re.match(
-        r"^\s*(what is|what are|explain|define|meaning of|causes of|symptoms of|how does|how can|why does|can .* (cause|have|get|experience|mean)|does .* cause|is .* (a|an|the)|are .* (a|an|the))\b",
-        normalized_question
-    ))
+    educational_question = _is_educational_question(query)
     emergency_terms = (
         "can't breathe", "cannot breathe", "difficulty breathing", "trouble breathing",
         "shortness of breath", "severe chest pain", "severe bleeding", "bleeding heavily",
@@ -1001,7 +1005,7 @@ def triage_classify(query: str, retrieved_context: str, conversation_context: st
         return {"triage_tag": "GENERAL_INFO", "confidence": 90, "reason": "General health query or myth check."}
 
     # Lightweight LLM call if non-red flag
-    client = Groq(api_key=settings.GROQ_API_KEY)
+    client = Groq(api_key=settings.GROQ_API_KEY, timeout=20.0, max_retries=0)
     prompt = (
         f'Classify the urgency of the user\'s current situation. Current message: "{query}". '
         f'Recent conversation for context only: "{conversation_context[-1200:]}". '
@@ -1539,7 +1543,7 @@ def run_agent(
         }
 
     active_model = settings.GROQ_MODEL_NAME
-    client = Groq(api_key=settings.GROQ_API_KEY)
+    client = Groq(api_key=settings.GROQ_API_KEY, timeout=20.0, max_retries=0)
 
     is_comparison = is_comparison_query(query)
     print(f"\n[ORCHESTRATOR START] Model: '{active_model}'")
@@ -1653,17 +1657,28 @@ def run_agent(
     else:
         t_parallel_start = time.time()
         valid_chunks = gate_result.get("valid_chunks", [])
-        with ThreadPoolExecutor(max_workers=2) as executor:
-            fut_triage = executor.submit(
-                triage_classify, triage_query,
-                "\n".join([c.get("snippet", "") for c in valid_chunks]),
-                conversation_context
-            )
-            fut_sufficiency = executor.submit(
-                sufficiency_check, client, active_model, query, valid_chunks
-            )
-            triage_res = fut_triage.result()
-            suff_result = fut_sufficiency.result()
+        retrieved_context = "\n".join([c.get("snippet", "") for c in valid_chunks])
+        if valid_chunks and _is_educational_question(query):
+            # CE already accepted these local passages. For direct educational
+            # queries, generate from those passages and keep the grounding audit;
+            # a separate LLM sufficiency call only adds latency here.
+            triage_res = triage_classify(triage_query, retrieved_context, conversation_context)
+            suff_result = {
+                "is_sufficient": True,
+                "missing_facts": [],
+                "reason": "Educational query with cross-encoder-accepted local evidence; final grounding audit remains enabled.",
+            }
+            print("  [SUFFICIENCY] Skipped extra model call for educational query with accepted local evidence.")
+        else:
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                fut_triage = executor.submit(
+                    triage_classify, triage_query, retrieved_context, conversation_context
+                )
+                fut_sufficiency = executor.submit(
+                    sufficiency_check, client, active_model, query, valid_chunks
+                )
+                triage_res = fut_triage.result()
+                suff_result = fut_sufficiency.result()
 
         dt_parallel = round((time.time() - t_parallel_start) * 1000, 2)
         timing_breakdown.append({"step": "Parallel (Triage + Evidence Sufficiency)", "duration_ms": dt_parallel})
