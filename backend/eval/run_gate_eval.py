@@ -20,6 +20,33 @@ from app.rag.gate import decide
 from app.rag.retriever import get_retriever
 
 
+class CachedSentenceTransformerRetriever:
+    """Evaluate the same MiniLM model family from the local HF cache when FastEmbed's ONNX archive is absent."""
+
+    def __init__(self):
+        import faiss
+        from sentence_transformers import SentenceTransformer
+
+        self.index = faiss.read_index(str(Path(settings.VECTOR_STORE_DIR) / "faiss_index.bin"))
+        metadata_path = Path(settings.VECTOR_STORE_DIR) / "chunk_metadata.json"
+        self.metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        self.encoder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+        if self.index.d != self.encoder.get_sentence_embedding_dimension():
+            raise RuntimeError("Cached sentence-transformer dimension does not match the committed FAISS index")
+        if self.index.ntotal != len(self.metadata):
+            raise RuntimeError("FAISS count does not match metadata while constructing evaluation retriever")
+
+    def search(self, query: str, top_k: int = 12, min_score: float = 0.0) -> list[dict]:
+        vector = np.asarray(self.encoder.encode([query], normalize_embeddings=True), dtype=np.float32)
+        scores, indices = self.index.search(vector, min(top_k, self.index.ntotal))
+        hits = []
+        for score, idx in zip(scores[0], indices[0]):
+            if idx < 0 or float(score) < min_score:
+                continue
+            hits.append({**self.metadata[int(idx)], "score": float(score)})
+        return hits
+
+
 def _predict(rows: list[dict], reranker, retriever) -> list[dict]:
     output = []
     for row in rows:
@@ -55,11 +82,12 @@ def _metrics(rows: list[dict], predictions: list[bool]) -> dict:
         "queries": len(rows), "false_answer_rate_near_domain": (sum(pred for _, pred in near) / len(near)) if near else None,
         "false_refusal_rate_in_kb": (sum(not pred for _, pred in in_kb) / len(in_kb)) if in_kb else None,
         "health_answer_rate": (sum(pred for _, pred in health) / len(health)) if health else None,
-        "llm_calls_avoided_pct": sum(not p for p in predictions) / len(predictions) * 100 if predictions else None,
+        # A gate non-answer may still route to a GENERAL/WEB response that calls an LLM.
+        # This benchmark does not run generation, so it cannot claim calls or cost were saved.
+        "gate_non_answer_pct": sum(not p for p in predictions) / len(predictions) * 100 if predictions else None,
         "confusion": {"tp": tp, "fp": fp, "fn": fn, "tn": tn},
         "p50_latency_ms": float(np.percentile(latencies, 50)) if latencies else None,
         "p95_latency_ms": float(np.percentile(latencies, 95)) if latencies else None,
-        "estimated_generation_calls_saved": sum(not p for p in predictions),
     }
 
 
@@ -70,14 +98,18 @@ def main() -> None:
         generate()
     rows = [json.loads(line) for line in dataset_path.read_text(encoding="utf-8").splitlines() if line.strip()]
     output_path = Path(__file__).with_name("results.json")
-    if os.getenv("HF_HUB_OFFLINE", "").casefold() in {"1", "true", "yes"}:
-        reason = "HF_HUB_OFFLINE is enabled and the FastEmbed model archive is not present in the local cache; query embeddings cannot be generated here."
-        output_path.write_text(json.dumps({"status": "blocked", "reason": reason, "dataset_size": len(rows), "note": "No benchmark numbers produced. Run with network access or preload the configured embedding and cross-encoder models."}, indent=2), encoding="utf-8")
-        Path(__file__).with_name("RESULTS.md").write_text(f"# Evaluation status\n\n**Blocked:** {reason}\n\nDataset size: {len(rows)} labeled queries. No quality or latency metrics are reported.\n", encoding="utf-8")
-        print(f"Evaluation blocked; details written to {output_path}: local embedding model cache is unavailable.")
-        return
+    embedding_provider = "fastembed"
     try:
-        retriever = get_retriever()
+        # In offline mode, avoid initializing FastEmbed: its archive is not
+        # guaranteed to be cached even when the equivalent HF model is.
+        if os.getenv("HF_HUB_OFFLINE", "").casefold() in {"1", "true", "yes"}:
+            retriever = CachedSentenceTransformerRetriever()
+            embedding_provider = "sentence-transformers/all-MiniLM-L6-v2 (cached evaluation adapter)"
+        else:
+            retriever = get_retriever()
+            if getattr(retriever, "model", None) is None:
+                retriever = CachedSentenceTransformerRetriever()
+                embedding_provider = "sentence-transformers/all-MiniLM-L6-v2 (cached evaluation adapter)"
         from sentence_transformers import CrossEncoder
         reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
         scored = _predict(rows, reranker, retriever)
@@ -132,13 +164,15 @@ def main() -> None:
         "cross_encoder_threshold": ce_cut, "original_midpoint_threshold": b2_cut,
         "manifest_hash": manifest_hash(retriever.metadata, Path(settings.RAW_DOCS_DIR, "SOURCES.md").read_text(encoding="utf-8")),
         "latency_scope": "retrieval plus cross-encoder; excludes LLM generation, web search, and network latency",
+        "embedding_provider": embedding_provider,
+        "embedding_compatibility_note": "When the cached evaluation adapter is selected, it encodes queries with the same all-MiniLM-L6-v2 model family as FastEmbed but a different runtime/precision path. Treat the result as a local proxy; confirm with the production FastEmbed runtime before using as deployed-system performance evidence.",
         "answer_quality_metrics": "unsupported-claim rate, leak-phrase rate, actual answer mode split, and verifier/web ablations require end-to-end model/network runs and are not measured by this gate-only benchmark",
-        "estimated_compute_saved": "estimated generation calls avoided; no monetary or energy conversion assumed"}
+        "compute_savings": "not measured; a gate non-answer may still invoke an LLM through a GENERAL or WEB fallback"}
     output_path.write_text(json.dumps(results, indent=2), encoding="utf-8")
-    lines = ["| System | False answer: near-domain | False refusal: in-KB | Health answered | LLM calls avoided | p50 gate ms | p95 gate ms |", "|---|---:|---:|---:|---:|---:|---:|"]
+    lines = ["| System | False answer: near-domain | False refusal: in-KB | Health answered | Gate non-answer | p50 gate ms | p95 gate ms |", "|---|---:|---:|---:|---:|---:|---:|"]
     for name, metric in results.items():
         if name == "metadata": continue
-        lines.append(f"| {name} | {metric['false_answer_rate_near_domain']:.3f} | {metric['false_refusal_rate_in_kb']:.3f} | {metric['health_answer_rate']:.3f} | {metric['llm_calls_avoided_pct']:.1f}% | {metric['p50_latency_ms']:.1f} | {metric['p95_latency_ms']:.1f} |")
+        lines.append(f"| {name} | {metric['false_answer_rate_near_domain']:.3f} | {metric['false_refusal_rate_in_kb']:.3f} | {metric['health_answer_rate']:.3f} | {metric['gate_non_answer_pct']:.1f}% | {metric['p50_latency_ms']:.1f} | {metric['p95_latency_ms']:.1f} |")
     Path(__file__).with_name("RESULTS.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))
 

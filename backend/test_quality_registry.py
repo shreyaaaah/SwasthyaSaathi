@@ -152,7 +152,10 @@ class SafetyAndEvidenceTests(unittest.TestCase):
     @patch("app.agent.orchestrator._get_cross_encoder")
     def test_relevance_gate_skips_off_topic_passage(self, get_encoder):
         get_encoder.return_value = SimpleNamespace(predict=lambda pairs: [-10.0 for _ in pairs])
-        gate = specificity_gate("query", [{"score": 0.8, "chunk_text": "unrelated passage"}])
+        # A stale/permissive calibration must not weaken the absolute reject floor.
+        with patch("app.rag.gate.settings.GATE_GLOBAL_THRESHOLD", -10.0), \
+                patch("app.agent.orchestrator.load_thresholds", return_value={"global": {"threshold": -10.0}}):
+            gate = specificity_gate("query", [{"score": 0.8, "chunk_text": "unrelated passage"}])
         self.assertTrue(gate["skip_kb"])
 
     @patch("app.agent.orchestrator.safe_chat_completion")

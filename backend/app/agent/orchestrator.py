@@ -24,7 +24,7 @@ if BACKEND_DIR not in sys.path:
 from groq import Groq
 from app.config import settings
 from app.rag.retriever import get_retriever
-from app.rag.gate import decide as decide_response_gate
+from app.rag.gate import MIN_CE_THRESHOLD, decide as decide_response_gate
 from app.rag.coverage import build_covered_registry
 from app.rag.auto_calibrate import load_thresholds, manifest_hash, recalibrate_from_evaluation_set
 from app.rag.gaps import record_refusal, record_answer_metadata
@@ -85,7 +85,7 @@ def _get_cross_encoder():
             _cross_encoder = None
     return _cross_encoder
 
-CE_SKIP_THRESHOLD = settings.GATE_GLOBAL_THRESHOLD   # calibrated thresholds may not weaken this configured floor
+CE_SKIP_THRESHOLD = MIN_CE_THRESHOLD   # runtime/calibrated thresholds may not weaken this hard floor
 _calibration_lock = threading.Lock()
 _calibration_attempted: set[str] = set()
 

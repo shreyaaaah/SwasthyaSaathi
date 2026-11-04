@@ -16,6 +16,11 @@ class GateDecision(StrEnum):
     OFF_TOPIC = "OFF_TOPIC"
 
 
+# A permissive runtime/calibrated threshold must never accept an extremely
+# unrelated passage whose cross-encoder score is below this safety floor.
+MIN_CE_THRESHOLD = -9.5
+
+
 def decide(
     query: str,
     chunks: list[dict[str, Any]],
@@ -35,6 +40,7 @@ def decide(
     cluster_entry = (thresholds or {}).get("clusters", {}).get(cluster, {})
     calibrated_global = float((thresholds or {}).get("global", {}).get("threshold", settings.GATE_GLOBAL_THRESHOLD))
     threshold = max(
+        MIN_CE_THRESHOLD,
         settings.GATE_GLOBAL_THRESHOLD,
         calibrated_global,
         float(cluster_entry.get("threshold", calibrated_global)),
