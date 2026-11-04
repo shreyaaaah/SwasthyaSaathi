@@ -75,17 +75,20 @@ def _available_models_in_order(models_to_try: List[str]) -> List[str]:
 # scores are not treated as proof that the passages answer the question.
 # ---------------------------------------------------------------------------
 _cross_encoder = None
+_cross_encoder_lock = threading.Lock()
 
 def _get_cross_encoder():
     global _cross_encoder
     if _cross_encoder is None:
-        try:
-            from sentence_transformers import CrossEncoder
-            _cross_encoder = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
-            print("  [CE-GATE] Cross-encoder loaded: cross-encoder/ms-marco-MiniLM-L-6-v2")
-        except Exception as e:
-            print(f"  [CE-GATE] Cross-encoder unavailable: {e}.")
-            _cross_encoder = None
+        with _cross_encoder_lock:
+            if _cross_encoder is None:
+                try:
+                    from sentence_transformers import CrossEncoder
+                    _cross_encoder = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+                    print("  [CE-GATE] Cross-encoder loaded: cross-encoder/ms-marco-MiniLM-L-6-v2")
+                except Exception as e:
+                    print(f"  [CE-GATE] Cross-encoder unavailable: {e}.")
+                    _cross_encoder = None
     return _cross_encoder
 
 CE_SKIP_THRESHOLD = MIN_CE_THRESHOLD   # runtime/calibrated thresholds may not weaken this hard floor
@@ -836,9 +839,6 @@ def web_search_health_authority(query: str, max_results: int = 3) -> List[Dict[s
         search_query = f"{query} {site_filter}"
         raw_results = list(ddg.text(search_query, max_results=max_results * 3))
 
-        if not raw_results:
-            fallback_query = f"{query} {site_filter}"
-            raw_results = list(ddg.text(fallback_query, max_results=max_results * 2))
     except Exception as e:
         print(f"Web search error: {e}")
         raw_results = []
@@ -956,9 +956,10 @@ def triage_classify(query: str, retrieved_context: str, conversation_context: st
         return {"triage_tag": "EMERGENCY", "confidence": 100, "reason": "Explicit self-harm risk or possible overdose."}
 
     # Avoid interpreting an educational question as a current emergency report.
+    normalized_question = re.sub(r"\br\b", "are", q_low)
     educational_question = bool(re.match(
         r"^\s*(what is|what are|explain|define|meaning of|causes of|symptoms of|how does|how can|why does|can .* (cause|have|get|experience|mean)|does .* cause|is .* (a|an|the)|are .* (a|an|the))\b",
-        q_low
+        normalized_question
     ))
     emergency_terms = (
         "can't breathe", "cannot breathe", "difficulty breathing", "trouble breathing",
@@ -969,6 +970,9 @@ def triage_classify(query: str, retrieved_context: str, conversation_context: st
     )
     if not educational_question and any(term in q_low for term in emergency_terms):
         return {"triage_tag": "EMERGENCY", "confidence": 95, "reason": "Red flag symptoms indicating acute life threat."}
+
+    if educational_question:
+        return {"triage_tag": "GENERAL_INFO", "confidence": 90, "reason": "Educational health question; no personal urgency reported."}
 
     # Fast heuristic check for myth / info queries
     if "myth" in q_low or "turmeric" in q_low or "cure" in q_low:
@@ -1375,25 +1379,6 @@ def _is_medication_advice_request(query: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# Model verification
-# ---------------------------------------------------------------------------
-
-def _verify_model_available(client: Groq, model_name: str) -> bool:
-    """Prints available models from client.models.list() and checks if model_name is present."""
-    try:
-        available = [m.id for m in client.models.list().data]
-        print(f"  [MODEL CHECK] Active model string in API call: '{model_name}'")
-        print(f"  [MODEL CHECK] Available models via client.models.list(): {available}")
-        if model_name not in available:
-            print(f"  [MODEL CHECK] WARNING: '{model_name}' not in listed models. Continuing anyway.")
-            return False
-        return True
-    except Exception as e:
-        print(f"  [MODEL CHECK] models.list() failed: {e}")
-        return False
-
-
-# ---------------------------------------------------------------------------
 # Orchestrator Core Loop
 # ---------------------------------------------------------------------------
 
@@ -1618,8 +1603,6 @@ def run_agent(
                 max_ce = retry_ce
                 gate_result = retry_gate
                 skip_kb = retry_gate.get("skip_kb", False)
-
-    _verify_model_available(client, active_model)
 
     answer_mode = "GENERAL"
     gate_scores = gate_result.get("signals") or {
@@ -1880,6 +1863,8 @@ def run_agent(
         "timings_ms": {t["step"]: t["duration_ms"] for t in timing_breakdown}
     }
 
+    timing_summary = " | ".join(f"{item['step']}={item['duration_ms']}ms" for item in timing_breakdown)
+    print(f"[ORCHESTRATOR TIMINGS] {timing_summary}")
     print(f"[ORCHESTRATOR COMPLETE] Total Latency: {total_duration} ms | Draft Grounded: {draft_audit.get('is_fully_grounded')} | Final Grounded: {is_grounded_val} | Regen: {regen_fired}\n")
     return {
         "model_used": active_model,
