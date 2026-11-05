@@ -33,8 +33,10 @@ _HEALTH_TERMS = re.compile(
 )
 _EMERGENCY = re.compile(
     r"(?:i(?:'m| am)?\s+(?:having|getting|experiencing)\s+)?(?:severe\s+)?chest pain.{0,45}(?:sweat|breath|dizzy|faint|nausea)|"
-    r"(?:trouble breathing|can't breathe|cannot breathe|severe bleeding|unconscious|stroke signs|face drooping|"
-    r"suicid(?:e|al)|want to kill myself|took too many pills|overdose)", re.I
+    r"(?:trouble breathing|can't breathe|cannot breathe|severe bleeding|bleeding heavily|unconscious|seizure|"
+    r"stroke signs|face (?:is )?drooping|slurred speech|sudden weakness|one-sided weakness|weakness on one side|"
+    r"severe chest pain|suicid(?:e|al)|want to kill myself|took too many pills|overdose|"
+    r"anaphylaxis|throat closing|swelling of (?:the )?tongue)", re.I
 )
 
 

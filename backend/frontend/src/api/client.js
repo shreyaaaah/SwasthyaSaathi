@@ -6,24 +6,30 @@ const API_BASE_URL = import.meta.env.DEV
   ? (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000')
   : 'https://swasthyasaathi-3.onrender.com';
 
+let activeChatController = null;
+
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 60000,
+  timeout: 120000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
 export const sendChatMessage = async (query, conversationHistory = []) => {
+  activeChatController?.abort();
+  const controller = new AbortController();
+  activeChatController = controller;
   try {
     const response = await apiClient.post('/chat', {
       query,
       user_id: 'anonymous',
       conversation_history: conversationHistory,
-    });
+    }, { signal: controller.signal });
     return response.data;
   } catch (error) {
     console.error('API Error sending chat message:', error);
+    if (axios.isCancel(error)) throw error;
     if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
       throw new Error('The health service is taking too long to respond. Please try again shortly.');
     }
@@ -31,6 +37,8 @@ export const sendChatMessage = async (query, conversationHistory = []) => {
       throw new Error(error.response.data.detail);
     }
     throw new Error('Unable to connect to the health information service. Please try again shortly.');
+  } finally {
+    if (activeChatController === controller) activeChatController = null;
   }
 };
 

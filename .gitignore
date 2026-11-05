@@ -54,6 +54,7 @@ Thumbs.db
 # Evaluation & Scratch logs
 eval_run_*.txt
 backend/eval_run_*.txt
+backend/data/model_cache/
 calibration_run.txt
 grep_uwin_output.txt
 table_parsing_output.txt

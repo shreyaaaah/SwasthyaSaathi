@@ -103,7 +103,6 @@ class SafetyAndEvidenceTests(unittest.TestCase):
     @patch("app.agent.orchestrator.record_answer_metadata")
     @patch("app.agent.orchestrator.record_refusal")
     @patch("app.agent.orchestrator.safe_chat_completion")
-    @patch("app.agent.orchestrator._verify_model_available")
     @patch("app.agent.orchestrator.Groq", return_value=object())
     @patch("app.agent.orchestrator.triage_classify", return_value={"triage_tag": "GENERAL_INFO"})
     @patch("app.agent.orchestrator.web_search_health_authority", return_value=[])
@@ -114,7 +113,7 @@ class SafetyAndEvidenceTests(unittest.TestCase):
         "refusal_type": None, "signals": {"faiss_top1": 0, "cross_encoder_max": None},
     })
     def test_uncovered_health_query_gets_general_answer_without_cold_refusal(
-        self, _gate, _search, _web, _triage, _groq, _verify, completion, _gap, _metadata,
+        self, _gate, _search, _web, _triage, _groq, completion, _gap, _metadata,
     ):
         response = SimpleNamespace(model="test-model", choices=[SimpleNamespace(
             message=SimpleNamespace(content="Chickenpox commonly causes an itchy rash with fluid-filled blisters. Seek care for severe symptoms."),

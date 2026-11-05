@@ -10,7 +10,7 @@ services:
     healthCheckPath: /health
     renderSubdomainPolicy: enabled
     # Use the committed vector store; verify it instead of re-embedding every source on each deploy.
-    buildCommand: pip install -r requirements.txt && python -c "from fastembed import TextEmbedding; TextEmbedding('sentence-transformers/all-MiniLM-L6-v2')" && python -c "from sentence_transformers import CrossEncoder; CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')" && python verify_sources.py --check-index
+    buildCommand: export FASTEMBED_CACHE_PATH=./data/model_cache/fastembed HF_HOME=./data/model_cache/huggingface && mkdir -p "$FASTEMBED_CACHE_PATH" "$HF_HOME" && pip install -r requirements.txt && python -c "from fastembed import TextEmbedding; TextEmbedding('sentence-transformers/all-MiniLM-L6-v2')" && python -c "from sentence_transformers import CrossEncoder; CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')" && python verify_sources.py --check-index
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: GROQ_API_KEY
@@ -19,6 +19,10 @@ services:
         sync: false
       - key: VECTOR_STORE_DIR
         value: ./data/vector_store
+      - key: FASTEMBED_CACHE_PATH
+        value: ./data/model_cache/fastembed
+      - key: HF_HOME
+        value: ./data/model_cache/huggingface
       - key: RAW_DOCS_DIR
         value: ./data/raw_docs
       - key: EMBEDDING_MODEL_NAME

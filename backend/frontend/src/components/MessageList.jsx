@@ -23,7 +23,7 @@ function TriageBanner({ tag, emergencyContact }) {
   return null;
 }
 
-const MessageList = ({ messages, isLoading }) => (
+const MessageList = ({ messages, isLoading, loadingMessage }) => (
   <div className="flex-1 overflow-y-auto p-4 space-y-4" aria-live="polite" aria-relevant="additions">
     {messages.map((msg, index) => {
       const isUser = msg.sender === 'user';
@@ -42,7 +42,7 @@ const MessageList = ({ messages, isLoading }) => (
         </div>
       </div>;
     })}
-    {isLoading && <div role="status" className="flex items-center gap-3 p-4 text-slate-300 text-sm"><Activity aria-hidden="true" className="w-5 h-5 text-teal-400 animate-spin" /><span>Looking for relevant health guidance…</span></div>}
+    {isLoading && <div role="status" className="flex items-center gap-3 p-4 text-slate-300 text-sm"><Activity aria-hidden="true" className="w-5 h-5 text-teal-400 animate-spin" /><span>{loadingMessage || 'Looking for relevant health guidance…'}</span></div>}
   </div>
 );
 

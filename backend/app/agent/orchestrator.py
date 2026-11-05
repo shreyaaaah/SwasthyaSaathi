@@ -25,7 +25,7 @@ from groq import Groq
 from app.config import settings
 from app.rag.retriever import get_retriever
 from app.rag.gate import MIN_CE_THRESHOLD, decide as decide_response_gate
-from app.rag.coverage import build_covered_registry
+from app.rag.coverage import build_covered_registry, detect_uncovered_condition
 from app.rag.auto_calibrate import load_thresholds, manifest_hash, recalibrate_from_evaluation_set
 from app.rag.gaps import record_refusal, record_answer_metadata
 from app.rag.intent import Intent, classify_intent, is_immediate_emergency, social_reply
@@ -33,6 +33,7 @@ from app.rag.prompts import (
     HEALTH_ASSISTANT_SYSTEM, CONTENT_FENCE_VERIFIER,
     limit_follow_up_questions, remove_internal_leaks,
 )
+from app.agent.performance import answer_cache, latency_history, normalize_query, PREWARM_CACHE_QUERIES
 
 # ===========================================================================
 # MODEL CHOICE EXPLANATION
@@ -76,6 +77,10 @@ def _available_models_in_order(models_to_try: List[str]) -> List[str]:
 # ---------------------------------------------------------------------------
 _cross_encoder = None
 _cross_encoder_lock = threading.Lock()
+_chat_executor = ThreadPoolExecutor(max_workers=6, thread_name_prefix="chat-work")
+CHAT_BUDGET_SECONDS = 25.0
+MODEL_CALL_TIMEOUT_SECONDS = 8.0
+FAST_EDUCATIONAL_MODEL = "openai/gpt-oss-20b"
 
 def _get_cross_encoder():
     global _cross_encoder
@@ -219,7 +224,8 @@ def specificity_gate(query: str, raw_chunks: List[Dict[str, Any]], faiss_floor: 
     }
 
 
-def sufficiency_check(client: Groq, active_model: str, query: str, valid_chunks: List[Dict[str, Any]]) -> Dict[str, Any]:
+def sufficiency_check(client: Groq, active_model: str, query: str, valid_chunks: List[Dict[str, Any]],
+                      deadline: float | None = None) -> Dict[str, Any]:
     """
     Evaluates whether retrieved KB chunks contain all necessary facts to answer query.
     Small JSON LLM call. Returns: {"is_sufficient": bool, "missing_facts": List[str], "reason": str}
@@ -251,7 +257,9 @@ def sufficiency_check(client: Groq, active_model: str, query: str, valid_chunks:
             active_model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.0,
-            max_tokens=800
+            max_tokens=350,
+            response_format={"type": "json_object"},
+            deadline=deadline,
         )
         raw = res.choices[0].message.content or ""
         raw_clean = raw.strip()
@@ -279,8 +287,39 @@ def sufficiency_check(client: Groq, active_model: str, query: str, valid_chunks:
         return {"is_sufficient": False, "missing_facts": [f"Error: {e}"], "reason": f"Check error: {e}"}
 
 
+_GROUNDING_STOPWORDS = {
+    "about", "after", "also", "and", "are", "because", "been", "being", "but", "can", "could",
+    "did", "does", "during", "each", "for", "from", "give", "has", "have", "help", "how", "into",
+    "is", "it", "may", "more", "most", "not", "often", "only", "or", "other", "should", "some",
+    "that", "the", "their", "then", "there", "these", "this", "those", "through", "to", "use", "was",
+    "were", "what", "when", "which", "with", "would", "you", "your",
+}
+
+
+def deterministic_unsupported_sentences(answer: str, sources: List[Dict[str, Any]]) -> list[str]:
+    """Flag factual sentences with little lexical support for a second-pass audit."""
+    evidence = " ".join(
+        str(source.get(key) or "")
+        for source in sources
+        for key in ("snippet", "content_snippet", "chunk_text")
+    ).casefold()
+    evidence_tokens = set(re.findall(r"[a-z0-9]+", evidence))
+    if not evidence_tokens:
+        return [sentence.strip() for sentence in re.split(r"(?<=[.!?])\s+", answer.strip()) if len(sentence.split()) >= 4]
+
+    flagged = []
+    for sentence in re.split(r"(?<=[.!?])\s+", answer.strip()):
+        tokens = {
+            token for token in re.findall(r"[a-z0-9]+", sentence.casefold())
+            if len(token) > 2 and token not in _GROUNDING_STOPWORDS
+        }
+        if len(tokens) >= 3 and len(tokens & evidence_tokens) / len(tokens) < 0.35:
+            flagged.append(sentence.strip())
+    return flagged
+
+
 def verify_content_fences(client: Groq, active_model: str, query: str, draft: str,
-                          sources: List[Dict[str, Any]]) -> Dict[str, Any]:
+                          sources: List[Dict[str, Any]], deadline: float | None = None) -> Dict[str, Any]:
     """Apply the configured second-pass general/mixed health-content verifier."""
     if not sources:
         # GENERAL mode is explicitly allowed to share safe educational guidance.
@@ -291,7 +330,21 @@ def verify_content_fences(client: Groq, active_model: str, query: str, draft: st
             "edited": False,
             "verifier": "general_no_source_scope",
         }
-    if settings.ENABLE_CONTENT_VERIFIER:
+    evidence_text = " ".join(
+        str(source.get(key) or "")
+        for source in sources
+        for key in ("snippet", "content_snippet", "chunk_text")
+    ).casefold()
+    risky_claim = any(
+        match.group(0).casefold() not in evidence_text
+        for pattern in _RESTRICTED_CLAIM_PATTERNS
+        for match in pattern.finditer(draft)
+    )
+    needs_review = risky_claim or bool(deterministic_unsupported_sentences(draft, sources))
+    if not needs_review:
+        return {"answer": remove_internal_leaks(draft), "edited": False, "verifier": "deterministic_overlap"}
+
+    if settings.ENABLE_CONTENT_VERIFIER and _remaining_budget(deadline) > 0.25:
         evidence = "\n\n".join(
             f"{source.get('doc_name') or source.get('title')}: {source.get('snippet', '')[:500]}"
             for source in sources
@@ -304,7 +357,8 @@ def verify_content_fences(client: Groq, active_model: str, query: str, draft: st
                     {"role": "user", "content": f"Mode: GENERAL or MIXED\nUser question: {query}\nVerified evidence, if any:\n{evidence}\n\nDraft to check:\n{draft}"},
                 ],
                 temperature=0.0,
-                max_tokens=600,
+                max_tokens=300,
+                deadline=deadline,
             )
             cleaned = (result.choices[0].message.content or "").strip()
             if cleaned:
@@ -312,11 +366,8 @@ def verify_content_fences(client: Groq, active_model: str, query: str, draft: st
         except Exception as exc:
             print(f"  [CONTENT FENCE VERIFIER] Unavailable; applying deterministic fallback: {exc}")
 
-    unsafe_specificity = re.search(r"\b\d+(?:\.\d+)?\s*(?:mg|mcg|µg|ml|mL|g|tablets?|percent|%)\b", draft, re.I)
-    if unsafe_specificity:
-        safe = "I can share general information, but exact doses, schedules, and numeric medical advice need a verified source and advice from a clinician or pharmacist."
-        return {"answer": remove_internal_leaks(safe), "edited": True, "verifier": "deterministic_fallback"}
-    return {"answer": remove_internal_leaks(draft), "edited": False, "verifier": "deterministic_fallback"}
+    fenced, edited = enforce_source_backed_fences(draft, sources)
+    return {"answer": remove_internal_leaks(fenced), "edited": edited, "verifier": "deterministic_fallback"}
 
 
 _RESTRICTED_CLAIM_PATTERNS = (
@@ -510,7 +561,11 @@ def _get_msg_str(m: Any) -> str:
         return str(getattr(m, "content") or "")
     return ""
 
-def safe_chat_completion(client: Groq, active_model: str, **kwargs):
+def _remaining_budget(deadline: float | None) -> float:
+    return float("inf") if deadline is None else max(0.0, deadline - time.monotonic())
+
+
+def safe_chat_completion(client: Groq, active_model: str, *, deadline: float | None = None, **kwargs):
     """
     Executes a Groq chat completion.
     Respects circuit-breaker per-model cooldowns before trying.
@@ -544,7 +599,7 @@ def safe_chat_completion(client: Groq, active_model: str, **kwargs):
     models_to_try = [active_model] + [m for m in candidate_list if m != active_model]
 
     # Filter out cooling models
-    available = _available_models_in_order(models_to_try)
+    available = _available_models_in_order(models_to_try)[:2]
     if not available:
         cooling_info = {m: round(_model_cooldown_until.get(m, 0) - time.time(), 0) for m in models_to_try}
         raise RuntimeError(
@@ -555,14 +610,24 @@ def safe_chat_completion(client: Groq, active_model: str, **kwargs):
     last_err = None
     for m in available:
         try:
+            remaining = _remaining_budget(deadline)
+            if remaining <= 0.1:
+                raise TimeoutError("Chat request budget exhausted before model call")
             kwargs["model"] = m
-            res = client.chat.completions.create(**kwargs)
+            call_kwargs = dict(kwargs)
+            call_kwargs.setdefault("reasoning_effort", "none" if "qwen3.8" in m else "low")
+            if "response_format" in call_kwargs and m.startswith("openai/gpt-oss-"):
+                call_kwargs.setdefault("reasoning_format", "hidden")
+            call_kwargs["timeout"] = min(MODEL_CALL_TIMEOUT_SECONDS, remaining)
+            res = client.chat.completions.create(**call_kwargs)
             served_model = getattr(res, "model", m)
             print(f"  [GROQ CALL SUCCESS] Target model: '{m}' | Served model: '{served_model}'")
             return res
         except Exception as e:
             last_err = e
             err_str = str(e)
+            if isinstance(e, TimeoutError) and "budget exhausted" in err_str.lower():
+                raise
             # Parse Retry-After if present (Groq may include it in error body)
             retry_after = None
             try:
@@ -973,39 +1038,40 @@ def is_self_harm_crisis(query: str) -> bool:
 def _is_educational_question(query: str) -> bool:
     normalized = re.sub(r"\br\b", "are", query.casefold())
     return bool(re.match(
-        r"^\s*(what is|what are|explain|define|meaning of|causes of|symptoms of|how does|how can|why does|can .* (cause|have|get|experience|mean)|does .* cause|is .* (a|an|the)|are .* (a|an|the))\b",
+        r"^\s*(what is|what are|explain|define|meaning of|causes of|symptoms of|signs of|how does|how can|why does|can .* (cause|have|get|experience|mean)|does .* (cause|cure|treat)|do .* (cure|treat)|is .* (a|an|the)|are .* (a|an|the))\b",
         normalized,
     ))
 
 
+def deterministic_triage(query: str) -> Dict[str, Any] | None:
+    """Resolve high-confidence urgency locally; return None when model triage is needed."""
+    text = re.sub(r"\s+", " ", query.casefold()).strip()
+    if is_self_harm_crisis(query) or is_immediate_emergency(query):
+        return {"triage_tag": "EMERGENCY", "confidence": 100, "reason": "A deterministic red-flag rule matched."}
+    infant_fever = bool(
+        re.search(r"\b(?:\d{1,2}\s*(?:day|week|month)s?\s*(?:old)?|newborn|new born|under\s+3\s+months?)\b", text)
+        and re.search(r"\b(?:fever|temperature|hot to touch|bukhar)\b", text)
+    )
+    if infant_fever:
+        return {"triage_tag": "EMERGENCY", "confidence": 98, "reason": "Fever in an infant under three months needs urgent assessment."}
+    if _is_educational_question(query):
+        return {"triage_tag": "GENERAL_INFO", "confidence": 95, "reason": "Educational question; no personal emergency is reported."}
+    if re.search(r"\b(?:pregnant|pregnancy)\b", text) and re.search(r"\b(?:fever|bleeding|severe pain|reduced movement)\b", text):
+        return {"triage_tag": "CONSULT_SOON", "confidence": 90, "reason": "Pregnancy with a concerning symptom warrants prompt clinical advice."}
+    if re.search(r"\b(?:worsening|getting worse|persistent|for more than|lasting over)\b", text):
+        return {"triage_tag": "CONSULT_SOON", "confidence": 82, "reason": "Persistent or worsening symptoms warrant clinical assessment."}
+    if re.search(r"\b(?:mild|slight|a little)\b", text) and re.search(r"\b(?:cough|cold|headache|sore throat)\b", text):
+        return {"triage_tag": "SELF_CARE", "confidence": 75, "reason": "No red flags detected; general self-care information may help."}
+    return None
+
+
 def triage_classify(query: str, retrieved_context: str, conversation_context: str = "") -> Dict[str, Any]:
     """Fast classification of medical urgency into EMERGENCY, CONSULT_SOON, SELF_CARE, or GENERAL_INFO."""
-    q_low = query.lower()
+    rule_result = deterministic_triage(query)
+    if rule_result is not None:
+        return rule_result
 
-    if is_self_harm_crisis(query):
-        return {"triage_tag": "EMERGENCY", "confidence": 100, "reason": "Explicit self-harm risk or possible overdose."}
-
-    # Avoid interpreting an educational question as a current emergency report.
-    educational_question = _is_educational_question(query)
-    emergency_terms = (
-        "can't breathe", "cannot breathe", "difficulty breathing", "trouble breathing",
-        "shortness of breath", "severe chest pain", "severe bleeding", "bleeding heavily",
-        "chest pain",
-        "vomiting blood", "blood in vomit", "blood in stool", "severe abdominal pain",
-        "persistent vomiting", "unconscious", "seizure"
-    )
-    if not educational_question and any(term in q_low for term in emergency_terms):
-        return {"triage_tag": "EMERGENCY", "confidence": 95, "reason": "Red flag symptoms indicating acute life threat."}
-
-    if educational_question:
-        return {"triage_tag": "GENERAL_INFO", "confidence": 90, "reason": "Educational health question; no personal urgency reported."}
-
-    # Fast heuristic check for myth / info queries
-    if "myth" in q_low or "turmeric" in q_low or "cure" in q_low:
-        return {"triage_tag": "GENERAL_INFO", "confidence": 90, "reason": "General health query or myth check."}
-
-    # Lightweight LLM call if non-red flag
-    client = Groq(api_key=settings.GROQ_API_KEY, timeout=20.0, max_retries=0)
+    client = Groq(api_key=settings.GROQ_API_KEY, timeout=MODEL_CALL_TIMEOUT_SECONDS, max_retries=0)
     prompt = (
         f'Classify the urgency of the user\'s current situation. Current message: "{query}". '
         f'Recent conversation for context only: "{conversation_context[-1200:]}". '
@@ -1018,10 +1084,11 @@ def triage_classify(query: str, retrieved_context: str, conversation_context: st
 
     try:
         res = client.chat.completions.create(
-            model=settings.GROQ_MODEL_NAME,
+            model=FAST_EDUCATIONAL_MODEL,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.0,
             max_tokens=150,
+            reasoning_effort="low",
             response_format={"type": "json_object"}
         )
         data = json.loads(res.choices[0].message.content)
@@ -1178,14 +1245,16 @@ def _pick_auditor_model(generator_served_model: str, candidate_chain: List[str])
 
 def verify_grounding(client: Groq, active_model: str, answer_to_audit: str,
                      sources: List[Dict[str, Any]],
-                     generator_served_model: str = None) -> Dict[str, Any]:
+                     generator_served_model: str = None,
+                     deadline: float | None = None,
+                     flagged_sentences: List[str] | None = None) -> Dict[str, Any]:
     """
     Audits whether every sentence in answer_to_audit is supported by reference sources.
     Uses a model DIFFERENT from the generator's served model.
     If no different model is available, marks answer as unverified.
     Prints model match warning if generator and auditor served model match.
     """
-    audit_chain = ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b"]
+    audit_chain = [FAST_EDUCATIONAL_MODEL, "qwen/qwen3.8-27b"]
     served = generator_served_model or active_model
     auditor_model = _pick_auditor_model(served, audit_chain)
 
@@ -1221,6 +1290,8 @@ def verify_grounding(client: Groq, active_model: str, answer_to_audit: str,
         f"Generated Answer (to audit):\n\"{answer_truncated}\"\n\n"
         "Task: For each sentence in the Generated Answer, identify any factual clinical claim NOT "
         "supported by the Reference Sources above.\n"
+        + (f"The deterministic pre-check flagged these sentences for closer review:\n{flagged_sentences}\n" if flagged_sentences else "")
+        +
         "If all factual claims are supported, set unsupported_sentences to [].\n\n"
         "EXCEPTION RULES FOR AUDITOR:\n"
         "- Do NOT flag standard clinical caveats ('Because these infections share similar symptoms, they are hard to tell apart, and laboratory testing is needed for a clear diagnosis') "
@@ -1232,7 +1303,7 @@ def verify_grounding(client: Groq, active_model: str, answer_to_audit: str,
         '"audit_summary": "<one sentence>"}'
     )
 
-    for attempt in range(1, 3):  # try at most twice
+    for attempt in range(1, 2):
         res = None
         try:
             res = safe_chat_completion(
@@ -1240,7 +1311,9 @@ def verify_grounding(client: Groq, active_model: str, answer_to_audit: str,
                 auditor_model,
                 messages=[{"role": "user", "content": audit_prompt}],
                 temperature=0.0,
-                max_tokens=4096
+                max_tokens=300,
+                response_format={"type": "json_object"},
+                deadline=deadline,
             )
             served_model = getattr(res, "model", auditor_model)
             raw = res.choices[0].message.content or ""
@@ -1280,23 +1353,21 @@ def verify_grounding(client: Groq, active_model: str, answer_to_audit: str,
 
             print(f"  [AUDIT FAILED] Attempt {attempt} | Model: '{served_model}' | Finish Reason: '{finish_reason}'")
             print(f"  [AUDIT ERROR]: {e}")
-            if attempt == 2:
-                print("  [AUDIT] Both attempts failed — setting is_fully_grounded = null (unverified)")
-                return {
-                    "unsupported_sentences": [],
-                    "is_fully_grounded": None,
-                    "audit_summary": f"Audit unverified after 2 attempts: {str(e)[:200]}",
-                    "audit_messages": [{"role": "user", "content": audit_prompt}],
-                    "auditor_model": None
-                }
-            time.sleep(0.5)
+            print("  [AUDIT] Model audit unavailable; keeping the answer explicitly unverified.")
+            return {
+                "unsupported_sentences": flagged_sentences or [],
+                "is_fully_grounded": None,
+                "audit_summary": f"Audit unverified within the request budget: {str(e)[:200]}",
+                "audit_messages": [{"role": "user", "content": audit_prompt}],
+                "auditor_model": None
+            }
 
     return {"unsupported_sentences": [], "is_fully_grounded": None, "audit_summary": "Audit failed.", "auditor_model": None}
 
 
 def _regenerate_constrained(client: Groq, active_model: str, query: str,
                              original_answer: str, sources: List[Dict[str, Any]],
-                             unsupported_sentences: List[str]) -> str:
+                             unsupported_sentences: List[str], deadline: float | None = None) -> str:
     """
     When audit returns unsupported sentences, regenerate the answer constrained
     strictly to the provided sources, removing any extrapolation.
@@ -1340,6 +1411,7 @@ def _regenerate_constrained(client: Groq, active_model: str, query: str,
             messages=[{"role": "user", "content": regen_prompt}],
             temperature=0.1,
             max_tokens=700,
+            deadline=deadline,
         )
         regen = res.choices[0].message.content
         if regen and len(regen) > 50:
@@ -1349,6 +1421,25 @@ def _regenerate_constrained(client: Groq, active_model: str, query: str,
     except Exception as e:
         print(f"  [REGEN] Regeneration failed: {e}. Keeping original.")
         return original_answer
+
+
+def _budget_fallback_answer(sources: List[Dict[str, Any]]) -> str:
+    """Return a transparent source-only response when generation misses its deadline."""
+    excerpts = []
+    for source in sources[:2]:
+        snippet = re.sub(r"\s+", " ", str(source.get("snippet") or source.get("chunk_text") or "")).strip()
+        if snippet:
+            excerpts.append(snippet[:220])
+    if excerpts:
+        quoted = " ".join(f"“{excerpt}”" for excerpt in excerpts)
+        return (
+            "Quick source summary: I couldn't complete a full answer within the response time budget. "
+            f"The available reference says: {quoted} Please check with a clinician for advice specific to you."
+        )
+    return (
+        "I couldn't complete a reliable health response within the response time budget. "
+        "If symptoms are severe or rapidly worsening, seek urgent medical care. Please try again shortly."
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -1411,7 +1502,9 @@ def _is_medication_advice_request(query: str) -> bool:
 def run_agent(
     user_id: str,
     query: str,
-    conversation_history: Optional[List[Dict[str, str]]] = None
+    conversation_history: Optional[List[Dict[str, str]]] = None,
+    budget_seconds: float = CHAT_BUDGET_SECONDS,
+    cache_only: bool = False,
 ) -> Dict[str, Any]:
     """
     Agentic Orchestrator with:
@@ -1425,6 +1518,15 @@ def run_agent(
     - Latency targets: <10s if draft passes audit, <20s with regen
     """
     overall_start = time.time()
+    monotonic_start = time.monotonic()
+    deadline = monotonic_start + max(0.1, float(budget_seconds))
+    timing_breakdown: list[dict[str, Any]] = []
+
+    def add_timing(step: str, started: float) -> None:
+        duration_ms = round((time.monotonic() - started) * 1000, 2)
+        timing_breakdown.append({"step": step, "duration_ms": duration_ms})
+        print(f"[TIMING] {step}={duration_ms}ms")
+
     affirmative_answers = {"yes", "yeah", "yep", "i do", "i am", "i have", "correct"}
     latest_turn = (conversation_history or [])[-1] if conversation_history else None
     self_harm_followup_confirmed = bool(
@@ -1481,7 +1583,8 @@ def run_agent(
             "emergency_contact": settings.EMERGENCY_NUMBER,
         }
 
-    if is_immediate_emergency(query):
+    initial_triage = deterministic_triage(query)
+    if is_immediate_emergency(query) or (initial_triage and initial_triage.get("triage_tag") == "EMERGENCY"):
         response_time = round((time.time() - overall_start) * 1000, 2)
         try:
             record_answer_metadata(user_id, query, "WEB_TRUSTED", None, verifier="deterministic_emergency")
@@ -1542,15 +1645,39 @@ def run_agent(
             "answer_mode": "GENERAL", "intent": "HEALTH", "gate_scores": None,
         }
 
-    active_model = settings.GROQ_MODEL_NAME
-    client = Groq(api_key=settings.GROQ_API_KEY, timeout=20.0, max_retries=0)
+    has_dependent_history = any(
+        turn.get("role") == "user"
+        or (turn.get("role") == "assistant" and str(turn.get("content", "")).strip() not in {
+            "Namaste! What health question can I help with?",
+            "Hi! What health question can I help with?",
+        })
+        for turn in (conversation_history or [])
+    )
+    cacheable_query = (
+        not has_dependent_history
+        and intent == Intent.HEALTH
+        and (_is_educational_question(query) or normalize_query(query) in PREWARM_CACHE_QUERIES)
+        and not is_self_harm_crisis(query)
+        and not is_immediate_emergency(query)
+    )
+    if cacheable_query:
+        cache_started = time.monotonic()
+        cached = answer_cache.get(query)
+        add_timing("Answer cache lookup", cache_started)
+        if cached is not None:
+            cached.setdefault("timing_breakdown", []).append({"step": "Answer cache hit", "duration_ms": 0.0})
+            cached["response_time_ms"] = round((time.monotonic() - monotonic_start) * 1000, 2)
+            print(f"[ORCHESTRATOR COMPLETE] Total Latency: {cached['response_time_ms']}ms | Cache hit")
+            return cached
+
+    active_model = FAST_EDUCATIONAL_MODEL if _is_educational_question(query) else settings.GROQ_MODEL_NAME
+    client = Groq(api_key=settings.GROQ_API_KEY, timeout=MODEL_CALL_TIMEOUT_SECONDS, max_retries=0)
 
     is_comparison = is_comparison_query(query)
     print(f"\n[ORCHESTRATOR START] Model: '{active_model}'")
     print(f"  [QUERY TYPE] comparison={is_comparison}")
     # Model availability is checked only after the deterministic gate accepts the query.
 
-    timing_breakdown = []
     sources_collected = []
     fallback_fired = False
 
@@ -1592,43 +1719,80 @@ def run_agent(
         if confirmed_sign:
             triage_query = f"The user confirmed they currently have {confirmed_sign}."
 
-    # 1. RETRIEVAL & SPECIFICITY GATE
-    t_ret_start = time.time()
-    raw_chunks = search_advisories(retrieval_query, top_k=12)
-    dt_ret = round((time.time() - t_ret_start) * 1000, 2)
-    timing_breakdown.append({"step": "Parallel Tools Execution (search_advisories)", "duration_ms": dt_ret})
+    # 1. Start authoritative web search for known corpus gaps while local retrieval runs.
+    uncovered_condition = detect_uncovered_condition(query)
+    web_future = (
+        _chat_executor.submit(web_search_health_authority, retrieval_query, 3)
+        if uncovered_condition else None
+    )
 
-    t_gate_start = time.time()
-    gate_result = specificity_gate(query, raw_chunks, faiss_floor=0.45, encode_query_str=retrieval_query)
-    dt_gate = round((time.time() - t_gate_start) * 1000, 2)
-    timing_breakdown.append({"step": "CE Specificity Gate", "duration_ms": dt_gate})
+    t_ret_start = time.monotonic()
+    raw_chunks: list[dict[str, Any]] = []
+    try:
+        raw_chunks = _chat_executor.submit(search_advisories, retrieval_query, 12).result(
+            timeout=max(0.05, _remaining_budget(deadline))
+        )
+    except Exception as exc:
+        print(f"  [RETRIEVAL] Failed or exceeded request budget: {exc}")
+    add_timing("FAISS retrieval", t_ret_start)
+
+    t_gate_start = time.monotonic()
+    gate_result: dict[str, Any] = {
+        "passed": False, "skip_kb": True, "max_ce_score": None,
+        "valid_chunks": [], "signals": {}, "reason": "Gate did not complete within the request budget.",
+    }
+    try:
+        gate_result = _chat_executor.submit(
+            specificity_gate, query, raw_chunks, faiss_floor=0.45, encode_query_str=retrieval_query
+        ).result(timeout=max(0.05, _remaining_budget(deadline)))
+    except Exception as exc:
+        print(f"  [GATE] Failed or exceeded request budget: {exc}")
+    add_timing("Cross-encoder specificity gate", t_gate_start)
 
     max_ce = gate_result.get("max_ce_score")
     skip_kb = gate_result.get("skip_kb", False)
 
-    # 2. EVIDENCE SUFFICIENCY CHECK + TRIAGE
-    # A relevance score alone does not show that retrieved passages answer the
-    # specific question. Check factual coverage and fail closed to web search.
-    suff_result = None
-    triage_tag = "GENERAL_INFO"
-    missing_facts = []
-
-    # Check if a cleaned symptom query improves max_ce before falling back to web
-    if max_ce is None or skip_kb:
-        stop_words = ["i have had a", "i have a", "for 3 days", "for a few days", "what should i do about", "i mentioned earlier"]
-        clean_q = query.lower()
-        for sw in stop_words:
-            clean_q = clean_q.replace(sw, "")
-        clean_q = clean_q.strip()
+    # A cleaned-query retry is useful only when retrieval returned no candidates.
+    if not raw_chunks and _remaining_budget(deadline) > 1.0:
+        clean_q = re.sub(r"\b(?:i have had a|i have a|for 3 days|for a few days|what should i do about|i mentioned earlier)\b", "", query.lower()).strip()
         if clean_q and clean_q != query.lower():
-            retry_chunks = search_advisories(clean_q, top_k=12)
-            retry_gate = specificity_gate(query, retry_chunks, faiss_floor=0.45, encode_query_str=clean_q)
-            retry_ce = retry_gate.get("max_ce_score")
-            print(f"  [RETRY CLEAN QUERY] '{clean_q}' -> Retry Max-CE={retry_ce}")
-            if retry_ce is not None and retry_ce > (max_ce or -99):
-                max_ce = retry_ce
-                gate_result = retry_gate
-                skip_kb = retry_gate.get("skip_kb", False)
+            retry_started = time.monotonic()
+            try:
+                retry_chunks = _chat_executor.submit(search_advisories, clean_q, 12).result(
+                    timeout=max(0.05, _remaining_budget(deadline))
+                )
+                if retry_chunks:
+                    retry_gate = _chat_executor.submit(
+                        specificity_gate, query, retry_chunks, faiss_floor=0.45, encode_query_str=clean_q
+                    ).result(timeout=max(0.05, _remaining_budget(deadline)))
+                    raw_chunks, gate_result = retry_chunks, retry_gate
+                    max_ce, skip_kb = retry_gate.get("max_ce_score"), retry_gate.get("skip_kb", False)
+            except Exception as exc:
+                print(f"  [RETRY CLEAN QUERY] Failed or exceeded budget: {exc}")
+            add_timing("Empty-result retrieval retry", retry_started)
+
+    suff_result = None
+    triage_tag = (initial_triage or {}).get("triage_tag", "CONSULT_SOON")
+    triage_future = None
+    triage_context = ""
+    missing_facts: list[str] = []
+
+    def schedule_triage(context: str) -> None:
+        nonlocal triage_future
+        if initial_triage is None and triage_future is None:
+            triage_future = _chat_executor.submit(
+                triage_classify, triage_query, context, conversation_context
+            )
+
+    def collect_web_results() -> list[dict[str, Any]]:
+        nonlocal web_future
+        if web_future is None:
+            web_future = _chat_executor.submit(web_search_health_authority, retrieval_query, 3)
+        try:
+            return web_future.result(timeout=min(8.0, max(0.05, _remaining_budget(deadline))))
+        except Exception as exc:
+            print(f"  [WEB SEARCH] Failed or exceeded request budget: {exc}")
+            return []
 
     answer_mode = "GENERAL"
     gate_scores = gate_result.get("signals") or {
@@ -1637,73 +1801,54 @@ def run_agent(
         "cluster_threshold": settings.GATE_GLOBAL_THRESHOLD,
     }
     if skip_kb or max_ce is None:
-        # Weak or unavailable retrieval selects the next source tier; health questions continue.
         print(f"  [GATE] Local evidence weak/unavailable (CE={max_ce}); selecting trusted web tier.")
         fallback_fired = True
-        t_fb_start = time.time()
-        with ThreadPoolExecutor(max_workers=2) as executor:
-            fut_web = executor.submit(web_search_health_authority, retrieval_query, 3)
-            fut_triage = executor.submit(triage_classify, triage_query, "", conversation_context)
-            live_res = fut_web.result()
-            triage_res = fut_triage.result()
-        dt_fb = round((time.time() - t_fb_start) * 1000, 2)
-        timing_breakdown.append({"step": "Parallel (Web Search + Triage) [skip_kb]", "duration_ms": dt_fb})
-        if isinstance(triage_res, dict) and "triage_tag" in triage_res:
-            triage_tag = triage_res["triage_tag"]
-        for s in live_res:
-            s["source_type"] = "live_search"
+        web_started = time.monotonic()
+        live_res = collect_web_results()
+        add_timing("Official-source web search", web_started)
+        for source in live_res:
+            source["source_type"] = "live_search"
         sources_collected.extend(live_res)
         answer_mode = "WEB_TRUSTED" if live_res else "GENERAL"
     else:
-        t_parallel_start = time.time()
         valid_chunks = gate_result.get("valid_chunks", [])
-        retrieved_context = "\n".join([c.get("snippet", "") for c in valid_chunks])
+        retrieved_context = "\n".join(chunk.get("snippet", "") for chunk in valid_chunks)
+        triage_context = retrieved_context
         if valid_chunks and _is_educational_question(query):
-            # CE already accepted these local passages. For direct educational
-            # queries, generate from those passages and keep the grounding audit;
-            # a separate LLM sufficiency call only adds latency here.
-            triage_res = triage_classify(triage_query, retrieved_context, conversation_context)
             suff_result = {
                 "is_sufficient": True,
                 "missing_facts": [],
-                "reason": "Educational query with cross-encoder-accepted local evidence; final grounding audit remains enabled.",
+                "reason": "Educational query with cross-encoder-accepted local evidence; final audits remain enabled.",
             }
-            print("  [SUFFICIENCY] Skipped extra model call for educational query with accepted local evidence.")
         else:
-            with ThreadPoolExecutor(max_workers=2) as executor:
-                fut_triage = executor.submit(
-                    triage_classify, triage_query, retrieved_context, conversation_context
-                )
-                fut_sufficiency = executor.submit(
-                    sufficiency_check, client, active_model, query, valid_chunks
-                )
-                triage_res = fut_triage.result()
-                suff_result = fut_sufficiency.result()
-
-        dt_parallel = round((time.time() - t_parallel_start) * 1000, 2)
-        timing_breakdown.append({"step": "Parallel (Triage + Evidence Sufficiency)", "duration_ms": dt_parallel})
-
-        if isinstance(triage_res, dict) and "triage_tag" in triage_res:
-            triage_tag = triage_res["triage_tag"]
+            suff_started = time.monotonic()
+            suff_future = _chat_executor.submit(
+                sufficiency_check, client, active_model, query, valid_chunks, deadline
+            )
+            try:
+                suff_result = suff_future.result(timeout=max(0.05, _remaining_budget(deadline)))
+            except Exception as exc:
+                print(f"  [SUFFICIENCY] Failed or exceeded request budget: {exc}")
+                suff_result = {"is_sufficient": False, "missing_facts": [], "reason": "Sufficiency review did not finish within the request budget."}
+            add_timing("Evidence sufficiency", suff_started)
 
         kb_is_sufficient = bool(suff_result.get("is_sufficient")) and not suff_result.get("missing_facts")
         if kb_is_sufficient:
             sources_collected.extend(valid_chunks)
             answer_mode = "GROUNDED"
-            print("  [SUFFICIENCY] Retrieved passages cover the requested facts.")
         else:
             fallback_fired = True
-            live_res_parallel = web_search_health_authority(retrieval_query, 3)
-            for source in live_res_parallel:
+            web_started = time.monotonic()
+            live_res = collect_web_results()
+            add_timing("Official-source web search", web_started)
+            for source in live_res:
                 source["source_type"] = "live_search"
-            if valid_chunks:
-                sources_collected.extend(valid_chunks)
-            sources_collected.extend(live_res_parallel)
-            answer_mode = "MIXED" if valid_chunks else ("WEB_TRUSTED" if live_res_parallel else "GENERAL")
-            missing_facts = suff_result.get("missing_facts", [])
-            print(f"  [SUFFICIENCY] Insufficient evidence; used web fallback. Missing: {missing_facts[:3]}")
+            sources_collected.extend(valid_chunks)
+            sources_collected.extend(live_res)
+            answer_mode = "MIXED" if valid_chunks else ("WEB_TRUSTED" if live_res else "GENERAL")
+            missing_facts = (suff_result or {}).get("missing_facts", [])
 
-    if answer_mode in {"WEB_TRUSTED", "GENERAL"}:
+    if answer_mode in {"WEB_TRUSTED", "GENERAL"} and not cache_only:
         try:
             record_refusal(query, answer_mode.casefold(), gate_scores, user_id=user_id)
         except Exception as exc:
@@ -1745,43 +1890,69 @@ def run_agent(
     ]
     print(f"  [GENERATOR MESSAGES] system_len={len(system_prompt)} user_len={len(user_msg_content)} history_injected={bool(session_history_context)}")
 
-    t_gen_start = time.time()
-    gen_response = safe_chat_completion(
-        client,
-        active_model,
-        messages=generator_messages,
-        temperature=0.2,
-        max_tokens=1000
-    )
-    dt_gen = round((time.time() - t_gen_start) * 1000, 2)
-    timing_breakdown.append({"step": "Groq Call (Generation)", "duration_ms": dt_gen})
-
-    generator_served_model = getattr(gen_response, "model", active_model)
-    draft_answer = (gen_response.choices[0].message.content or "").strip()
-    if not draft_answer:
-        print("  [GENERATION RETRY] First generation attempt returned empty text. Retrying with fallback model...")
+    # Start uncertain-case LLM triage alongside generation, never ahead of it.
+    schedule_triage(triage_context)
+    generation_failed = False
+    t_gen_start = time.monotonic()
+    try:
         gen_response = safe_chat_completion(
             client,
-            "openai/gpt-oss-120b",
+            active_model,
+            deadline=deadline,
             messages=generator_messages,
             temperature=0.2,
-            max_tokens=1000
+            max_tokens=650,
         )
-        generator_served_model = getattr(gen_response, "model", "openai/gpt-oss-120b")
-        draft_answer = (gen_response.choices[0].message.content or "Information unavailable.").strip()
+        generator_served_model = getattr(gen_response, "model", active_model)
+        draft_answer = (gen_response.choices[0].message.content or "").strip()
+        if not draft_answer:
+            raise RuntimeError("Generation returned an empty response")
+    except Exception as exc:
+        print(f"  [GENERATION] Failed or exceeded request budget: {exc}")
+        generation_failed = True
+        generator_served_model = None
+        draft_answer = _budget_fallback_answer(sources_collected)
+    add_timing("Answer generation", t_gen_start)
 
     print(f"  [GENERATOR MODEL] Served by: '{generator_served_model}'")
 
     # 4. AUDIT DRAFT
-    if answer_mode in {"GENERAL", "MIXED"}:
+    if generation_failed:
+        draft_audit = {
+            "is_fully_grounded": None,
+            "unsupported_sentences": [],
+            "audit_summary": "No generated answer was available; returned a transparent source-only fallback.",
+            "auditor_model": None,
+        }
+        dt_audit_draft = 0.0
+    elif answer_mode in {"GENERAL", "MIXED"}:
         draft_audit = {"is_fully_grounded": None, "unsupported_sentences": [], "audit_summary": "Content-fence review follows."}
         dt_audit_draft = 0.0
     else:
-        t_audit_draft_start = time.time()
-        draft_audit = verify_grounding(client, active_model, draft_answer, sources_collected,
-                                       generator_served_model=generator_served_model)
-        dt_audit_draft = round((time.time() - t_audit_draft_start) * 1000, 2)
-        timing_breakdown.append({"step": "Groq Call (Draft Audit)", "duration_ms": dt_audit_draft})
+        t_audit_draft_start = time.monotonic()
+        unsupported_by_overlap = deterministic_unsupported_sentences(draft_answer, sources_collected)
+        if not unsupported_by_overlap:
+            draft_audit = {
+                "is_fully_grounded": True,
+                "unsupported_sentences": [],
+                "audit_summary": "Deterministic sentence-to-source overlap check passed.",
+                "auditor_model": "deterministic_overlap",
+            }
+        elif _remaining_budget(deadline) > 0.25:
+            draft_audit = verify_grounding(
+                client, active_model, draft_answer, sources_collected,
+                generator_served_model=generator_served_model, deadline=deadline,
+                flagged_sentences=unsupported_by_overlap,
+            )
+        else:
+            draft_audit = {
+                "is_fully_grounded": None,
+                "unsupported_sentences": unsupported_by_overlap,
+                "audit_summary": "Grounding review exceeded the response time budget.",
+                "auditor_model": None,
+            }
+        dt_audit_draft = round((time.monotonic() - t_audit_draft_start) * 1000, 2)
+        add_timing("Draft grounding audit", t_audit_draft_start)
 
     draft_unsupported = draft_audit.get("unsupported_sentences", [])
     draft_ungrounded = draft_audit.get("is_fully_grounded") is False
@@ -1791,35 +1962,91 @@ def run_agent(
     final_audit = draft_audit
     regen_fired = False
 
-    if draft_ungrounded and draft_unsupported:
+    if draft_ungrounded and draft_unsupported and _remaining_budget(deadline) > 1.0:
         print(f"  [REGEN TRIGGER] Draft audit found {len(draft_unsupported)} unsupported sentence(s). Regenerating...")
-        t_regen_start = time.time()
+        t_regen_start = time.monotonic()
         final_answer = _regenerate_constrained(
-            client, active_model, query, draft_answer, sources_collected, draft_unsupported
+            client, active_model, query, draft_answer, sources_collected, draft_unsupported, deadline=deadline
         )
-        dt_regen = round((time.time() - t_regen_start) * 1000, 2)
-        timing_breakdown.append({"step": "Groq Call (Constrained Regeneration)", "duration_ms": dt_regen})
+        dt_regen = round((time.monotonic() - t_regen_start) * 1000, 2)
+        add_timing("Constrained regeneration", t_regen_start)
         regen_fired = True
 
-        # 6. RE-AUDIT FINAL
-        t_audit_final_start = time.time()
-        final_audit = verify_grounding(client, active_model, final_answer, sources_collected,
-                                       generator_served_model=generator_served_model)
-        dt_audit_final = round((time.time() - t_audit_final_start) * 1000, 2)
-        timing_breakdown.append({"step": "Groq Call (Final Audit)", "duration_ms": dt_audit_final})
+        # Re-run the deterministic overlap audit; use the fast model only if it flags claims.
+        final_flags = deterministic_unsupported_sentences(final_answer, sources_collected)
+        if final_flags and _remaining_budget(deadline) > 0.25:
+            t_audit_final_start = time.monotonic()
+            final_audit = verify_grounding(
+                client, active_model, final_answer, sources_collected,
+                generator_served_model=generator_served_model, deadline=deadline,
+                flagged_sentences=final_flags,
+            )
+            add_timing("Final grounding audit", t_audit_final_start)
+        elif not final_flags:
+            final_audit = {
+                "is_fully_grounded": True, "unsupported_sentences": [],
+                "audit_summary": "Deterministic sentence-to-source overlap check passed after regeneration.",
+                "auditor_model": "deterministic_overlap",
+            }
+        else:
+            final_answer = _budget_fallback_answer(sources_collected)
+            final_audit = {
+                "is_fully_grounded": None, "unsupported_sentences": final_flags,
+                "audit_summary": "Final grounding review exceeded the response time budget; returned source-only fallback.",
+                "auditor_model": None,
+            }
+    elif draft_ungrounded and draft_unsupported:
+        final_answer = _budget_fallback_answer(sources_collected)
+        final_audit = {
+            "is_fully_grounded": None, "unsupported_sentences": draft_unsupported,
+            "audit_summary": "Insufficient time for constrained regeneration; returned source-only fallback.",
+            "auditor_model": None,
+        }
 
     fence_verification = None
     if answer_mode in {"GENERAL", "MIXED"}:
-        t_fence_start = time.time()
-        fence_verification = verify_content_fences(client, active_model, query, final_answer, sources_collected)
+        t_fence_start = time.monotonic()
+        fence_verification = verify_content_fences(client, active_model, query, final_answer, sources_collected, deadline=deadline)
         final_answer = fence_verification["answer"]
-        timing_breakdown.append({"step": "Content Fence Verification", "duration_ms": round((time.time() - t_fence_start) * 1000, 2)})
+        add_timing("General/mixed content fence", t_fence_start)
         final_audit = {
             "is_fully_grounded": None,
             "unsupported_sentences": [],
             "audit_summary": "General/mixed answer passed through content-fence verification.",
             "auditor_model": active_model if fence_verification.get("verifier") == "enabled" else None,
         }
+
+    triage_timed_out = False
+    if triage_future is not None:
+        triage_started = time.monotonic()
+        try:
+            triage_result = triage_future.result(timeout=max(0.05, _remaining_budget(deadline)))
+            triage_tag = triage_result.get("triage_tag", triage_tag)
+        except Exception as exc:
+            triage_timed_out = True
+            print(f"  [TRIAGE] LLM triage did not finish within the request budget: {exc}")
+            triage_tag = "CONSULT_SOON"
+        add_timing("Uncertain-case triage", triage_started)
+
+    if triage_tag == "EMERGENCY":
+        final_answer = (
+            f"Your symptoms may need emergency care. Call {settings.EMERGENCY_NUMBER} now or go to the nearest emergency department. "
+            "Do not drive yourself if you feel faint."
+        )
+        sources_collected.append({
+            "doc_name": "Government of India Emergency Response Support System",
+            "section": "Emergency number",
+            "snippet": f"Call {settings.EMERGENCY_NUMBER} for an emergency.",
+            "source_type": "official_resource",
+            "source_url": "https://112.gov.in/",
+        })
+        final_audit = {"is_fully_grounded": True, "unsupported_sentences": [], "audit_summary": "Deterministic emergency response."}
+    elif triage_timed_out:
+        final_answer += (
+            "\n\nI couldn't complete the urgency check within the response time budget. "
+            "If symptoms are severe or rapidly worsening, seek urgent medical care."
+        )
+
     final_answer = limit_follow_up_questions(final_answer, maximum=1)
     final_answer = remove_internal_leaks(final_answer)
     final_answer, deterministic_fence_edited = enforce_source_backed_fences(final_answer, sources_collected)
@@ -1828,14 +2055,15 @@ def run_agent(
     elif deterministic_fence_edited and fence_verification is not None:
         fence_verification["edited"] = True
         fence_verification["deterministic_source_fence_edited"] = True
-    try:
-        record_answer_metadata(
-            user_id, query, answer_mode, gate_scores,
-            fence_edited=bool(fence_verification and fence_verification.get("edited")),
-            verifier=fence_verification.get("verifier") if fence_verification else final_audit.get("auditor_model"),
-        )
-    except Exception as exc:
-        print(f"  [ANSWER METADATA] Could not record answer metadata: {exc}")
+    if not cache_only:
+        try:
+            record_answer_metadata(
+                user_id, query, answer_mode, gate_scores,
+                fence_edited=bool(fence_verification and fence_verification.get("edited")),
+                verifier=fence_verification.get("verifier") if fence_verification else final_audit.get("auditor_model"),
+            )
+        except Exception as exc:
+            print(f"  [ANSWER METADATA] Could not record answer metadata: {exc}")
 
     total_duration = round((time.time() - overall_start) * 1000, 2)
     is_grounded_val = final_audit.get("is_fully_grounded")
@@ -1900,10 +2128,12 @@ def run_agent(
         "timings_ms": {t["step"]: t["duration_ms"] for t in timing_breakdown}
     }
 
+    total_duration = round((time.time() - overall_start) * 1000, 2)
+    timing_breakdown.append({"step": "Total request", "duration_ms": total_duration})
     timing_summary = " | ".join(f"{item['step']}={item['duration_ms']}ms" for item in timing_breakdown)
     print(f"[ORCHESTRATOR TIMINGS] {timing_summary}")
     print(f"[ORCHESTRATOR COMPLETE] Total Latency: {total_duration} ms | Draft Grounded: {draft_audit.get('is_fully_grounded')} | Final Grounded: {is_grounded_val} | Regen: {regen_fired}\n")
-    return {
+    output = {
         "model_used": active_model,
         "answer": final_answer,
         "fallback_fired": fallback_fired,
@@ -1923,3 +2153,6 @@ def run_agent(
         "timing_breakdown": timing_breakdown,
         "response_time_ms": total_duration
     }
+    if cacheable_query and triage_tag != "EMERGENCY" and not generation_failed:
+        answer_cache.put(query, output)
+    return output

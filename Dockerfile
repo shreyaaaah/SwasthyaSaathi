@@ -4,6 +4,8 @@ RUN useradd -m -u 1000 user
 USER user
 ENV HOME=/home/user \
     PATH=/home/user/.local/bin:$PATH \
+    FASTEMBED_CACHE_PATH=/home/user/app/data/model_cache/fastembed \
+    HF_HOME=/home/user/app/data/model_cache/huggingface \
     INTEGRITY_MODE=strict
 
 WORKDIR $HOME/app
@@ -13,7 +15,7 @@ COPY --chown=user backend/requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Pre-bake the ONNX embedding model used by both ingestion and serving.
-RUN python -c "from fastembed import TextEmbedding; TextEmbedding('sentence-transformers/all-MiniLM-L6-v2')"
+RUN mkdir -p "$FASTEMBED_CACHE_PATH" "$HF_HOME" && python -c "from fastembed import TextEmbedding; TextEmbedding('sentence-transformers/all-MiniLM-L6-v2')"
 RUN python -c "from sentence_transformers import CrossEncoder; CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')"
 
 # Copy the backend application code (including the committed vector store)

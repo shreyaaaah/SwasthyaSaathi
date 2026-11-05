@@ -18,6 +18,7 @@ const GREETING_PATTERN = /^(?:hi|hii+|hello|hey(?: there)?|namaste|namaskar)[!.?
 function App() {
   const [messages, setMessages] = useState([INITIAL_WELCOME_MESSAGE]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isWakingUp, setIsWakingUp] = useState(false);
   const [healthStatus, setHealthStatus] = useState(null);
 
   useEffect(() => {
@@ -43,6 +44,8 @@ function App() {
 
     setMessages((prev) => [...prev, { sender: 'user', text: userQuery }]);
     setIsLoading(true);
+    setIsWakingUp(false);
+    const wakeTimer = window.setTimeout(() => setIsWakingUp(true), 8000);
     try {
       const conversationHistory = messages.slice(-6).map((message) => ({
         role: message.sender === 'user' ? 'user' : 'assistant',
@@ -61,6 +64,7 @@ function App() {
         emergency_contact: response.emergency_contact
       }]);
     } catch (error) {
+      if (error?.code === 'ERR_CANCELED' || error?.name === 'AbortError') return;
       setMessages((prev) => [...prev, {
         sender: 'bot',
         text: error.message || 'We could not get a response. Please try again in a moment.',
@@ -70,7 +74,9 @@ function App() {
         tools_used: []
       }]);
     } finally {
+      window.clearTimeout(wakeTimer);
       setIsLoading(false);
+      setIsWakingUp(false);
     }
   };
 
@@ -78,7 +84,7 @@ function App() {
     <div className="flex h-screen w-screen overflow-hidden bg-slate-950 text-slate-100 font-sans">
       <main className="flex-1 flex flex-col h-full overflow-hidden px-3 py-2 max-w-6xl mx-auto w-full">
         <Header status={healthStatus} />
-        <ChatWindow messages={messages} onSendMessage={handleSendMessage} isLoading={isLoading} />
+        <ChatWindow messages={messages} onSendMessage={handleSendMessage} isLoading={isLoading} loadingMessage={isWakingUp ? 'Waking up the server, this can take a minute…' : 'Looking for relevant health guidance…'} />
         <p className="px-2 py-2 text-center text-[11px] text-slate-400">
           Health information only. Full chats are not saved. For answers using trusted websites or general information, a normalized topic is retained to help improve the guidance library. Your question and up to six recent turns may go to the AI service; web searches may also be sent to a search provider and health websites. Avoid sharing identifying details.
         </p>
