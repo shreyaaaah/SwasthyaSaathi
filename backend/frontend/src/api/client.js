@@ -1,6 +1,12 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+// Keep production usable even if the Vercel environment variable was omitted.
+// Local development still targets the local FastAPI server.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (
+  import.meta.env.DEV
+    ? 'http://localhost:8000'
+    : 'https://swasthya-saathi-backend.onrender.com'
+);
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
