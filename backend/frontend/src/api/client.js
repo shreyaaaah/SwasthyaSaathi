@@ -1,12 +1,10 @@
 import axios from 'axios';
 
-// Keep production usable even if the Vercel environment variable was omitted.
-// Local development still targets the local FastAPI server.
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (
-  import.meta.env.DEV
-    ? 'http://localhost:8000'
-    : 'https://swasthya-saathi-3.onrender.com'
-);
+// Use the confirmed production service URL so a stale Vercel env var cannot
+// route chat requests to a different or retired Render service.
+const API_BASE_URL = import.meta.env.DEV
+  ? (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000')
+  : 'https://swasthyasaathi-3.onrender.com';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

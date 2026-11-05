@@ -91,7 +91,7 @@ The separate `backend/run_eval_suite.py` is a live, networked LLM evaluation tha
 
 ## Deployment
 
-The root `Dockerfile` builds the FastAPI service on port 7860 and preloads the FastEmbed ONNX embedding model. Configure `GROQ_API_KEY` and `ALLOWED_ORIGINS` in the deployment environment. The Vercel frontend uses `VITE_API_BASE_URL` for the deployed API URL. `backend/render.yaml` provides a Render Python service configuration; set the same environment variables there.
+The root `Dockerfile` builds the FastAPI service on port 7860 and preloads the FastEmbed ONNX embedding model. Configure `GROQ_API_KEY` and `ALLOWED_ORIGINS` in the deployment environment. The production frontend points to `https://swasthyasaathi-3.onrender.com`; local development can use `VITE_API_BASE_URL` to select an API URL. `backend/render.yaml` provides a Render Python service configuration; set the same environment variables there.
 
 ## API example
 
