@@ -10,11 +10,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'backend'))
 sys.stdout.reconfigure(encoding='utf-8')
 
 from app.rag.retriever import get_retriever
-from sentence_transformers import CrossEncoder
+from app.agent.orchestrator import _get_cross_encoder
 
 CE_MODEL = 'cross-encoder/ms-marco-MiniLM-L-6-v2'
-print(f"Loading cross-encoder: {CE_MODEL}")
-ce = CrossEncoder(CE_MODEL)
+print(f"Loading CPU ONNX cross-encoder: {CE_MODEL}")
+ce = _get_cross_encoder()
+if ce is None:
+    raise RuntimeError("Could not load the FastEmbed cross-encoder")
 
 retriever = get_retriever()
 

@@ -15,8 +15,8 @@ COPY --chown=user backend/requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Pre-bake the ONNX embedding model used by both ingestion and serving.
-RUN mkdir -p "$FASTEMBED_CACHE_PATH" "$HF_HOME" && python -c "from fastembed import TextEmbedding; TextEmbedding('sentence-transformers/all-MiniLM-L6-v2')"
-RUN python -c "from sentence_transformers import CrossEncoder; CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')"
+RUN mkdir -p "$FASTEMBED_CACHE_PATH" "$HF_HOME" && python -c "from fastembed import TextEmbedding; TextEmbedding('sentence-transformers/all-MiniLM-L6-v2', threads=1)"
+RUN python -c "from fastembed.rerank.cross_encoder import TextCrossEncoder; TextCrossEncoder('Xenova/ms-marco-MiniLM-L-6-v2', threads=1, providers=['CPUExecutionProvider'])"
 
 # Copy the backend application code (including the committed vector store)
 COPY --chown=user backend/ .

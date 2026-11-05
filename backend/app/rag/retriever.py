@@ -76,7 +76,7 @@ class FAISSRetriever:
                     fe_model_name = f"sentence-transformers/{fe_model_name}"
                 try:
                     print(f"Loading embedding model {fe_model_name} via fastembed (ONNX)...")
-                    self.model = TextEmbedding(model_name=fe_model_name)
+                    self.model = TextEmbedding(model_name=fe_model_name, threads=1)
                 except Exception as e:
                     print(f"Could not load fastembed model ({e}). Trying TF-IDF fallback...")
                     try:

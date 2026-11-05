@@ -4,6 +4,7 @@ import unittest
 from unittest.mock import patch
 
 from app.agent.orchestrator import deterministic_triage, deterministic_unsupported_sentences
+from app.agent import orchestrator
 from app.agent.performance import AnswerCache, normalize_query
 from app.main import get_latency_history
 from app.config import settings
@@ -53,6 +54,22 @@ class PerformanceFeatureTests(unittest.TestCase):
         )
         self.assertEqual(len(flagged), 1)
         self.assertIn("lemon water", flagged[0])
+
+    def test_runtime_cross_encoder_uses_single_threaded_fastembed_onnx(self):
+        previous = orchestrator._cross_encoder
+        orchestrator._cross_encoder = None
+        with patch("fastembed.rerank.cross_encoder.TextCrossEncoder") as encoder_type:
+            encoder_type.return_value.rerank_pairs.return_value = iter([1.25])
+            try:
+                encoder = orchestrator._get_cross_encoder()
+                self.assertEqual(encoder.predict([("query", "evidence")]), [1.25])
+                encoder_type.assert_called_once_with(
+                    "Xenova/ms-marco-MiniLM-L-6-v2",
+                    threads=1,
+                    providers=["CPUExecutionProvider"],
+                )
+            finally:
+                orchestrator._cross_encoder = previous
 
     def test_latency_endpoint_requires_admin_token(self):
         with patch.object(settings, "ADMIN_TOKEN", "secret"):

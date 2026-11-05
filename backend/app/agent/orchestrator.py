@@ -88,9 +88,23 @@ def _get_cross_encoder():
         with _cross_encoder_lock:
             if _cross_encoder is None:
                 try:
-                    from sentence_transformers import CrossEncoder
-                    _cross_encoder = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
-                    print("  [CE-GATE] Cross-encoder loaded: cross-encoder/ms-marco-MiniLM-L-6-v2")
+                    from fastembed.rerank.cross_encoder import TextCrossEncoder
+
+                    class FastEmbedCrossEncoder:
+                        """Sentence-transformers-compatible adapter backed by CPU ONNX Runtime."""
+
+                        def __init__(self):
+                            self.encoder = TextCrossEncoder(
+                                "Xenova/ms-marco-MiniLM-L-6-v2",
+                                threads=1,
+                                providers=["CPUExecutionProvider"],
+                            )
+
+                        def predict(self, pairs):
+                            return list(self.encoder.rerank_pairs(pairs, batch_size=16))
+
+                    _cross_encoder = FastEmbedCrossEncoder()
+                    print("  [CE-GATE] CPU ONNX cross-encoder loaded: Xenova/ms-marco-MiniLM-L-6-v2")
                 except Exception as e:
                     print(f"  [CE-GATE] Cross-encoder unavailable: {e}.")
                     _cross_encoder = None

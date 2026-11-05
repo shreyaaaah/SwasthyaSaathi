@@ -14,6 +14,7 @@ import numpy as np
 BACKEND = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND))
 from app.config import settings
+from app.agent.orchestrator import _get_cross_encoder
 from app.rag.auto_calibrate import choose_threshold, manifest_hash
 from app.rag.coverage import detect_uncovered_condition
 from app.rag.gate import decide
@@ -110,8 +111,9 @@ def main() -> None:
             if getattr(retriever, "model", None) is None:
                 retriever = CachedSentenceTransformerRetriever()
                 embedding_provider = "sentence-transformers/all-MiniLM-L6-v2 (cached evaluation adapter)"
-        from sentence_transformers import CrossEncoder
-        reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+        reranker = _get_cross_encoder()
+        if reranker is None:
+            raise RuntimeError("FastEmbed ONNX cross-encoder could not be loaded")
         scored = _predict(rows, reranker, retriever)
     except Exception as exc:
         output_path.write_text(json.dumps({"status": "blocked", "reason": str(exc), "dataset_size": len(rows),
