@@ -13,6 +13,8 @@ const INITIAL_WELCOME_MESSAGE = {
   tools_used: []
 };
 
+const GREETING_PATTERN = /^(?:hi|hii+|hello|hey(?: there)?|namaste|namaskar)[!.?\s]*$/i;
+
 function App() {
   const [messages, setMessages] = useState([INITIAL_WELCOME_MESSAGE]);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,6 +25,22 @@ function App() {
   }, []);
 
   const handleSendMessage = async (userQuery) => {
+    if (GREETING_PATTERN.test(userQuery.trim())) {
+      setMessages((prev) => [...prev,
+        { sender: 'user', text: userQuery },
+        {
+          sender: 'bot',
+          text: 'Namaste! What health question can I help with?',
+          sources: [],
+          is_grounded: null,
+          triage_tag: null,
+          answer_mode: 'SOCIAL',
+          tools_used: []
+        }
+      ]);
+      return;
+    }
+
     setMessages((prev) => [...prev, { sender: 'user', text: userQuery }]);
     setIsLoading(true);
     try {
