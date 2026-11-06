@@ -85,7 +85,7 @@ def ranked_gaps(limit: int = 100, db_path: str | Path | None = None) -> list[dic
         import psycopg
         from psycopg.rows import dict_row
         dsn = settings.DATABASE_URL.replace("postgres://", "postgresql://", 1)
-        with psycopg.connect(dsn, row_factory=dict_row) as conn:
+        with psycopg.connect(dsn, row_factory=dict_row, connect_timeout=2) as conn:
             conn.execute(_POSTGRES_SCHEMA)
             rows = conn.execute(
                 "SELECT topic_text, refusal_type, count, first_seen, last_seen, mean_faiss, mean_cross_encoder FROM knowledge_gaps ORDER BY count DESC, last_seen DESC LIMIT %s",
@@ -111,7 +111,7 @@ def record_answer_metadata(user_id: str, query: str, answer_mode: str, gate_scor
         import psycopg
         from psycopg.types.json import Jsonb
         dsn = settings.DATABASE_URL.replace("postgres://", "postgresql://", 1)
-        with psycopg.connect(dsn) as conn:
+        with psycopg.connect(dsn, connect_timeout=2) as conn:
             conn.execute("""CREATE TABLE IF NOT EXISTS conversation_decisions (
                 id BIGSERIAL PRIMARY KEY, topic_hash TEXT NOT NULL, user_hash TEXT NOT NULL,
                 answer_mode TEXT NOT NULL, gate_scores JSONB NOT NULL DEFAULT '{}'::jsonb,
@@ -157,7 +157,7 @@ def _record_postgres(query: str, refusal_type: str, gate_signals: dict[str, Any]
     faiss_score = gate_signals.get("faiss_top1")
     ce_score = gate_signals.get("cross_encoder_max")
     dsn = settings.DATABASE_URL.replace("postgres://", "postgresql://", 1)
-    with psycopg.connect(dsn) as conn:
+    with psycopg.connect(dsn, connect_timeout=2) as conn:
         conn.execute(_POSTGRES_SCHEMA)
         existing = conn.execute("SELECT topic_key, topic_text FROM knowledge_gaps WHERE refusal_type=%s", (refusal_type,)).fetchall()
         for old_key, old_topic in existing:

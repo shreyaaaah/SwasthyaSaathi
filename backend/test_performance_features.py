@@ -1,12 +1,14 @@
 """Deterministic coverage for latency optimizations and unchanged safety gates."""
 
 import unittest
+import os
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from app.agent.orchestrator import deterministic_triage, deterministic_unsupported_sentences
 from app.agent import orchestrator
 from app.agent.performance import AnswerCache, normalize_query
-from app.main import get_latency_history
+from app.main import get_latency_history, health_check, on_startup
 from app.config import settings
 
 
@@ -62,7 +64,9 @@ class PerformanceFeatureTests(unittest.TestCase):
             encoder_type.return_value.rerank_pairs.return_value = iter([1.25])
             try:
                 encoder = orchestrator._get_cross_encoder()
-                self.assertEqual(encoder.predict([("query", "evidence")]), [1.25])
+                pairs = [("query", "evidence")]
+                self.assertEqual(encoder.predict(pairs), [1.25])
+                encoder_type.return_value.rerank_pairs.assert_called_once_with(pairs, batch_size=4)
                 encoder_type.assert_called_once_with(
                     "Xenova/ms-marco-MiniLM-L-6-v2",
                     threads=1,
@@ -70,6 +74,24 @@ class PerformanceFeatureTests(unittest.TestCase):
                 )
             finally:
                 orchestrator._cross_encoder = previous
+
+    def test_startup_skips_full_answer_prewarm_when_disabled(self):
+        with patch.dict(os.environ, {}, clear=True), \
+             patch("app.main.warm_retrieval_stack", return_value={"status": "ready"}), \
+             patch("app.main.threading.Thread") as thread:
+            on_startup()
+        thread.assert_not_called()
+
+    def test_health_reports_render_commit_for_deployment_verification(self):
+        retriever = SimpleNamespace(
+            index=SimpleNamespace(ntotal=10),
+            embedding_ready=True,
+            missing_source_documents=[],
+            integrity_report={"ok": True, "issues": [], "metadata_rows": 10, "manifest_hash": "hash"},
+        )
+        with patch("app.main.get_retriever", return_value=retriever), \
+             patch.dict(os.environ, {"RENDER_GIT_COMMIT": "abc123"}):
+            self.assertEqual(health_check()["app_version"], "abc123")
 
     def test_latency_endpoint_requires_admin_token(self):
         with patch.object(settings, "ADMIN_TOKEN", "secret"):

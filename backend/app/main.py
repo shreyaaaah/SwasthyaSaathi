@@ -1,3 +1,4 @@
+import os
 import secrets
 import threading
 from fastapi import FastAPI, HTTPException, Header
@@ -36,24 +37,27 @@ def on_startup():
         if settings.INTEGRITY_MODE == "strict":
             raise
 
-    # Populate process-local answers for the non-emergency topic chips in the background.
-    # The severe chest-pain chip is intentionally never cached.
-    def prewarm_chip_answers():
-        chip_queries = [
-            "What should I do about high fever lasting 3 days?",
-            "I've had a persistent cough for 3 weeks",
-            "What are early warning signs and home care for Dengue fever?",
-            "What antenatal checkups and nutrition are needed during pregnancy?",
-            "Do antibiotics cure viral infections like cold or flu?",
-            "Does turmeric cure diabetes?",
-        ]
-        for chip_query in chip_queries:
-            try:
-                run_agent("cache-prewarm", chip_query, [], budget_seconds=CHAT_BUDGET_SECONDS, cache_only=True)
-            except Exception as exc:
-                print(f"[CACHE PREWARM] Skipped a topic after failure: {exc}")
+    # Full answer prewarming performs six retrieval/rerank/model runs during startup.
+    # Keep it opt-in for small instances; ordinary requests populate the LRU lazily.
+    if os.getenv("ENABLE_CHIP_ANSWER_PREWARM", "").strip().casefold() in {"1", "true", "yes"}:
+        def prewarm_chip_answers():
+            chip_queries = [
+                "What should I do about high fever lasting 3 days?",
+                "I've had a persistent cough for 3 weeks",
+                "What are early warning signs and home care for Dengue fever?",
+                "What antenatal checkups and nutrition are needed during pregnancy?",
+                "Do antibiotics cure viral infections like cold or flu?",
+                "Does turmeric cure diabetes?",
+            ]
+            for chip_query in chip_queries:
+                try:
+                    run_agent("cache-prewarm", chip_query, [], budget_seconds=CHAT_BUDGET_SECONDS, cache_only=True)
+                except Exception as exc:
+                    print(f"[CACHE PREWARM] Skipped a topic after failure: {exc}")
 
-    threading.Thread(target=prewarm_chip_answers, name="chip-cache-prewarm", daemon=True).start()
+        threading.Thread(target=prewarm_chip_answers, name="chip-cache-prewarm", daemon=True).start()
+    else:
+        print("[CACHE PREWARM] Full answer prewarm disabled; answer cache will fill on demand.")
 
 @app.get("/")
 def root():
@@ -74,6 +78,7 @@ def health_check():
     is_ready = vector_store_ready and embedding_ready and corpus_ready and integrity.get("ok", False)
     return {
         "status": "healthy" if is_ready else ("degraded" if vector_store_ready else "unindexed"),
+        "app_version": os.getenv("RENDER_GIT_COMMIT", "unknown"),
         "vector_store_ready": vector_store_ready,
         "embedding_model_ready": embedding_ready,
         "source_corpus_ready": corpus_ready,

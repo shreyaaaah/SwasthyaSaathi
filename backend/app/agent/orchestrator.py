@@ -101,7 +101,7 @@ def _get_cross_encoder():
                             )
 
                         def predict(self, pairs):
-                            return list(self.encoder.rerank_pairs(pairs, batch_size=16))
+                            return list(self.encoder.rerank_pairs(pairs, batch_size=4))
 
                     _cross_encoder = FastEmbedCrossEncoder()
                     print("  [CE-GATE] CPU ONNX cross-encoder loaded: Xenova/ms-marco-MiniLM-L-6-v2")
