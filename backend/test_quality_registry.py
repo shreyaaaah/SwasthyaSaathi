@@ -90,15 +90,38 @@ class SafetyAndEvidenceTests(unittest.TestCase):
         self.assertEqual(result["verifier"], "general_no_source_scope")
         completion.assert_not_called()
 
-    @patch("app.agent.orchestrator.Groq", side_effect=AssertionError("social fast path must not call model"))
-    def test_greeting_and_thanks_are_natural_without_sources_or_triage(self, groq):
-        for query in ("hi", "thank u so much"):
-            with self.subTest(query=query):
-                result = run_agent("anonymous", query)
-                self.assertEqual(result["answer_mode"], "SOCIAL")
-                self.assertFalse(result["sources"])
-                self.assertIsNone(result["triage_tag"])
-                self.assertNotIn("guideline", result["answer"].casefold())
+    def test_greeting_and_thanks_use_one_source_free_smalltalk_call(self):
+        from app.agent import orchestrator
+
+        response = SimpleNamespace(
+            model="test-model",
+            choices=[SimpleNamespace(message=SimpleNamespace(content="Hey! What health question can I help with?"))],
+        )
+        with patch("app.agent.orchestrator.Groq") as groq, \
+             patch("app.agent.orchestrator.search_advisories", side_effect=AssertionError("small talk must skip retrieval")) as search, \
+             patch("app.agent.orchestrator.specificity_gate", side_effect=AssertionError("small talk must skip the gate")) as gate, \
+             patch("app.agent.orchestrator.web_search_health_authority", side_effect=AssertionError("small talk must skip web search")) as web, \
+             patch("app.agent.orchestrator.triage_classify", side_effect=AssertionError("small talk must skip LLM triage")) as triage, \
+             patch("app.agent.orchestrator.record_refusal", side_effect=AssertionError("small talk must not log symptoms")) as refusal, \
+             patch("app.agent.orchestrator.record_answer_metadata", side_effect=AssertionError("small talk must not log symptoms")) as metadata:
+            groq.return_value.chat.completions.create.return_value = response
+            for query in ("hello", "thanks a lot"):
+                with self.subTest(query=query):
+                    result = run_agent("anonymous", query)
+                    self.assertEqual(result["answer_mode"], "SOCIAL")
+                    self.assertEqual(result["triage_tag"], "GENERAL_INFO")
+                    self.assertIsNone(result["is_grounded"])
+                    self.assertIsNone(result["grounding_audit"])
+                    self.assertEqual(result["sources"], [])
+                    self.assertEqual(result["tools_used"], [])
+                    self.assertNotIn("guideline", result["answer"].casefold())
+            self.assertEqual(groq.return_value.chat.completions.create.call_count, 2)
+            search.assert_not_called()
+            gate.assert_not_called()
+            web.assert_not_called()
+            triage.assert_not_called()
+            refusal.assert_not_called()
+            metadata.assert_not_called()
 
     @patch("app.agent.orchestrator.record_answer_metadata")
     @patch("app.agent.orchestrator.record_refusal")

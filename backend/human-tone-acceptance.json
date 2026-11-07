@@ -1,0 +1,422 @@
+{
+  "environment": "Local FastAPI TestClient, warmed backend. Synthetic acceptance queries only.",
+  "latency_summary_wall_ms": {
+    "p50": 1400.96,
+    "p95": 9848.51
+  },
+  "audit_log_excerpt": [
+    "[ORCHESTRATOR COMPLETE] Total Latency: 9629.34 ms | Draft Grounded: None | Final Grounded: None | Regen: False",
+    "[ORCHESTRATOR COMPLETE] Total Latency: 9845.54 ms | Draft Grounded: None | Final Grounded: None | Regen: False",
+    "[ORCHESTRATOR COMPLETE] Total Latency: 6139.05 ms | Draft Grounded: None | Final Grounded: None | Regen: False"
+  ],
+  "acceptance_tests": [
+    {
+      "query": "hello",
+      "http_status": 200,
+      "wall_time_ms": 1318.97,
+      "response_time_ms": 1310.94,
+      "raw_json": {
+        "answer": "Namaste! What health question can I help with?",
+        "sources": [],
+        "is_grounded": null,
+        "triage_tag": "GENERAL_INFO",
+        "tools_used": [],
+        "response_time_ms": 1310.94,
+        "gate_decision": null,
+        "refusal_type": null,
+        "answer_mode": "SOCIAL",
+        "gate_scores": null,
+        "intent": "GREETING",
+        "emergency_contact": null
+      }
+    },
+    {
+      "query": "thanks a lot",
+      "http_status": 200,
+      "wall_time_ms": 1400.96,
+      "response_time_ms": 1397.76,
+      "raw_json": {
+        "answer": "You’re very welcome! If you have any other questions about health or anything else, feel free to ask.",
+        "sources": [],
+        "is_grounded": null,
+        "triage_tag": "GENERAL_INFO",
+        "tools_used": [],
+        "response_time_ms": 1397.76,
+        "gate_decision": null,
+        "refusal_type": null,
+        "answer_mode": "SOCIAL",
+        "gate_scores": null,
+        "intent": "THANKS",
+        "emergency_contact": null
+      }
+    },
+    {
+      "query": "I have a cough for 3 days",
+      "http_status": 200,
+      "wall_time_ms": 9633.3,
+      "response_time_ms": 9629.34,
+      "raw_json": {
+        "answer": "A cough lasting three days is usually an acute cough, often caused by a common cold or flu, and typically resolves on its own within a few weeks. For now, staying hydrated and using home remedies like honey or ginger can help soothe your throat. Do you have any fever, shortness of breath, or chest pain along with the cough?",
+        "sources": [
+          {
+            "doc_name": "standard-treatment-guidelines.pdf",
+            "section": "PERTUSSIS (WHOOPING COUGH)",
+            "snippet": "al have any benefit except for eradication of any\nsecondary pulmonary infection.\n In patients wi th severe coughing paroxysms salbutamol 1 -2 mg/kg/ day in 3 -4 divided\ndoses for a week or so may be tried.\n Severe cases particularly those <6 months of age and those with respiratory distress need\nt...",
+            "score": 0.4973,
+            "source_type": "knowledge_base",
+            "source_url": null
+          },
+          {
+            "doc_name": "standard-treatment-guidelines.pdf",
+            "section": "COMMON CONDITIONS",
+            "snippet": "than 2 weeks, an X-ray chest is indicated even in\nthe absence of respiratory symptoms. Any abnormal fluid collection should be sampled.\nTreatment\nRoutine use of antipyretics in low -grade fever is not justified. This may mask important clinical\nindications. However, in acute febrile illnesses sugges...",
+            "score": 0.4849,
+            "source_type": "knowledge_base",
+            "source_url": null
+          },
+          {
+            "doc_name": "standard-treatment-guidelines.pdf",
+            "section": "CHRONIC TONSILLITIS",
+            "snippet": "haemolytic S treptococci, Haemophilus influenza,\nStaphylococcus also occurs.\nSalient features\nPharmacological treatment\n• Tab. paracetamol 500 mg 3 -4 times a day for 5 days (children 10 kg/dose) or Tab.\nibuprofen 400 mg - 600 mg 3 times a day for 5 days (children 10 mg/kg/dose.)\n• Cap. amoxicillin ...",
+            "score": 0.4797,
+            "source_type": "knowledge_base",
+            "source_url": null
+          },
+          {
+            "doc_name": "standard-treatment-guidelines.pdf",
+            "section": "INFLUENZA INFECTION",
+            "snippet": "ich is a mixture of all three.  At p resent there\nare four types H1N1, H1N2, H3N2 and H3N1.  The present pandemic is by influenza AH1N1\ntype.\nInfections\n143\n Symptoms in clude fever, headache, cough, sore throat, rhinorrhea, myalgia, f atigue,\nvomiting, or diarrhea. Patients appear flushed and the ...",
+            "score": 0.4756,
+            "source_type": "knowledge_base",
+            "source_url": null
+          },
+          {
+            "doc_name": "standard-treatment-guidelines.pdf",
+            "section": "PERTUSSIS (WHOOPING COUGH)",
+            "snippet": "rehabilitative services to an appropriate centre.\nPERTUSSIS (WHOOPING COUGH)\nThe causative organism is Bordetella pertussis which leads to this respiratory disorder.\nSalient features\nPharmacological treatment\n Syr./Tab. erythromycin, 40 -50 mg/kg/day in 4 divided doses orally for 14 days initiated\n...",
+            "score": 0.4641,
+            "source_type": "knowledge_base",
+            "source_url": null
+          },
+          {
+            "doc_name": "standard-treatment-guidelines.pdf",
+            "section": "ACUTE BRONCHIOLITIS",
+            "snippet": "ine drops in bo th nostrils as and when required,\nespecially before feeds, and use of home remedies (ginger, honey, tulsi) for control of cough\nand plenty of liquids orally. To be nursed in comfortable environment.\nPharmacological treatment\n Adequate hydration and oxygenation (humidified O2) remain...",
+            "score": 0.46,
+            "source_type": "knowledge_base",
+            "source_url": null
+          },
+          {
+            "doc_name": "standard-treatment-guidelines.pdf",
+            "section": "COMMON COLD (CORYZA)",
+            "snippet": "rops should not be used for more than seven days.\nReferences\n1. Mechanism and Treatment of Allergic Rhini tis. In: Scott Brown's Otolaryngology. JB Booth (ed), 6th\nEdition, 1997. Butterworth’s-Heinemann, pp 4/6/1-16.\nCOMMON COLD (CORYZA)\nIt is one of the most common viral infection affecting upper r...",
+            "score": 0.4563,
+            "source_type": "knowledge_base",
+            "source_url": null
+          },
+          {
+            "doc_name": "tb_public_faqs.txt",
+            "section": "TUBERCULOSIS (TB) — FREQUENTLY ASKED QUESTIONS",
+            "snippet": "d nose while coughing and sneezing as a practice.\n\n9. How long does it take to recover from TB?\nDuration depends on drug resistance. For drug-sensitive TB, treatment is generally 6-9 months. Patients with resistance to one or more drugs may need longer treatment - after diagnosis, patients undergo c...",
+            "score": 0.4524,
+            "source_type": "knowledge_base",
+            "source_url": null
+          },
+          {
+            "doc_name": "Cough: MedlinePlus Medical Encyclopedia",
+            "section": "Live Web Search Result",
+            "snippet": "Cough To use the sharing features on this page, please enable JavaScript. Coughing is an important way to keep your throat and airways clear. But too much coughing may mean you have a disease or disorder. Watch this video about: Coughing Some coughs are dry. Others are productive. A productive cough...",
+            "score": 0.9,
+            "source_type": "live_search",
+            "source_url": "https://medlineplus.gov/ency/article/003072.htm"
+          },
+          {
+            "doc_name": "Cough | Chronic Cough | Acute Cough - MedlinePlus",
+            "section": "Live Web Search Result",
+            "snippet": "Cough On this page Basics Summary Start Here Diagnosis and Tests Prevention and Risk Factors Treatments and Therapies Learn More Related Issues Specifics See, Play and Learn Health Check Tools Videos and Tutorials Research Journal Articles Resources Find an Expert For You Children Patient Handouts S...",
+            "score": 0.9,
+            "source_type": "live_search",
+            "source_url": "https://medlineplus.gov/cough.html"
+          },
+          {
+            "doc_name": "Treatment of Respiratory Viruses | Respiratory Illnesses | CDC",
+            "section": "Live Web Search Result",
+            "snippet": "Seek healthcare right away for testing and/or treatment if you feel sick or tested positive for a respiratory virus and have risk factors for severe illness. If you have flu or COVID-19, treatment may be an option to make your symptoms less severe and shorten the time you are sick. Treatment needs t...",
+            "score": 0.9,
+            "source_type": "live_search",
+            "source_url": "https://www.cdc.gov/respiratory-viruses/treatment/index.html"
+          }
+        ],
+        "is_grounded": null,
+        "triage_tag": "CONSULT_SOON",
+        "tools_used": [
+          "search_advisories",
+          "web_search_health_authority"
+        ],
+        "response_time_ms": 9629.34,
+        "gate_decision": "ANSWER",
+        "refusal_type": null,
+        "answer_mode": "MIXED",
+        "gate_scores": {
+          "faiss_top1": 0.4973,
+          "faiss_floor": 0.45,
+          "faiss_passed": true,
+          "cross_encoder_max": -0.465589702129364,
+          "cluster": "standard-treatment-guidelines.pdf",
+          "cluster_threshold": -9.5,
+          "entity_coverage": "no_named_condition",
+          "uncovered_condition": null
+        },
+        "intent": "HEALTH",
+        "emergency_contact": null
+      }
+    },
+    {
+      "query": "how do I feel better",
+      "http_status": 200,
+      "wall_time_ms": 9848.51,
+      "response_time_ms": 9845.54,
+      "raw_json": {
+        "answer": "I'm sorry you're not feeling well. To help me guide you better, could you tell me what specific symptoms you are experiencing and how long they have been going on?",
+        "sources": [],
+        "is_grounded": null,
+        "triage_tag": "SELF_CARE",
+        "tools_used": [
+          "search_advisories",
+          "web_search_health_authority"
+        ],
+        "response_time_ms": 9845.54,
+        "gate_decision": "GENERAL",
+        "refusal_type": null,
+        "answer_mode": "GENERAL",
+        "gate_scores": {
+          "faiss_top1": 0.0,
+          "faiss_floor": 0.45,
+          "faiss_passed": false,
+          "cross_encoder_max": null,
+          "cluster": "__global__",
+          "cluster_threshold": -9.5,
+          "entity_coverage": "no_named_condition",
+          "uncovered_condition": null
+        },
+        "intent": "HEALTH",
+        "emergency_contact": null
+      }
+    },
+    {
+      "query": "I have severe chest pain and can't breathe",
+      "http_status": 200,
+      "wall_time_ms": 4.95,
+      "response_time_ms": 0.1,
+      "raw_json": {
+        "answer": "Chest pain with sweating or breathing trouble can be an emergency. Please call 112 now or go to the nearest emergency department. Do not drive yourself if you feel faint.",
+        "sources": [
+          {
+            "doc_name": "Government of India Emergency Response Support System",
+            "section": "Emergency number",
+            "snippet": "Call 112 for an emergency....",
+            "score": null,
+            "source_type": "official_resource",
+            "source_url": "https://112.gov.in/"
+          }
+        ],
+        "is_grounded": true,
+        "triage_tag": "EMERGENCY",
+        "tools_used": [],
+        "response_time_ms": 0.1,
+        "gate_decision": null,
+        "refusal_type": null,
+        "answer_mode": "WEB_TRUSTED",
+        "gate_scores": null,
+        "intent": "HEALTH",
+        "emergency_contact": "112"
+      }
+    },
+    {
+      "query": "what is the dose of paracetamol for fever",
+      "http_status": 200,
+      "wall_time_ms": 6.07,
+      "response_time_ms": 0.2,
+      "raw_json": {
+        "answer": "I can help with general care, but I can’t safely give an exact dose without a verified source and the person’s details. Check the medicine label and ask a doctor or pharmacist, especially for a child. If you share the symptom, I can explain warning signs and non-medicine steps.",
+        "sources": [],
+        "is_grounded": null,
+        "triage_tag": null,
+        "tools_used": [],
+        "response_time_ms": 0.2,
+        "gate_decision": null,
+        "refusal_type": null,
+        "answer_mode": "GENERAL",
+        "gate_scores": null,
+        "intent": "HEALTH",
+        "emergency_contact": null
+      }
+    },
+    {
+      "query": "how is chikungunya different from dengue",
+      "http_status": 200,
+      "wall_time_ms": 6142.1,
+      "response_time_ms": 6139.05,
+      "raw_json": {
+        "answer": "Chikungunya and dengue are both mosquito-borne viral infections, but they affect the body differently. Chikungunya is primarily known for causing severe, long-lasting joint pain and swelling, whereas dengue typically presents with high fever, intense body aches, and a characteristic rash. While both can cause fatigue and fever, the joint symptoms in chikungunya are often the most defining feature. Dengue can sometimes lead to more severe complications involving bleeding or organ involvement, which requires careful monitoring. If you are experiencing symptoms like high fever, severe joint pain, or rash, it is important to see a doctor for proper testing and guidance. Because these infections share similar symptoms, they are hard to tell apart, and laboratory testing is needed for a clear diagnosis.",
+        "sources": [],
+        "is_grounded": null,
+        "triage_tag": "GENERAL_INFO",
+        "tools_used": [
+          "search_advisories",
+          "web_search_health_authority"
+        ],
+        "response_time_ms": 6139.05,
+        "gate_decision": "GENERAL",
+        "refusal_type": null,
+        "answer_mode": "GENERAL",
+        "gate_scores": {
+          "faiss_top1": 0.6595,
+          "faiss_floor": 0.45,
+          "faiss_passed": true,
+          "cross_encoder_max": -0.46503931283950806,
+          "cluster": "standard-treatment-guidelines.pdf",
+          "cluster_threshold": -9.5,
+          "entity_coverage": "uncovered",
+          "uncovered_condition": {
+            "id": "chikungunya",
+            "label": "Chikungunya"
+          }
+        },
+        "intent": "HEALTH",
+        "emergency_contact": null
+      }
+    }
+  ],
+  "audit_verification": {
+    "query": "What are the symptoms of malaria?",
+    "http_status": 200,
+    "wall_time_ms": 4359.5,
+    "raw_json": {
+      "answer": "If the infection is not treated, the illness can become severe. Severe malaria may cause extreme tiredness, fatigue, impaired consciousness, seizures, breathing difficulty, dark or bloody urine, jaundice, and abnormal bleeding. If you notice any of these severe symptoms, seek emergency care right away.",
+      "sources": [
+        {
+          "doc_name": "malaria.pdf",
+          "section": "95% CI: 0.68–1.15).",
+          "snippet": "g, a full blood count, a platelet count, clotting\nstudies, blood culture and full biochemistry (if possible). Careful attention should be paid to the patient’s fluid balance in severe\nmalaria in order to avoid over- or under-hydration. Individual requirements vary widely and depend on fluid losses b...",
+          "score": 0.6723,
+          "source_type": "knowledge_base",
+          "source_url": null
+        },
+        {
+          "doc_name": "malaria_guidelines.txt",
+          "section": "DIAGNOSIS AND TREATMENT",
+          "snippet": "/www.who.int/news-room/fact-sheets/detail/malaria......",
+          "score": 0.6695,
+          "source_type": "knowledge_base",
+          "source_url": null
+        },
+        {
+          "doc_name": "malaria_guidelines.txt",
+          "section": "SYMPTOMS",
+          "snippet": "ies outside sub-Saharan Africa (including India).\n\nSYMPTOMS\n\nThe most common early symptoms are fever, headache, and chills. Symptoms usually start within 10-15 days of being bitten by an infected mosquito. Symptoms may be mild for some people, especially those who've had malaria before - because sy...",
+          "score": 0.6693,
+          "source_type": "knowledge_base",
+          "source_url": null
+        },
+        {
+          "doc_name": "malaria.pdf",
+          "section": "95% CI: 0.68–1.15).",
+          "snippet": "rily on the basis of fever or a history of fever.\nThere is no combination of signs or symptoms that reliably distinguishes malaria from other causes of fever; diagnosis based only on\nclinical features has very low specificity and results in overtreatment. Other possible causes of fever and whether a...",
+          "score": 0.6629,
+          "source_type": "knowledge_base",
+          "source_url": null
+        },
+        {
+          "doc_name": "mengitis.pdf",
+          "section": "(95% UI 87 400–145 000) (1).",
+          "snippet": "present with clinical features similar to acute \nmeningitis. According to the WHO guidelines for malaria, all cases of suspected malaria should have \na parasitological test (microscopy or rapid diagnostic test) to confirm the diagnosis (96). However, \nin settings with moderate to high malaria transm...",
+          "score": 0.6606,
+          "source_type": "knowledge_base",
+          "source_url": null
+        },
+        {
+          "doc_name": "malaria_guidelines.txt",
+          "section": "OVERVIEW",
+          "snippet": "d does NOT spread from person to person directly.\n\nMalaria mostly spreads through the bites of infected female Anopheles mosquitoes. Blood transfusion and contaminated needles may also transmit malaria (rarely). The first symptoms may be mild, similar to many febrile illnesses, and difficult to reco...",
+          "score": 0.6328,
+          "source_type": "knowledge_base",
+          "source_url": null
+        },
+        {
+          "doc_name": "malaria.pdf",
+          "section": "(CI 95% 0.93 — 1.15)",
+          "snippet": "ntion-to-treat analysis). Severe malaria assessed\nwith P. falciparum asexual parasitaemia at a density of > 5000 parasites per cubic millimetre with one or more markers of disease\nseverity and without diagnosis of a co-existing illness. Markers of severe disease were prostration, respiratory distres...",
+          "score": 0.6226,
+          "source_type": "knowledge_base",
+          "source_url": null
+        },
+        {
+          "doc_name": "malaria_guidelines.txt",
+          "section": "PREVENTION",
+          "snippet": "AIDS are at higher risk. Severe symptoms include:\n- Extreme tiredness and fatigue\n- Impaired consciousness\n- Multiple convulsions\n- Difficulty breathing\n- Dark or bloody urine\n- Jaundice (yellowing of eyes and skin)\n- Abnormal bleeding\n\nPeople with severe symptoms should get emergency care right awa...",
+          "score": 0.6115,
+          "source_type": "knowledge_base",
+          "source_url": null
+        },
+        {
+          "doc_name": "malaria.pdf",
+          "section": "(CI 95% 0.93 — 1.15)",
+          "snippet": "consciousness), two or more observed or reported\nseizures, hypoglycaemia, acidosis, elevated lactate level, or haemoglobin level of < 5 g per decilitre. Co-existing illnesses were\nWHO guidelines for malaria - 13 August 2025 - World Health Organization (WHO)\n403 of 478\ndefined as radiographically pro...",
+          "score": 0.6078,
+          "source_type": "knowledge_base",
+          "source_url": null
+        },
+        {
+          "doc_name": "standard-treatment-guidelines.pdf",
+          "section": "FEVER OF UNKNOWN ORIGIN (FUO)",
+          "snippet": "ally an uncommon presentation of common diseases.\nSalient features\nInvestigations\n A detailed clinical history, repeated physical examination to provide potentially\ndiagnostic clues (PDC).\n No single algorithmic approach to diagnosis can be recommended for all patients of FUO\nand diagnostic approa...",
+          "score": 0.6004,
+          "source_type": "knowledge_base",
+          "source_url": null
+        },
+        {
+          "doc_name": "malaria.pdf",
+          "section": "95% CI: 0.68–1.15).",
+          "snippet": "UZ Oswaldo Cruz Foundation, Rio de Janeiro,Brazil\n• Dr Marcy Erskine, Senior Health Officer (Malaria), International Federation of Red Cross and Red Crescent Societies, Geneva,\nSwitzerland\n• Dr Josiane Etang, Organisation de coordination pour la lutte contre les endémies en Afrique centrale, Yaoundé...",
+          "score": 0.5927,
+          "source_type": "knowledge_base",
+          "source_url": null
+        },
+        {
+          "doc_name": "malaria.pdf",
+          "section": "95% CI: 0.68–1.15).",
+          "snippet": "t common adverse events were fever (0.023/person-\nday), headache (0.008/person-day, vomiting (0.006/person-day), cough (0.004/person-day),\nshivering (0.003/person-day) and nasal congestion (0.002/person-day) (one cRCT, not GRADEd\nbecause no information was available from the comparator arm).\nJudgeme...",
+          "score": 0.5915,
+          "source_type": "knowledge_base",
+          "source_url": null
+        }
+      ],
+      "is_grounded": true,
+      "triage_tag": "GENERAL_INFO",
+      "tools_used": [
+        "search_advisories"
+      ],
+      "response_time_ms": 4350.03,
+      "gate_decision": "ANSWER",
+      "refusal_type": null,
+      "answer_mode": "GROUNDED",
+      "gate_scores": {
+        "faiss_top1": 0.6723,
+        "faiss_floor": 0.45,
+        "faiss_passed": true,
+        "cross_encoder_max": 5.635075569152832,
+        "cluster": "malaria_guidelines.txt",
+        "cluster_threshold": -9.5,
+        "entity_coverage": "covered",
+        "uncovered_condition": null
+      },
+      "intent": "HEALTH",
+      "emergency_contact": null
+    },
+    "audit_log_excerpt": [
+      "[ORCHESTRATOR COMPLETE] Total Latency: 4350.03 ms | Draft Grounded: True | Final Grounded: True | Regen: False"
+    ],
+    "finding": "Grounded answer returned with cited knowledge-base sources; deterministic grounding overlap audit passed."
+  }
+}
