@@ -10,7 +10,7 @@ from pathlib import Path
 
 from app.rag.source_registry import SourceRegistryError, validate_source_registry
 from app.agent.orchestrator import (
-    enforce_source_backed_fences, is_self_harm_crisis, is_url_allowed, run_agent,
+    deterministic_triage, enforce_source_backed_fences, is_self_harm_crisis, is_url_allowed, run_agent,
     specificity_gate, sufficiency_check, verify_content_fences, verify_grounding,
 )
 from app.rag.prompts import limit_follow_up_questions
@@ -65,6 +65,18 @@ class SourceRegistryTests(unittest.TestCase):
 
 
 class SafetyAndEvidenceTests(unittest.TestCase):
+    def test_three_day_fever_is_consult_soon_not_infant_emergency(self):
+        triage = deterministic_triage("What should I do about high fever lasting 3 days?")
+        self.assertEqual(triage["triage_tag"], "CONSULT_SOON")
+
+    def test_fever_in_explicit_two_month_old_still_escalates(self):
+        triage = deterministic_triage("My 2-month-old baby has a fever.")
+        self.assertEqual(triage["triage_tag"], "EMERGENCY")
+
+    def test_fever_in_three_month_old_does_not_match_under_three_month_rule(self):
+        triage = deterministic_triage("My 3-month-old baby has a fever.")
+        self.assertIsNone(triage)
+
     def test_response_keeps_at_most_one_follow_up_question(self):
         response = (
             "For now, avoid licking or picking at the area. "

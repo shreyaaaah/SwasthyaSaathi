@@ -1165,13 +1165,37 @@ def _is_educational_question(query: str) -> bool:
     ))
 
 
+def _is_under_three_month_age(text: str) -> bool:
+    """Match explicit infant ages without confusing symptom duration for age."""
+    if re.search(
+        r"\b(?:newborn|new\s+born|under\s+(?:3|three)\s+months?(?:\s+old)?|"
+        r"less than\s+(?:3|three)\s+months?(?:\s+old)?|not yet\s+(?:3|three)\s+months?(?:\s+old)?)\b",
+        text,
+    ):
+        return True
+
+    age = re.search(
+        r"\b(?P<value>\d{1,3})\s*[- ]?\s*(?P<unit>days?|weeks?|months?)\s*[- ]?old\b",
+        text,
+    )
+    if not age:
+        return False
+    value = int(age.group("value"))
+    unit = age.group("unit")
+    if unit.startswith("day"):
+        return value < 90
+    if unit.startswith("week"):
+        return value < 13
+    return value < 3
+
+
 def deterministic_triage(query: str) -> Dict[str, Any] | None:
     """Resolve high-confidence urgency locally; return None when model triage is needed."""
     text = re.sub(r"\s+", " ", query.casefold()).strip()
     if is_self_harm_crisis(query) or is_immediate_emergency(query):
         return {"triage_tag": "EMERGENCY", "confidence": 100, "reason": "A deterministic red-flag rule matched."}
     infant_fever = bool(
-        re.search(r"\b(?:\d{1,2}\s*(?:day|week|month)s?\s*(?:old)?|newborn|new born|under\s+3\s+months?)\b", text)
+        _is_under_three_month_age(text)
         and re.search(r"\b(?:fever|temperature|hot to touch|bukhar)\b", text)
     )
     if infant_fever:
@@ -1180,7 +1204,12 @@ def deterministic_triage(query: str) -> Dict[str, Any] | None:
         return {"triage_tag": "GENERAL_INFO", "confidence": 95, "reason": "Educational question; no personal emergency is reported."}
     if re.search(r"\b(?:pregnant|pregnancy)\b", text) and re.search(r"\b(?:fever|bleeding|severe pain|reduced movement)\b", text):
         return {"triage_tag": "CONSULT_SOON", "confidence": 90, "reason": "Pregnancy with a concerning symptom warrants prompt clinical advice."}
-    if re.search(r"\b(?:worsening|getting worse|persistent|for more than|lasting over)\b", text):
+    persistent_duration = re.search(
+        r"\b(?:for|lasting(?:\s+for)?|persisting(?:\s+for)?)\s+(?:the\s+)?"
+        r"(?:(?:past|last)\s+)?(?:\d+|one|two|three|four|several|a few)\s*(?:days?|weeks?)\b",
+        text,
+    )
+    if persistent_duration or re.search(r"\b(?:worsening|getting worse|persistent|for more than|lasting over)\b", text):
         return {"triage_tag": "CONSULT_SOON", "confidence": 82, "reason": "Persistent or worsening symptoms warrant clinical assessment."}
     if re.search(r"\b(?:mild|slight|a little)\b", text) and re.search(r"\b(?:cough|cold|headache|sore throat)\b", text):
         return {"triage_tag": "SELF_CARE", "confidence": 75, "reason": "No red flags detected; general self-care information may help."}
