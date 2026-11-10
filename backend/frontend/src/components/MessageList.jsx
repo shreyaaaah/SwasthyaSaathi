@@ -15,6 +15,10 @@ function normalizeAssistantAnswer(text = '') {
       .replace(/:[ \t]*-[ \t]+/, ':\n- ')
       .replace(/[ \t]+-[ \t]+(?=\*\*|[A-Z0-9])/g, '\n- ');
   }
+  answer = answer.replace(
+    /(\*\*[^*\n]+\*\*|\*[^*\n]+\*)[ \t]+(?=(?:If you|Please seek|Seek medical|Get medical|Contact a health|A health professional)\b)/g,
+    '$1\n\n',
+  );
   return answer.replace(
     /([.!?)])[ \t]+(?=(?:If you notice|If you experience|If symptoms|If the fever|Please seek|Seek medical|Get medical|Contact a health|A health professional)\b)/g,
     '$1\n\n',
