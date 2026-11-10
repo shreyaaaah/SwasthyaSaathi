@@ -487,20 +487,37 @@ _RESTRICTED_CLAIM_PATTERNS = (
 )
 
 
+def _filter_sentences_preserving_whitespace(answer: str, should_keep) -> str:
+    """Filter sentences without flattening Markdown lists or paragraph breaks."""
+    parts = re.split(r"(?<=[.!?])(\s+)", answer.strip())
+    sentence_indexes = list(range(0, len(parts), 2))
+    keep = [should_keep(parts[index]) for index in sentence_indexes]
+    kept_indexes = [index for number, index in enumerate(sentence_indexes) if keep[number]]
+    result = []
+    for sentence_number, index in enumerate(kept_indexes):
+        result.append(parts[index])
+        if sentence_number + 1 < len(kept_indexes):
+            next_index = kept_indexes[sentence_number + 1]
+            separators = "".join(parts[position] for position in range(index + 1, next_index, 2))
+            result.append(separators or " ")
+    return "".join(result).strip()
+
+
 def enforce_source_backed_fences(answer: str, sources: List[Dict[str, Any]]) -> tuple[str, bool]:
     """Remove numeric/dose/guideline claims unless the source text contains them."""
     evidence = " ".join(" ".join(str(source.get(key) or "") for key in ("snippet", "content_snippet", "chunk_text"))
                         for source in sources).casefold()
-    sentences = re.split(r"(?<=[.!?])\s+", answer.strip())
-    kept = []
     edited = False
-    for sentence in sentences:
+
+    def should_keep(sentence: str) -> bool:
+        nonlocal edited
         matches = [match.group(0) for pattern in _RESTRICTED_CLAIM_PATTERNS for match in pattern.finditer(sentence)]
         if matches and any(claim.casefold() not in evidence for claim in matches):
             edited = True
-            continue
-        kept.append(sentence)
-    cleaned = " ".join(kept).strip()
+            return False
+        return True
+
+    cleaned = _filter_sentences_preserving_whitespace(answer, should_keep)
     if edited and not cleaned:
         cleaned = "I can share general information, but exact doses, schedules, and numeric medical advice need a verified source and advice from a clinician or pharmacist."
     return cleaned, edited
@@ -1477,7 +1494,7 @@ def _regenerate_constrained(client: Groq, active_model: str, query: str,
     When audit returns unsupported sentences, regenerate the answer constrained
     strictly to the provided sources, removing any extrapolation.
     Extractive framing: paraphrase only what is explicitly in the passages.
-    No markdown tables or headers (use plain text and bullet lists only for 3+ items).
+    Use readable, concise Markdown when it helps: short bold labels, simple headings, and one item per list line. Never use tables.
     """
     if not unsupported_sentences:
         return original_answer
@@ -1501,8 +1518,8 @@ def _regenerate_constrained(client: Groq, active_model: str, query: str,
         "Never prescribe, recommend, or name specific medicines or doses. If clarification is essential, ask at most one concise follow-up question and never list questions. "
         "For traditional remedies, only mention source-supported non-drug supportive practices, make no cure claims, and do not give herbal recipes or amounts. "
         "IMPORTANT FORMATTING RULES:\n"
-        "- Use plain text only: no Markdown, bold, headings, tables, bullets, or pipe characters.\n"
-        "- Keep simple answers to 2 to 5 short sentences, at most 3 brief paragraphs, with blank lines between ideas.\n"
+        "- Keep simple replies short. Use concise Markdown: bold symptom labels, short section headings, and bullets on separate lines.\n"
+        "- Keep blank lines between an intro, a list, and safety advice; never flatten list items into an inline sentence.\n"
         "- Use a numbered list only for 3 or more steps, one short step per line.\n"
         "- Include a brief, natural care-seeking close only for personal symptoms or urgent triage; omit disclaimers from general information.\n"
         "For look-alike diseases (such as Chikungunya vs Dengue), ALWAYS preserve the sentence: "
@@ -2182,17 +2199,25 @@ def run_agent(
             "source_url": "https://112.gov.in/",
         })
         final_audit = {"is_fully_grounded": True, "unsupported_sentences": [], "audit_summary": "Deterministic emergency response."}
-    elif triage_timed_out:
-        final_answer += (
-            "\n\nI couldn't complete the urgency check within the response time budget. "
-            "If symptoms are severe or rapidly worsening, seek urgent medical care."
-        )
-
     final_answer = limit_follow_up_questions(final_answer, maximum=1)
     final_answer = remove_internal_leaks(final_answer)
     final_answer, deterministic_fence_edited = enforce_source_backed_fences(final_answer, sources_collected)
     final_answer = preserve_lookalike_comparison_caveat(query, final_answer)
     final_answer = ensure_personal_symptom_followup(query, final_answer, triage_tag)
+    if triage_timed_out and triage_tag != "EMERGENCY":
+        triage_note = (
+            "I couldn't fully assess urgency from this chat. If symptoms are severe or getting worse quickly, "
+            "please seek urgent medical care."
+        )
+        # Keep the user's follow-up question at the end while making the limitation
+        # a calm closing note instead of exposing an internal response-time detail.
+        question_match = re.search(r"([^?]*\?)\s*$", final_answer)
+        if question_match:
+            answer_body = final_answer[:question_match.start()].rstrip()
+            follow_up = question_match.group(1).strip()
+            final_answer = f"{answer_body}\n\n{triage_note}\n\n{follow_up}".strip()
+        else:
+            final_answer = f"{final_answer.rstrip()}\n\n{triage_note}".strip()
     if deterministic_fence_edited and fence_verification is None:
         fence_verification = {"edited": True, "verifier": "deterministic_source_fence"}
     elif deterministic_fence_edited and fence_verification is not None:

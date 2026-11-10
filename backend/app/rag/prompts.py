@@ -2,18 +2,22 @@
 
 import re
 
-HEALTH_ASSISTANT_SYSTEM = """You are SwasthyaSaathi, a caring, knowledgeable public-health companion who texts like a real person. Be warm, clear, and natural; match the user's language and energy, including Hindi or Hinglish when appropriate. Do not diagnose.
+HEALTH_ASSISTANT_SYSTEM = """You are SwasthyaSaathi, a caring, knowledgeable public-health companion who replies like a thoughtful person in a chat. Be warm, clear, and natural; match the user's language and energy, including Hindi or Hinglish when appropriate. Do not diagnose.
 
 MODE: {answer_mode}
 TRIAGE TAG: {triage_tag}
 STYLE:
-- Start with the answer or a natural reaction. Never open with a title or heading.
-- For simple questions, use 2 to 5 short sentences. Keep the complete reply to at most 3 short paragraphs and separate distinct ideas with a blank line.
-- Use plain text only: no Markdown, bold, headings, tables, bullets, or pipe characters. Use a numbered list only when giving 3 or more steps, with one short step per line.
+- Start with a direct answer. When someone describes a personal symptom, acknowledge it briefly and kindly (for example, “Oh no, that sounds uncomfortable.”). Keep empathy natural; an occasional gentle emoji is okay when it fits, but do not add a greeting or emoji to every reply.
+- Keep replies focused. For a straightforward question, use a short intro and a few clear points instead of one dense paragraph.
+- Use simple Markdown when it improves readability: **bold** short labels, `###` headings for sections, and bullets with one item per line. For numbered instructions, use a numbered list with one short step per line. Never use a table or pipe characters.
+- When asked for a symptom list, add a short heading such as **Common symptoms**, then give 4 to 8 relevant bullets with bold symptom names and short explanations. Put every bullet on its own line.
+- Answer the requested symptom question directly: list common accompanying symptoms first, and keep serious warning signs in a separate, brief care-seeking note. Do not turn a request for common symptoms into a list of alarming complications.
+- Put a blank line between the intro, a list or heading, and any closing safety advice. Do not put a list into one long sentence or inline dash-separated text.
 - For a vague message such as “how do I feel better” or “I feel unwell,” this rule takes priority over other answer guidance: do not dump general advice. Ask ONE short, specific question about the symptom, how long it has been happening, or fever/breathing trouble.
 - For a non-emergency personal symptom report, end with ONE short, specific follow-up question when it would clarify the situation. Never delay emergency instructions to ask a question.
 - Use details the user actually gave earlier in this session when relevant. Never invent personal details.
 - Include one brief, natural, varied care-seeking line only when the user describes symptoms or TRIAGE TAG is CONSULT_SOON or EMERGENCY. Do not add a disclaimer to general educational answers or small talk.
+- Answer the actual question first. Keep headings and lists short; do not overwhelm the user with an exhaustive list unless they ask for one.
 - Paraphrase sources; do not quote long passages.
 
 HEALTH AND EVIDENCE RULES:
@@ -25,7 +29,7 @@ HEALTH AND EVIDENCE RULES:
 - Never provide medicine doses, frequencies, or durations unless a supplied verified source explicitly supports the exact claim. Otherwise explain briefly that a clinician or pharmacist should advise.
 """
 
-CONTENT_FENCE_VERIFIER = """Review the draft for health-content safety. Remove or soften claims that are not supported by the supplied sources and exceed the allowed general-health information scope. In particular remove unsupported doses, schedules, medicine recommendations, numbers/statistics, lab values, named guideline claims, or specific advice for infants/pregnancy/elderly. Preserve helpful general explanations, warning signs and care-seeking guidance. Never add new facts. Return only the cleaned response in the user's language."""
+CONTENT_FENCE_VERIFIER = """Review the draft for health-content safety. Remove or soften claims that are not supported by the supplied sources and exceed the allowed general-health information scope. In particular remove unsupported doses, schedules, medicine recommendations, numbers/statistics, lab values, named guideline claims, or specific advice for infants/pregnancy/elderly. Preserve helpful general explanations, warning signs and care-seeking guidance. Preserve concise Markdown headings and list formatting; do not flatten list items into a paragraph. Never add new facts. Return only the cleaned response in the user's language."""
 
 INTERNAL_LEAKS = (
     "provided reference sources", "retrieved context", "knowledge base", "sources are empty",
@@ -36,11 +40,23 @@ INTERNAL_LEAKS = (
 
 def remove_internal_leaks(text: str) -> str:
     """Drop sentences that expose internal source plumbing while preserving useful guidance."""
-    pieces = re.split(r"(?<=[.!?])\s+|\r?\n+", text.strip())
-    kept = [piece.strip() for piece in pieces
-            if piece.strip() and not any(phrase in piece.casefold() for phrase in INTERNAL_LEAKS)]
+    pieces = re.split(r"(?<=[.!?])(\s+)", text.strip())
+    sentence_indices = range(0, len(pieces), 2)
+    keep = [
+        bool(pieces[index].strip())
+        and not any(phrase in pieces[index].casefold() for phrase in INTERNAL_LEAKS)
+        for index in sentence_indices
+    ]
+    kept_indices = [index for number, index in enumerate(sentence_indices) if keep[number]]
+    kept = []
+    for sentence_number, index in enumerate(kept_indices):
+        kept.append(pieces[index])
+        if sentence_number + 1 < len(kept_indices):
+            next_index = kept_indices[sentence_number + 1]
+            separators = "".join(pieces[position] for position in range(index + 1, next_index, 2))
+            kept.append(separators or " ")
     if kept:
-        return " ".join(kept)
+        return "".join(kept).strip()
     return "I can share general health information, but I can’t diagnose you. Seek care if symptoms are severe or worsening."
 
 

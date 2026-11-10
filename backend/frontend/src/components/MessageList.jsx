@@ -4,20 +4,97 @@ import SourceCitations from './SourceCitations';
 
 const messageKey = (message, index) => message.id || `${message.sender}-${index}`;
 
-function cleanAnswer(text = '') {
-  return String(text)
-    .replace(/\*\*/g, '')
-    .replace(/\*/g, '')
-    .replace(/^\s*#{1,6}\s*/gm, '')
-    .replace(/\|/g, '')
-    .replace(/^\s*[-+]\s+/gm, '')
-    .trim();
+function normalizeAssistantAnswer(text = '') {
+  let answer = String(text).replace(/\r\n?/g, '\n').trim();
+  answer = answer
+    .replace(/(^|\n)[ \t]*\*[ \t]+(?=\*\*|[A-Z0-9])/g, '$1- ')
+    .replace(/([.!?)])\*[ \t]+(?=\*\*|[A-Z0-9])/g, '$1\n- ')
+    .replace(/[ \t]+\*[ \t]+(?=\*\*|[A-Z0-9])/g, '\n- ');
+  if (/:[ \t]*-[ \t]+/.test(answer)) {
+    answer = answer
+      .replace(/:[ \t]*-[ \t]+/, ':\n- ')
+      .replace(/[ \t]+-[ \t]+(?=\*\*|[A-Z0-9])/g, '\n- ');
+  }
+  return answer.replace(
+    /([.!?)])[ \t]+(?=(?:If you notice|If you experience|If symptoms|If the fever|Please seek|Seek medical|Get medical|Contact a health|A health professional)\b)/g,
+    '$1\n\n',
+  );
 }
 
 function splitIntoBubbles(text) {
-  const paragraphs = cleanAnswer(text).split(/\n\s*\n/).map((part) => part.trim()).filter(Boolean);
+  const paragraphs = normalizeAssistantAnswer(text).split(/\n\s*\n/).map((part) => part.trim()).filter(Boolean);
   if (paragraphs.length <= 3) return paragraphs;
   return [paragraphs[0], paragraphs[1], paragraphs.slice(2).join('\n\n')];
+}
+
+function renderInlineMarkdown(text, keyPrefix) {
+  const parts = String(text).split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g);
+  return parts.map((part, index) => {
+    const key = `${keyPrefix}-inline-${index}`;
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={key} className="font-semibold text-slate-50">{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith('*') && part.endsWith('*')) {
+      return <em key={key}>{part.slice(1, -1)}</em>;
+    }
+    if (part.startsWith('`') && part.endsWith('`')) {
+      return <code key={key} className="rounded bg-slate-800 px-1 py-0.5">{part.slice(1, -1)}</code>;
+    }
+    return <React.Fragment key={key}>{part.replace(/^#{1,6}\s*/, '').replace(/\*\*?|`/g, '')}</React.Fragment>;
+  });
+}
+
+function renderAssistantMarkdown(text, keyPrefix) {
+  const lines = String(text).split('\n');
+  const blocks = [];
+  let lineIndex = 0;
+
+  while (lineIndex < lines.length) {
+    const line = lines[lineIndex].trim();
+    if (!line) {
+      lineIndex += 1;
+      continue;
+    }
+
+    const heading = line.match(/^(#{1,3})\s+(.+?)\s*#*$/);
+    if (heading) {
+      const Heading = heading[1].length === 1 ? 'h2' : 'h3';
+      blocks.push(<Heading key={`${keyPrefix}-block-${lineIndex}`} className="text-sm font-semibold text-slate-50">{renderInlineMarkdown(heading[2], `${keyPrefix}-${lineIndex}`)}</Heading>);
+      lineIndex += 1;
+      continue;
+    }
+
+    const firstListItem = line.match(/^(?:([-+*])\s+|(\d+)[.)]\s+)(.+)$/);
+    if (firstListItem) {
+      const ordered = Boolean(firstListItem[2]);
+      const items = [];
+      while (lineIndex < lines.length) {
+        const item = lines[lineIndex].trim().match(/^(?:([-+*])\s+|(\d+)[.)]\s+)(.+)$/);
+        if (!item || Boolean(item[2]) !== ordered) break;
+        items.push(item[3]);
+        lineIndex += 1;
+      }
+      const List = ordered ? 'ol' : 'ul';
+      blocks.push(
+        <List key={`${keyPrefix}-list-${lineIndex}`} className={`${ordered ? 'list-decimal' : 'list-disc'} space-y-1 pl-5 marker:text-teal-300`}>
+          {items.map((item, itemIndex) => <li key={`${keyPrefix}-item-${itemIndex}`} className="whitespace-pre-wrap">{renderInlineMarkdown(item, `${keyPrefix}-item-${lineIndex}-${itemIndex}`)}</li>)}
+        </List>,
+      );
+      continue;
+    }
+
+    const paragraph = [line];
+    lineIndex += 1;
+    while (lineIndex < lines.length) {
+      const next = lines[lineIndex].trim();
+      if (!next || /^(?:#{1,3}\s+|(?:[-+*])\s+|\d+[.)]\s+)/.test(next)) break;
+      paragraph.push(next);
+      lineIndex += 1;
+    }
+    blocks.push(<p key={`${keyPrefix}-paragraph-${lineIndex}`} className="whitespace-pre-wrap">{renderInlineMarkdown(paragraph.join(' '), `${keyPrefix}-${lineIndex}`)}</p>);
+  }
+
+  return <div className="space-y-2.5">{blocks}</div>;
 }
 
 function TypingDots({ label = 'SwasthyaSaathi is typing' }) {
@@ -181,7 +258,7 @@ const MessageList = ({ messages, isLoading, loadingMessage, onTypingProgress }) 
         const isAnimating = animation?.messageId === id;
         const hasPlayed = handledAnimations.has(id);
         const metadataVisible = !shouldAnimate || (hasPlayed && !isAnimating);
-        const cleanText = isUser ? String(msg.text || '') : cleanAnswer(msg.text || '');
+        const cleanText = isUser ? String(msg.text || '') : normalizeAssistantAnswer(msg.text || '');
         const paragraphs = isUser ? [cleanText] : splitIntoBubbles(cleanText);
 
         return (
@@ -225,8 +302,10 @@ const MessageList = ({ messages, isLoading, loadingMessage, onTypingProgress }) 
                         {isEmergency && <TriageBanner tag={msg.triage_tag} emergencyContact={msg.emergency_contact} />}
                       </>
                     )}
-                    <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                      {isDots ? <TypingDots /> : visibleText}
+                    <div className="text-sm leading-relaxed">
+                      {isDots
+                        ? <TypingDots />
+                        : isUser ? <div className="whitespace-pre-wrap">{visibleText}</div> : renderAssistantMarkdown(visibleText, `${id}-${paragraphIndex}`)}
                     </div>
                   </div>
                 );
