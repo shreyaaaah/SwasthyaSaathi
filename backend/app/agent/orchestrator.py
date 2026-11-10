@@ -1606,10 +1606,10 @@ def ensure_personal_symptom_empathy(query: str, answer: str, triage_tag: str | N
         text,
     )
     symptom = re.search(
-        r"\b(?:fever|feverish|temperature|cough|pain|headache|rash|itch|sore throat|vomit|nausea|diarrh|breath|cold|flu)\b",
+        r"\b(?:fever|feverish|temperature|cough|pain|headache|rash|itch|sore throat|vomit|nausea|diarrh|breath|cold|flu|dengue|malaria|chicken\s?pox|measles|chikungunya|covid)\b",
         text,
     )
-    if triage_tag in {"EMERGENCY", "URGENT"} or not personal_report or not symptom:
+    if triage_tag == "EMERGENCY" or not personal_report or not symptom:
         return answer
 
     cleaned = answer.lstrip()
