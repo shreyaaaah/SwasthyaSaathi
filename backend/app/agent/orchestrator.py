@@ -1598,6 +1598,31 @@ def preserve_lookalike_comparison_caveat(query: str, answer: str) -> str:
     return f"{answer.rstrip()} {LOOKALIKE_COMPARISON_CAVEAT}".strip()
 
 
+def ensure_personal_symptom_empathy(query: str, answer: str, triage_tag: str | None) -> str:
+    """Add a short empathetic opening when the user reports their own symptoms."""
+    text = query.casefold()
+    personal_report = re.search(
+        r"\b(?:i(?:['’]?m| am| have|['’]ve| think i(?:['’]?m| am| have)| feel)|my|my child|my baby)\b",
+        text,
+    )
+    symptom = re.search(
+        r"\b(?:fever|feverish|temperature|cough|pain|headache|rash|itch|sore throat|vomit|nausea|diarrh|breath|cold|flu)\b",
+        text,
+    )
+    if triage_tag in {"EMERGENCY", "URGENT"} or not personal_report or not symptom:
+        return answer
+
+    cleaned = answer.lstrip()
+    already_empathetic = re.match(
+        r"(?:i['’]?m sorry|sorry to hear|oh no\b|that sounds|i understand|take care\b)",
+        cleaned,
+        flags=re.I,
+    )
+    if already_empathetic:
+        return answer
+    return f"I’m sorry you’re feeling unwell—take care.\n\n{cleaned}".strip()
+
+
 def ensure_personal_symptom_followup(query: str, answer: str, triage_tag: str | None) -> str:
     """Add one useful follow-up when a non-emergency symptom reply lacks one."""
     text = query.casefold()
@@ -2203,6 +2228,7 @@ def run_agent(
     final_answer = remove_internal_leaks(final_answer)
     final_answer, deterministic_fence_edited = enforce_source_backed_fences(final_answer, sources_collected)
     final_answer = preserve_lookalike_comparison_caveat(query, final_answer)
+    final_answer = ensure_personal_symptom_empathy(query, final_answer, triage_tag)
     final_answer = ensure_personal_symptom_followup(query, final_answer, triage_tag)
     if triage_timed_out and triage_tag != "EMERGENCY":
         triage_note = (
