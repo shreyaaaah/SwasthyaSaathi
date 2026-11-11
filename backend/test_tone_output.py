@@ -1,14 +1,13 @@
 """
 test_tone_output.py — Test script to collect new conversational responses across 4 key test queries.
 """
-import os
 import sys
 import requests
 import json
 
 sys.stdout.reconfigure(encoding='utf-8')
 
-BASE_URL = os.environ.get("SWASTHYASAATHI_API_URL", "http://localhost:8000")
+BASE_URL = "http://localhost:8000"
 USER_ID = "tone_test_user_01"
 
 test_queries = [

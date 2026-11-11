@@ -27,8 +27,6 @@ const SourceCitations = ({ sources = [], isGrounded = true }) => {
   const [expandedIdx, setExpandedIdx] = useState(null);
   const groundedSources = sources || [];
 
-  if (!groundedSources.length && isGrounded !== false) return null;
-
   if (!groundedSources.length) return (
     <div className="mt-3 pt-2.5 border-t border-slate-700/60" role="note">
       <div className="p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-amber-100 text-xs flex items-start gap-2.5">

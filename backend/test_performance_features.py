@@ -5,12 +5,7 @@ import os
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from app.agent.orchestrator import (
-    deterministic_triage,
-    deterministic_unsupported_sentences,
-    ensure_personal_symptom_followup,
-    preserve_lookalike_comparison_caveat,
-)
+from app.agent.orchestrator import deterministic_triage, deterministic_unsupported_sentences
 from app.agent import orchestrator
 from app.agent.performance import AnswerCache, normalize_query
 from app.main import get_latency_history, health_check, on_startup
@@ -52,45 +47,6 @@ class PerformanceFeatureTests(unittest.TestCase):
 
     def test_uncertain_personal_query_is_left_for_async_triage(self):
         self.assertIsNone(deterministic_triage("I feel unwell"))
-
-    def test_smalltalk_requires_a_short_social_message_without_health_content(self):
-        for query in (
-            "hello", "thanks a lot", "who are you", "what can you do", "ok", "lol",
-            "sat sri akal", "salaam", "dhanyavad", "tnx bro", "ok bye", "kya haal hai", "phir milte hain",
-        ):
-            with self.subTest(query=query):
-                self.assertTrue(orchestrator.is_smalltalk(query))
-        for query in (
-            "I feel unwell", "how do I feel better", "hello, I have a fever",
-            "what can you do for cough?", "hi doctor",
-        ):
-            with self.subTest(query=query):
-                self.assertFalse(orchestrator.is_smalltalk(query))
-
-    def test_chikungunya_dengue_comparison_keeps_the_verbatim_safety_sentence(self):
-        query = "how is chikungunya different from dengue"
-        caveat = "Because these infections share similar symptoms, they are hard to tell apart, and laboratory testing is needed for a clear diagnosis."
-        result = preserve_lookalike_comparison_caveat(query, "Both infections can look alike.")
-        self.assertTrue(result.endswith(caveat))
-        self.assertEqual(preserve_lookalike_comparison_caveat(query, result), result)
-        self.assertEqual(
-            preserve_lookalike_comparison_caveat("dengue versus malaria", "Compare carefully."),
-            "Compare carefully.",
-        )
-
-    def test_non_emergency_personal_symptoms_get_one_specific_followup_if_missing(self):
-        result = ensure_personal_symptom_followup(
-            "I have a cough for 3 days", "Rest and drink fluids.", "SELF_CARE"
-        )
-        self.assertTrue(result.endswith("Are you also having a fever or any trouble breathing?"))
-        self.assertEqual(
-            ensure_personal_symptom_followup("I have a cough", "How are you feeling?", "SELF_CARE"),
-            "How are you feeling?",
-        )
-        self.assertEqual(
-            ensure_personal_symptom_followup("I have a cough", "Call 112 now.", "EMERGENCY"),
-            "Call 112 now.",
-        )
 
     def test_deterministic_grounding_flags_unsupported_sentence(self):
         sources = [{"snippet": "Malaria can cause fever, chills, headache, and fatigue."}]

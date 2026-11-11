@@ -1,4 +1,3 @@
 -r requirements.txt
 # Only needed for offline evaluation adapters and ingestion development tools.
 sentence-transformers>=3.0.0
-PyMuPDF>=1.24.0

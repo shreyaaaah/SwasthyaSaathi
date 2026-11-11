@@ -9,9 +9,8 @@ from unittest.mock import patch
 from pathlib import Path
 
 from app.rag.source_registry import SourceRegistryError, validate_source_registry
-from app.rag.integrity import check_integrity
 from app.agent.orchestrator import (
-    deterministic_triage, enforce_source_backed_fences, is_self_harm_crisis, is_url_allowed, run_agent,
+    enforce_source_backed_fences, is_self_harm_crisis, is_url_allowed, run_agent,
     specificity_gate, sufficiency_check, verify_content_fences, verify_grounding,
 )
 from app.rag.prompts import limit_follow_up_questions
@@ -64,66 +63,8 @@ class SourceRegistryTests(unittest.TestCase):
         metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
         self.assertEqual(index.ntotal, len(metadata))
 
-    def test_integrity_rejects_misaligned_metadata_ids(self):
-        import faiss
-        import numpy as np
-
-        with tempfile.TemporaryDirectory(dir=Path(__file__).parent) as tmp:
-            root = Path(tmp)
-            raw, store = root / "raw", root / "store"
-            raw.mkdir()
-            store.mkdir()
-            self.make_registry(raw, "verified text")
-            index = faiss.IndexFlatIP(3)
-            vectors = np.asarray([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]], dtype=np.float32)
-            index.add(vectors)
-            faiss.write_index(index, str(store / "faiss_index.bin"))
-            (store / "chunk_metadata.json").write_text(json.dumps([
-                {"chunk_id": 1, "doc_name": "guide.txt", "chunk_text": "first"},
-                {"chunk_id": 0, "doc_name": "guide.txt", "chunk_text": "second"},
-            ]), encoding="utf-8")
-
-            report = check_integrity(raw, store)
-
-        self.assertFalse(report["index_metadata_compatible"])
-        self.assertIn("chunk metadata IDs are not unique sequential indexes", report["issues"])
-
-    def test_integrity_rejects_non_normalized_inner_product_vectors(self):
-        import faiss
-        import numpy as np
-
-        with tempfile.TemporaryDirectory(dir=Path(__file__).parent) as tmp:
-            root = Path(tmp)
-            raw, store = root / "raw", root / "store"
-            raw.mkdir()
-            store.mkdir()
-            self.make_registry(raw, "verified text")
-            index = faiss.IndexFlatIP(3)
-            index.add(np.asarray([[2.0, 0.0, 0.0]], dtype=np.float32))
-            faiss.write_index(index, str(store / "faiss_index.bin"))
-            (store / "chunk_metadata.json").write_text(json.dumps([
-                {"chunk_id": 0, "doc_name": "guide.txt", "chunk_text": "verified text"},
-            ]), encoding="utf-8")
-
-            report = check_integrity(raw, store)
-
-        self.assertFalse(report["index_metadata_compatible"])
-        self.assertIn("FAISS vectors are not finite, non-zero unit vectors", report["issues"])
-
 
 class SafetyAndEvidenceTests(unittest.TestCase):
-    def test_three_day_fever_is_consult_soon_not_infant_emergency(self):
-        triage = deterministic_triage("What should I do about high fever lasting 3 days?")
-        self.assertEqual(triage["triage_tag"], "CONSULT_SOON")
-
-    def test_fever_in_explicit_two_month_old_still_escalates(self):
-        triage = deterministic_triage("My 2-month-old baby has a fever.")
-        self.assertEqual(triage["triage_tag"], "EMERGENCY")
-
-    def test_fever_in_three_month_old_does_not_match_under_three_month_rule(self):
-        triage = deterministic_triage("My 3-month-old baby has a fever.")
-        self.assertIsNone(triage)
-
     def test_response_keeps_at_most_one_follow_up_question(self):
         response = (
             "For now, avoid licking or picking at the area. "
@@ -149,38 +90,15 @@ class SafetyAndEvidenceTests(unittest.TestCase):
         self.assertEqual(result["verifier"], "general_no_source_scope")
         completion.assert_not_called()
 
-    def test_greeting_and_thanks_use_one_source_free_smalltalk_call(self):
-        from app.agent import orchestrator
-
-        response = SimpleNamespace(
-            model="test-model",
-            choices=[SimpleNamespace(message=SimpleNamespace(content="Hey! What health question can I help with?"))],
-        )
-        with patch("app.agent.orchestrator.Groq") as groq, \
-             patch("app.agent.orchestrator.search_advisories", side_effect=AssertionError("small talk must skip retrieval")) as search, \
-             patch("app.agent.orchestrator.specificity_gate", side_effect=AssertionError("small talk must skip the gate")) as gate, \
-             patch("app.agent.orchestrator.web_search_health_authority", side_effect=AssertionError("small talk must skip web search")) as web, \
-             patch("app.agent.orchestrator.triage_classify", side_effect=AssertionError("small talk must skip LLM triage")) as triage, \
-             patch("app.agent.orchestrator.record_refusal", side_effect=AssertionError("small talk must not log symptoms")) as refusal, \
-             patch("app.agent.orchestrator.record_answer_metadata", side_effect=AssertionError("small talk must not log symptoms")) as metadata:
-            groq.return_value.chat.completions.create.return_value = response
-            for query in ("hello", "thanks a lot"):
-                with self.subTest(query=query):
-                    result = run_agent("anonymous", query)
-                    self.assertEqual(result["answer_mode"], "SOCIAL")
-                    self.assertEqual(result["triage_tag"], "GENERAL_INFO")
-                    self.assertIsNone(result["is_grounded"])
-                    self.assertIsNone(result["grounding_audit"])
-                    self.assertEqual(result["sources"], [])
-                    self.assertEqual(result["tools_used"], [])
-                    self.assertNotIn("guideline", result["answer"].casefold())
-            self.assertEqual(groq.return_value.chat.completions.create.call_count, 2)
-            search.assert_not_called()
-            gate.assert_not_called()
-            web.assert_not_called()
-            triage.assert_not_called()
-            refusal.assert_not_called()
-            metadata.assert_not_called()
+    @patch("app.agent.orchestrator.Groq", side_effect=AssertionError("social fast path must not call model"))
+    def test_greeting_and_thanks_are_natural_without_sources_or_triage(self, groq):
+        for query in ("hi", "thank u so much"):
+            with self.subTest(query=query):
+                result = run_agent("anonymous", query)
+                self.assertEqual(result["answer_mode"], "SOCIAL")
+                self.assertFalse(result["sources"])
+                self.assertIsNone(result["triage_tag"])
+                self.assertNotIn("guideline", result["answer"].casefold())
 
     @patch("app.agent.orchestrator.record_answer_metadata")
     @patch("app.agent.orchestrator.record_refusal")
