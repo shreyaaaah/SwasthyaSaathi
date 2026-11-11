@@ -9,6 +9,7 @@ from unittest.mock import patch
 from pathlib import Path
 
 from app.rag.source_registry import SourceRegistryError, validate_source_registry
+from app.rag.integrity import check_integrity
 from app.agent.orchestrator import (
     deterministic_triage, enforce_source_backed_fences, is_self_harm_crisis, is_url_allowed, run_agent,
     specificity_gate, sufficiency_check, verify_content_fences, verify_grounding,
@@ -62,6 +63,52 @@ class SourceRegistryTests(unittest.TestCase):
         index = retriever_module.faiss.read_index(str(index_path))
         metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
         self.assertEqual(index.ntotal, len(metadata))
+
+    def test_integrity_rejects_misaligned_metadata_ids(self):
+        import faiss
+        import numpy as np
+
+        with tempfile.TemporaryDirectory(dir=Path(__file__).parent) as tmp:
+            root = Path(tmp)
+            raw, store = root / "raw", root / "store"
+            raw.mkdir()
+            store.mkdir()
+            self.make_registry(raw, "verified text")
+            index = faiss.IndexFlatIP(3)
+            vectors = np.asarray([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]], dtype=np.float32)
+            index.add(vectors)
+            faiss.write_index(index, str(store / "faiss_index.bin"))
+            (store / "chunk_metadata.json").write_text(json.dumps([
+                {"chunk_id": 1, "doc_name": "guide.txt", "chunk_text": "first"},
+                {"chunk_id": 0, "doc_name": "guide.txt", "chunk_text": "second"},
+            ]), encoding="utf-8")
+
+            report = check_integrity(raw, store)
+
+        self.assertFalse(report["index_metadata_compatible"])
+        self.assertIn("chunk metadata IDs are not unique sequential indexes", report["issues"])
+
+    def test_integrity_rejects_non_normalized_inner_product_vectors(self):
+        import faiss
+        import numpy as np
+
+        with tempfile.TemporaryDirectory(dir=Path(__file__).parent) as tmp:
+            root = Path(tmp)
+            raw, store = root / "raw", root / "store"
+            raw.mkdir()
+            store.mkdir()
+            self.make_registry(raw, "verified text")
+            index = faiss.IndexFlatIP(3)
+            index.add(np.asarray([[2.0, 0.0, 0.0]], dtype=np.float32))
+            faiss.write_index(index, str(store / "faiss_index.bin"))
+            (store / "chunk_metadata.json").write_text(json.dumps([
+                {"chunk_id": 0, "doc_name": "guide.txt", "chunk_text": "verified text"},
+            ]), encoding="utf-8")
+
+            report = check_integrity(raw, store)
+
+        self.assertFalse(report["index_metadata_compatible"])
+        self.assertIn("FAISS vectors are not finite, non-zero unit vectors", report["issues"])
 
 
 class SafetyAndEvidenceTests(unittest.TestCase):

@@ -12,6 +12,14 @@ except ImportError:
     pypdf = None
 
 try:
+    import pymupdf as fitz
+except ImportError:
+    try:
+        import fitz
+    except ImportError:
+        fitz = None
+
+try:
     from fastembed import TextEmbedding
     import faiss
 except ImportError:
@@ -24,6 +32,16 @@ DEFAULT_RAW_DOCS_DIR = os.path.join(BASE_DIR, "data", "raw_docs")
 DEFAULT_VECTOR_STORE_DIR = os.path.join(BASE_DIR, "data", "vector_store")
 MODEL_NAME = settings.EMBEDDING_MODEL_NAME
 
+_PDF_UNICODE_GLYPH = re.compile(r"/uni([0-9a-fA-F]{4,6})")
+
+
+def _decode_pdf_unicode_glyphs(text: str) -> str:
+    """Repair pypdf's /uniXXXX output for PDFs with broken ToUnicode maps."""
+    matches = list(_PDF_UNICODE_GLYPH.finditer(text))
+    if len(matches) < 8:
+        return text
+    return _PDF_UNICODE_GLYPH.sub(lambda match: chr(int(match.group(1), 16)), text)
+
 def extract_text_from_file(file_path: str) -> str:
     """Extract plain text from .txt, .md, or .pdf files."""
     ext = os.path.splitext(file_path)[1].lower()
@@ -31,50 +49,107 @@ def extract_text_from_file(file_path: str) -> str:
         with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
             return f.read()
     elif ext == ".pdf":
+        if fitz is not None:
+            try:
+                with fitz.open(file_path) as document:
+                    pages = [page.get_text("text") for page in document]
+                extracted = "\n".join(text for text in pages if text)
+                if extracted.strip():
+                    return extracted
+            except Exception as exc:
+                print(f"PyMuPDF could not extract {os.path.basename(file_path)} ({exc}); falling back to pypdf.")
         if pypdf is None:
-            raise ImportError("pypdf package is required for processing PDF files.")
+            raise ImportError("PyMuPDF or pypdf is required for processing PDF files.")
         reader = pypdf.PdfReader(file_path)
         text_parts = []
         for page in reader.pages:
             t = page.extract_text()
             if t:
-                text_parts.append(t)
+                text_parts.append(_decode_pdf_unicode_glyphs(t))
         return "\n".join(text_parts)
     return ""
 
 def chunk_document(doc_name: str, content: str, chunk_size: int = 500, chunk_overlap: int = 50) -> List[Dict[str, Any]]:
-    chunks = []
-    lines = content.split("\n")
-    
-    current_section = "General Overview"
-    current_buffer = ""
-    
-    for line in lines:
-        stripped = line.strip()
-        if stripped.isupper() and len(stripped) > 5 or stripped.startswith("SECTION") or stripped.startswith("#"):
-            # Keep source identity bound to the filename authorized by SOURCES.md.
-            # Document text is untrusted and must not be able to rewrite provenance.
-            current_section = re.sub(r"^[#\s]+", "", stripped)
-        
-        current_buffer += line + "\n"
-        
-        if len(current_buffer) >= chunk_size:
-            chunk_text = current_buffer.strip()
-            if chunk_text:
-                chunks.append({
-                    "doc_name": doc_name,
-                    "section": current_section,
-                    "chunk_text": chunk_text
-                })
-            overlap_buffer = current_buffer[-chunk_overlap:] if len(current_buffer) > chunk_overlap else ""
-            current_buffer = overlap_buffer
+    """Split a document into bounded, word-aligned chunks within each section."""
+    if chunk_size <= 0:
+        raise ValueError("chunk_size must be greater than zero")
+    if chunk_overlap < 0 or chunk_overlap >= chunk_size:
+        raise ValueError("chunk_overlap must be between zero and chunk_size - 1")
 
-    if current_buffer.strip():
-        chunks.append({
-            "doc_name": doc_name,
-            "section": current_section,
-            "chunk_text": current_buffer.strip()
-        })
+    chunks: List[Dict[str, Any]] = []
+    current_section = "General Overview"
+    section_lines: list[str] = []
+
+    def flush_section() -> None:
+        text = " ".join(part.strip() for part in section_lines if part.strip())
+        text = re.sub(r"\s+", " ", text).strip()
+        for chunk_text in _split_into_chunks(text, chunk_size, chunk_overlap):
+            chunks.append({
+                "doc_name": doc_name,
+                "section": current_section,
+                "chunk_text": chunk_text,
+            })
+
+    for line in content.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        is_heading = (
+            stripped.startswith("#")
+            or stripped.upper().startswith("SECTION ")
+            or (stripped.isupper() and sum(char.isalpha() for char in stripped) >= 5 and len(stripped) <= 160)
+        )
+        if is_heading:
+            # Flush before changing section so a chunk never receives the next
+            # heading's label while still containing the previous section.
+            flush_section()
+            current_section = re.sub(r"^[#\s]+", "", stripped)
+            section_lines = [stripped]
+        else:
+            section_lines.append(stripped)
+
+    flush_section()
+    return chunks
+
+
+def _split_into_chunks(text: str, chunk_size: int, chunk_overlap: int) -> list[str]:
+    """Prefer sentence and word boundaries while strictly bounding chunk size."""
+    if not text:
+        return []
+
+    chunks: list[str] = []
+    start = 0
+    while start < len(text):
+        hard_end = min(start + chunk_size, len(text))
+        end = hard_end
+        if hard_end < len(text):
+            # Prefer a sentence break in the latter half of the window.
+            sentence_breaks = [
+                match.end()
+                for match in re.finditer(r"[.!?](?:[\"'”’)]*)?(?:\s+|$)", text[start:hard_end])
+                if match.end() >= chunk_size // 2
+            ]
+            if sentence_breaks:
+                end = start + sentence_breaks[-1]
+            else:
+                whitespace = text.rfind(" ", start, hard_end)
+                if whitespace > start:
+                    end = whitespace
+
+        chunk = text[start:end].strip()
+        if chunk:
+            chunks.append(chunk)
+        if end >= len(text):
+            break
+
+        next_start = max(start + 1, end - chunk_overlap)
+        # Move overlap to the next whole word when its initial offset landed
+        # inside one. This may shorten the overlap but never split a token.
+        while next_start < end and next_start > 0 and not text[next_start - 1].isspace() and not text[next_start].isspace():
+            next_start += 1
+        while next_start < len(text) and text[next_start].isspace():
+            next_start += 1
+        start = next_start
 
     return chunks
 
@@ -111,17 +186,21 @@ def build_and_save_index(raw_docs_dir: str = None, vector_store_dir: str = None)
     model_name = MODEL_NAME if "/" in MODEL_NAME else f"sentence-transformers/{MODEL_NAME}"
     model = TextEmbedding(model_name=model_name)
     embeddings = np.asarray(list(model.embed(texts_to_embed)), dtype=np.float32)
+    if embeddings.ndim != 2 or embeddings.shape[0] != len(all_chunks) or embeddings.shape[1] <= 0:
+        raise RuntimeError(
+            f"Embedding output shape {embeddings.shape} does not match {len(all_chunks)} input chunks"
+        )
+    if not np.isfinite(embeddings).all():
+        raise RuntimeError("Embedding model returned non-finite values")
 
     # Normalize vectors for cosine similarity
     faiss.normalize_L2(embeddings)
+    if not np.allclose(np.linalg.norm(embeddings, axis=1), 1.0, atol=1e-3):
+        raise RuntimeError("Embedding model returned zero or invalid vectors after normalization")
     
     dimension = embeddings.shape[1]
     index = faiss.IndexFlatIP(dimension)
     index.add(embeddings.astype(np.float32))
-
-    # Save FAISS index
-    for index_name in ("faiss_index.bin", "index.faiss"):
-        faiss.write_index(index, os.path.join(vector_store_dir, index_name))
 
     # Save metadata sidecar
     metadata_sidecar = []
@@ -133,9 +212,29 @@ def build_and_save_index(raw_docs_dir: str = None, vector_store_dir: str = None)
             "chunk_text": chunk["chunk_text"]
         })
 
-    for metadata_name in ("chunk_metadata.json", "metadata.json"):
-        with open(os.path.join(vector_store_dir, metadata_name), "w", encoding="utf-8") as f:
-            json.dump(metadata_sidecar, f, indent=2, ensure_ascii=False)
+    # Write complete temporary artifacts first so a failed rebuild leaves the
+    # last known-good index and metadata available to the service.
+    pending_files = []
+    try:
+        for index_name in ("faiss_index.bin", "index.faiss"):
+            destination = os.path.join(vector_store_dir, index_name)
+            temporary = destination + ".tmp"
+            pending_files.append((temporary, destination))
+            faiss.write_index(index, temporary)
+
+        for metadata_name in ("chunk_metadata.json", "metadata.json"):
+            destination = os.path.join(vector_store_dir, metadata_name)
+            temporary = destination + ".tmp"
+            pending_files.append((temporary, destination))
+            with open(temporary, "w", encoding="utf-8") as f:
+                json.dump(metadata_sidecar, f, indent=2, ensure_ascii=False)
+
+        for temporary, destination in pending_files:
+            os.replace(temporary, destination)
+    finally:
+        for temporary, _ in pending_files:
+            if os.path.exists(temporary):
+                os.remove(temporary)
 
     print(f"Saved FAISS index and metadata to: {vector_store_dir}")
 

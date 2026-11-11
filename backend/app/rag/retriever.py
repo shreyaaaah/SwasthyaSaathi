@@ -46,6 +46,15 @@ class FAISSRetriever:
             raise RuntimeError("Source/index integrity check failed: " + "; ".join(self.integrity_report["issues"]))
         if not self.integrity_report["ok"]:
             print("[INTEGRITY WARNING] " + "; ".join(self.integrity_report["issues"]))
+        if not self.integrity_report.get("index_metadata_compatible", False):
+            # A valid FAISS row must still map to the metadata row at that
+            # position. Serving a mismatched pair can return incorrect sources.
+            self.index = None
+            self.metadata = []
+            self.model = None
+            self.fallback_embedder = None
+            print("[INTEGRITY ERROR] Refusing to serve an incompatible vector index and metadata pair.")
+            return
         index_bin = os.path.join(self.vector_store_dir, "faiss_index.bin")
         index_faiss = os.path.join(self.vector_store_dir, "index.faiss")
         index_path = index_bin if os.path.exists(index_bin) else index_faiss
