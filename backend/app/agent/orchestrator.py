@@ -1504,6 +1504,20 @@ def _query_references_history(query: str) -> bool:
     return False
 
 
+def _is_elliptical_follow_up(query: str) -> bool:
+    """Identify short replies that need the preceding turn to make sense."""
+    q = re.sub(r"\s+", " ", query.casefold()).strip()
+    if not q:
+        return False
+    if re.search(r"\b(?:it|they|them|this|that|these|those|there|one|ones)\b", q):
+        return True
+    if re.match(r"^(?:and|also|same|both|neither|what about (?:it|that|this|them|those)|how about (?:it|that|this|them|those))\b", q):
+        return True
+    if re.match(r"^(?:what|how|why|when|where|who|can|could|do|does|did|is|are|should|would|will|tell me|give me|explain|list)\b", q):
+        return False
+    return len(q.split()) <= 4
+
+
 def _is_medication_advice_request(query: str) -> bool:
     """Detect requests to choose, start, stop, or dose a medicine."""
     q = query.lower()
@@ -1725,7 +1739,10 @@ def run_agent(
         latest_turn and latest_turn["role"] == "assistant"
         and "?" in latest_turn["content"]
     )
-    if recent_turns and (is_answer_to_follow_up or _query_references_history(query)):
+    use_history_for_retrieval = _query_references_history(query) or (
+        is_answer_to_follow_up and _is_elliptical_follow_up(query)
+    )
+    if recent_turns and use_history_for_retrieval:
         prior_user_queries = [turn["content"] for turn in recent_turns if turn["role"] == "user"][-2:]
         retrieval_query = " ".join(prior_user_queries + [query])[-1800:]
     conversation_context = "\n".join(history_lines)[-1200:]

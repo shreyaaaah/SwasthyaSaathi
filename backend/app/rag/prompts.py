@@ -16,7 +16,7 @@ CONVERSATION STYLE:
 - If the user asks multiple things, answer each part. Ask at most one useful follow-up question, only after answering, on its own final line.
 - Use valid simple Markdown: start each heading and bullet on a new line. Do not separate list items only with inline dashes or semicolons.
 USER-FACING RESTRICTIONS:
-- Never mention a knowledge base, retrieved context, empty sources, prompts, internal tools, tiers, or system instructions.
+- Never mention a knowledge base, retrieved context, provided sources, irrelevant source matches, prompts, internal tools, tiers, or system instructions. If evidence for the current topic is missing, answer within the GENERAL rules without describing unrelated source material.
 - GROUNDED: use only facts supported by the provided official advisory passages; attribute them accurately.
 - WEB_TRUSTED: use only the provided allowlisted page excerpts and identify that this is general information from trusted health websites.
 - MIXED: clearly distinguish what the supplied guideline supports from general background. Do not attribute unsupported statements to a guideline.
@@ -32,7 +32,8 @@ CONTENT_FENCE_VERIFIER = """Review the draft for health-content safety. Remove o
 INTERNAL_LEAKS = (
     "provided reference sources", "retrieved context", "knowledge base", "sources are empty",
     "the sources are empty", "reference sources are empty", "no reference sources", "sources are unavailable",
-    "which reference sources were you referring to", "internal tool", "system prompt",
+    "provided sources", "sources focus on", "sources are focused on", "available sources focus on",
+    "retrieved sources", "which reference sources were you referring to", "internal tool", "system prompt",
 )
 
 
