@@ -1,18 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, ChevronDown, ChevronUp, FileText, ShieldAlert, ExternalLink } from 'lucide-react';
-
-const authorityFor = (url = '', title = '') => {
-  const value = `${url} ${title}`.toLowerCase();
-  if (value.includes('who.int') || value.includes('world health organization')) return 'World Health Organization';
-  if (value.includes('mohfw') || value.includes('mohfw.gov.in')) return 'Ministry of Health and Family Welfare (India)';
-  if (value.includes('icmr')) return 'Indian Council of Medical Research';
-  if (value.includes('nhp.gov.in') || value.includes('national health portal')) return 'National Health Portal (India)';
-  if (value.includes('cdc.gov')) return 'U.S. Centers for Disease Control and Prevention';
-  if (value.includes('nhs.uk')) return 'National Health Service (UK)';
-  if (value.includes('medlineplus.gov')) return 'MedlinePlus (U.S. National Library of Medicine)';
-  if (value.includes('nih.gov')) return 'U.S. National Institutes of Health';
-  return '';
-};
+import { BookOpen, ExternalLink, MapPin, ShieldAlert } from 'lucide-react';
 
 const safeUrl = (value) => {
   try {
@@ -23,45 +10,80 @@ const safeUrl = (value) => {
   }
 };
 
+function sourceLocation(source) {
+  const page = source.page_number ?? source.page ?? source.page_no;
+  if (page !== undefined && page !== null && String(page).trim()) return `p. ${page}`;
+  return source.section || (source.source_type === 'live_search' ? 'Web source' : '');
+}
+
+function uniqueSources(sources) {
+  const seen = new Set();
+  return (sources || []).filter((source) => {
+    const name = source.doc_name || source.title || 'Health guideline';
+    const page = source.page_number ?? source.page ?? source.page_no;
+    const locationKey = page !== undefined && page !== null ? `page:${page}` : `section:${source.section || ''}`;
+    const key = `${name}|${locationKey}|${source.source_url || ''}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 const SourceCitations = ({ sources = [], isGrounded = true }) => {
   const [expandedIdx, setExpandedIdx] = useState(null);
-  const groundedSources = sources || [];
+  const citations = uniqueSources(sources);
 
-  if (!groundedSources.length) return (
-    <div className="mt-3 pt-2.5 border-t border-slate-700/60" role="note">
-      <div className="p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-amber-100 text-xs flex items-start gap-2.5">
-        <ShieldAlert aria-hidden="true" className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
-        <div><strong className="block text-amber-200">General information; no official guideline match</strong>
-          <span className="block mt-1">This response could not be matched to an official guideline. It may be incomplete; ask a qualified health professional for advice about your situation.</span>
-        </div>
+  if (!citations.length) return (
+    <div className="mt-2.5 rounded-xl border border-amber-500/30 bg-amber-950/30 p-3 text-xs text-amber-100" role="note">
+      <div className="flex items-start gap-2"><ShieldAlert aria-hidden="true" className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-300" />
+        <span>This reply is general information and has no official source citation.</span>
       </div>
     </div>
   );
 
-  return <section className="mt-3 pt-3 border-t border-slate-700/60" aria-label="Sources">
-    {isGrounded === false && <div role="note" className="mb-3 p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-amber-100 text-xs">The answer could not be fully matched to its references. Treat it as general information and confirm important decisions with a qualified health professional.</div>}
-    <div className="flex items-center gap-1.5 text-xs font-semibold text-teal-300 mb-2"><BookOpen aria-hidden="true" className="w-3.5 h-3.5" /><span>References ({groundedSources.length})</span></div>
-    <div className="flex flex-wrap gap-2">
-      {groundedSources.map((source, idx) => {
-        const expanded = expandedIdx === idx;
-        const title = source.doc_name || source.title || 'Health guideline';
-        const url = safeUrl(source.source_url);
-        const authority = authorityFor(source.source_url, title);
-        const live = source.source_type === 'live_search';
-        return <article key={`${title}-${idx}`} className={`w-full text-xs rounded-lg border overflow-hidden ${live ? 'border-cyan-500/40 bg-cyan-950/20' : 'border-teal-500/30 bg-teal-950/20'}`}>
-          <button type="button" aria-expanded={expanded} onClick={() => setExpandedIdx(expanded ? null : idx)} className="w-full px-3 py-2 flex items-center justify-between gap-3 text-left hover:bg-slate-800/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-400">
-            <span className="flex items-center gap-2 min-w-0"><FileText aria-hidden="true" className="w-3.5 h-3.5 text-teal-300 flex-shrink-0" /><span className="min-w-0"><span className="block font-medium text-slate-100 truncate">{title}</span><span className="block text-slate-300 truncate">{authority || source.section || (live ? 'Live search result' : 'Guideline reference')}</span></span></span>
-            <span className="flex items-center gap-2 flex-shrink-0 text-slate-300">{live ? 'Live source' : ''}{expanded ? <ChevronUp aria-hidden="true" className="w-4 h-4" /> : <ChevronDown aria-hidden="true" className="w-4 h-4" />}</span>
-          </button>
-          {expanded && <div className="px-3 py-2.5 bg-slate-900/70 border-t border-slate-800 text-slate-200 leading-relaxed">
-            {source.section && <p className="mb-2"><strong>Section:</strong> {source.section}</p>}
-            <p className="whitespace-pre-wrap">{source.snippet || 'No excerpt is available for this reference.'}</p>
-            {url && <a href={url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-cyan-300 underline underline-offset-2">Open original source <ExternalLink aria-hidden="true" className="w-3 h-3" /><span className="sr-only"> (opens in a new tab)</span></a>}
-          </div>}
-        </article>;
-      })}
-    </div>
-  </section>;
+  const activeSource = expandedIdx === null ? null : citations[expandedIdx];
+  const activeTitle = activeSource?.doc_name || activeSource?.title || 'Health guideline';
+  const activeUrl = safeUrl(activeSource?.source_url);
+
+  return (
+    <section className="mt-1.5 w-full border-t border-slate-700/60 pt-3" aria-label="Sources">
+      {isGrounded === false && <div role="note" className="mb-3 rounded-xl border border-amber-500/30 bg-amber-950/30 p-2.5 text-xs text-amber-100">I couldn’t fully match this reply to its references, so please confirm important decisions with a health professional.</div>}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="mr-0.5 flex items-center gap-1.5 text-xs font-semibold text-emerald-300"><BookOpen aria-hidden="true" className="h-4 w-4" /> Sources:</span>
+        {citations.map((source, idx) => {
+          const title = source.doc_name || source.title || 'Health guideline';
+          const location = sourceLocation(source);
+          const selected = expandedIdx === idx;
+          const detailsId = `source-details-${idx}`;
+          return (
+            <button
+              key={`${title}-${location}-${idx}`}
+              type="button"
+              aria-expanded={selected}
+              aria-controls={detailsId}
+              title={`${title}${location ? `, ${location}` : ''}`}
+              onClick={() => setExpandedIdx(selected ? null : idx)}
+              className={`inline-flex max-w-full items-center gap-1.5 rounded-full border px-3 py-1.5 text-left text-xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-300 ${selected ? 'border-emerald-300 bg-emerald-900/70 text-emerald-50' : 'border-emerald-500/40 bg-emerald-950/55 text-emerald-100 hover:bg-emerald-900/60'}`}
+            >
+              <MapPin aria-hidden="true" className="h-3.5 w-3.5 flex-shrink-0 text-emerald-300" />
+              <span className="max-w-[min(22rem,65vw)] truncate">{title}{location ? `, ${location}` : ''}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {activeSource && <div id={`source-details-${expandedIdx}`} className="mt-2 rounded-xl border border-emerald-500/30 bg-slate-950/60 p-3 text-xs leading-relaxed text-slate-200">
+        <div className="mb-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold text-emerald-100">
+          <span>{activeTitle}</span>
+          {sourceLocation(activeSource) && <span className="font-normal text-slate-300">· {sourceLocation(activeSource)}</span>}
+        </div>
+        {activeSource.snippet && <p className="whitespace-pre-wrap">{activeSource.snippet}</p>}
+        {activeUrl && <a href={activeUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-emerald-300 underline underline-offset-2 hover:text-emerald-200">
+          Open original source <ExternalLink aria-hidden="true" className="h-3 w-3" /><span className="sr-only"> (opens in a new tab)</span>
+        </a>}
+      </div>}
+    </section>
+  );
 };
 
 export default SourceCitations;

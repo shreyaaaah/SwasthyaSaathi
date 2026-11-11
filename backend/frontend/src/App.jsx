@@ -4,8 +4,9 @@ import ChatWindow from './components/ChatWindow';
 import { sendChatMessage, fetchHealthStatus } from './api/client';
 
 const INITIAL_WELCOME_MESSAGE = {
+  id: 'welcome',
   sender: 'bot',
-  text: 'Namaste! What health question can I help with?',
+  text: 'Hey! 😊 How are you doing today? If something’s on your mind, tell me about it—I’m here to help.',
   sources: [],
   is_grounded: true,
   triage_tag: null,
@@ -14,6 +15,12 @@ const INITIAL_WELCOME_MESSAGE = {
 };
 
 const GREETING_PATTERN = /^(?:hi|hii+|hello|hey(?: there)?|namaste|namaskar)[!.?\s]*$/i;
+
+function createMessageId() {
+  return typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `message-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
 
 function App() {
   const [messages, setMessages] = useState([INITIAL_WELCOME_MESSAGE]);
@@ -28,21 +35,23 @@ function App() {
   const handleSendMessage = async (userQuery) => {
     if (GREETING_PATTERN.test(userQuery.trim())) {
       setMessages((prev) => [...prev,
-        { sender: 'user', text: userQuery },
+        { id: createMessageId(), sender: 'user', text: userQuery },
         {
+          id: createMessageId(),
           sender: 'bot',
-          text: 'Namaste! What health question can I help with?',
+          text: 'Hey! 😊 How are you doing? What’s on your mind today? 💚',
           sources: [],
           is_grounded: null,
           triage_tag: null,
           answer_mode: 'SOCIAL',
-          tools_used: []
+          tools_used: [],
+          animate: true
         }
       ]);
       return;
     }
 
-    setMessages((prev) => [...prev, { sender: 'user', text: userQuery }]);
+    setMessages((prev) => [...prev, { id: createMessageId(), sender: 'user', text: userQuery }]);
     setIsLoading(true);
     setIsWakingUp(false);
     const wakeTimer = window.setTimeout(() => setIsWakingUp(true), 8000);
@@ -53,6 +62,7 @@ function App() {
       }));
       const response = await sendChatMessage(userQuery, conversationHistory);
       setMessages((prev) => [...prev, {
+        id: createMessageId(),
         sender: 'bot',
         text: response.answer,
         sources: response.sources || [],
@@ -61,11 +71,13 @@ function App() {
         tools_used: response.tools_used || [],
         answer_mode: response.answer_mode,
         gate_scores: response.gate_scores,
-        emergency_contact: response.emergency_contact
+        emergency_contact: response.emergency_contact,
+        animate: true
       }]);
     } catch (error) {
       if (error?.code === 'ERR_CANCELED' || error?.name === 'AbortError') return;
       setMessages((prev) => [...prev, {
+        id: createMessageId(),
         sender: 'bot',
         text: error.message || 'We could not get a response. Please try again in a moment.',
         sources: [],
