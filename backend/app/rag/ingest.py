@@ -1,6 +1,7 @@
 import os
 import json
 import re
+import time
 from typing import List, Dict, Any
 import numpy as np
 from app.config import settings
@@ -168,12 +169,18 @@ def build_and_save_index(raw_docs_dir: str = None, vector_store_dir: str = None)
         print(f"No documents found in {raw_docs_dir}")
         return {"status": "warning", "message": "No documents found to ingest", "documents_indexed": 0, "chunks_created": 0}
 
-    for file_name in doc_files:
+    for idx, file_name in enumerate(doc_files, 1):
         file_path = os.path.join(raw_docs_dir, file_name)
-        text = extract_text_from_file(file_path)
-        if text.strip():
-            doc_chunks = chunk_document(doc_name=file_name, content=text)
-            all_chunks.extend(doc_chunks)
+        try:
+            text = extract_text_from_file(file_path)
+            if text.strip():
+                doc_chunks = chunk_document(doc_name=file_name, content=text)
+                all_chunks.extend(doc_chunks)
+                print(f"[{idx}/{len(doc_files)}] Processed '{file_name}': {len(doc_chunks)} chunks (total so far: {len(all_chunks)})")
+            else:
+                print(f"[{idx}/{len(doc_files)}] Warning: '{file_name}' yielded empty text.")
+        except Exception as exc:
+            raise RuntimeError(f"Error extracting or chunking document '{file_name}': {exc}") from exc
 
     if not all_chunks:
         return {"status": "warning", "message": "No text content extracted", "documents_indexed": 0, "chunks_created": 0}
@@ -184,8 +191,40 @@ def build_and_save_index(raw_docs_dir: str = None, vector_store_dir: str = None)
     if TextEmbedding is None or faiss is None:
         raise RuntimeError("fastembed and faiss-cpu are required to build the vector store")
     model_name = MODEL_NAME if "/" in MODEL_NAME else f"sentence-transformers/{MODEL_NAME}"
-    model = TextEmbedding(model_name=model_name)
-    embeddings = np.asarray(list(model.embed(texts_to_embed)), dtype=np.float32)
+    print(f"Initializing FastEmbed model: '{model_name}'...")
+    try:
+        model = TextEmbedding(model_name=model_name)
+    except Exception as exc:
+        raise RuntimeError(f"Failed to load FastEmbed model '{model_name}': {exc}") from exc
+
+    batch_size = 256
+    total_chunks = len(texts_to_embed)
+    print(f"Generating embeddings for {total_chunks} chunks using FastEmbed '{model_name}' (batch_size={batch_size})...")
+
+    embedded_vectors = []
+    start_time = time.perf_counter()
+    last_log_time = start_time
+    try:
+        for idx, vec in enumerate(model.embed(texts_to_embed, batch_size=batch_size), 1):
+            embedded_vectors.append(vec)
+            now = time.perf_counter()
+            if idx % 2500 == 0 or idx == total_chunks or (now - last_log_time >= 10.0):
+                elapsed = now - start_time
+                speed = idx / elapsed if elapsed > 0 else 0
+                eta = (total_chunks - idx) / speed if speed > 0 else 0
+                print(
+                    f"  [EMBED PROGRESS] {idx}/{total_chunks} chunks ({idx/total_chunks*100:.1f}%) | "
+                    f"Elapsed: {elapsed:.1f}s | Speed: {speed:.1f} chunks/s | ETA: {eta:.1f}s"
+                )
+                last_log_time = now
+    except Exception as exc:
+        failed_idx = len(embedded_vectors)
+        failed_doc = all_chunks[failed_idx]["doc_name"] if failed_idx < total_chunks else "unknown"
+        raise RuntimeError(
+            f"Embedding stalled or failed at chunk {failed_idx}/{total_chunks} (doc: '{failed_doc}'): {exc}"
+        ) from exc
+
+    embeddings = np.asarray(embedded_vectors, dtype=np.float32)
     if embeddings.ndim != 2 or embeddings.shape[0] != len(all_chunks) or embeddings.shape[1] <= 0:
         raise RuntimeError(
             f"Embedding output shape {embeddings.shape} does not match {len(all_chunks)} input chunks"

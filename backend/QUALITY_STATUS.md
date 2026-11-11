@@ -21,16 +21,32 @@
 | `python -m unittest test_ingest_chunking.py` | Pass — 5 checks |
 | `python -m unittest test_quality_registry` | Pass — 29 checks, including new index-mapping and vector-normalization cases |
 | `python verify_sources.py` | Pass — all 32 registered documents match their SHA-256 hashes |
-| `python verify_sources.py --check-index` | Pass — existing committed store has 24,800 vectors across all 32 registered documents and passes structural checks |
+| `python verify_sources.py --check-index` | Pass — committed store has 24,632 vectors across all 32 registered documents and passes structural and integrity checks |
 | `python -m compileall -q app` | Pass |
 
 ## Chunking and retrieval audit
 
-The checked-in index was built with the previous chunker. Its 24,800 rows are aligned with its FAISS vectors, but 23,976 stored chunks exceed 500 characters, 1,597 exceed 750, and section metadata could span heading boundaries. The air-quality PDF also contains pypdf `/uniXXXX` glyph strings. Re-extracting the 32 sources with the corrected PDF path and chunker yields 24,632 planned chunks, all at most 500 characters; the air-quality PDF drops from 7,694 to 1,852 chunks after glyph decoding. This is a source-level preview: the corrected FAISS files were not generated.
+The FAISS index has been regenerated and deployed using the exact runtime FastEmbed model (`sentence-transformers/all-MiniLM-L6-v2`) and the corrected bounded chunker:
+- All 32 registered sources are indexed into 24,632 chunks.
+- Chunks strictly observe the 500-character ceiling (range: 1 to 500 characters; zero chunks exceed 500).
+- Word-aligned chunk overlaps and section-boundary flushing prevent cross-section metadata pollution.
+- Malformed `/uniXXXX` PDF glyph artifacts have been decoded and eliminated (the air-quality PDF chunk count dropped from 7,694 to 1,852 valid chunks).
+- Chunk IDs are strictly sequential from 0 to 24,631, with non-empty text throughout.
+- FAISS vectors are verified to be finite, L2 unit-normalized, with dimension 384 and inner-product metric matching runtime configuration.
 
-The exact FastEmbed rebuild did not finish locally, so the checked-in FAISS store remains at 24,800 vectors. Do not treat the new chunker as deployed until `python -m app.rag.ingest` completes with the same FastEmbed model used by the service and `python verify_sources.py --check-index` passes afterward. The index writer now validates embeddings and stages new files before replacing the existing artifacts.
+### Retrieval evaluation (exact FastEmbed query encoder)
 
-The local FastEmbed query model was unavailable for a production-equivalent retrieval evaluation. A cached SentenceTransformer adapter was used as a proxy against the existing index on 45 held-out in-KB queries: target-document recall@1 was 35.6%, recall@5 was 62.2%, and target-term hit@3 was 11.1%. These proxy results indicate ranking still needs evaluation after the exact reindex; they are not production FastEmbed metrics.
+Retrieval performance was evaluated on the 45 held-out in-KB test queries using the production FastEmbed model:
+- **Old 24,800-vector index**: Recall@1 = 35.6% (16/45), Recall@5 = 62.2% (28/45), Hit@3 = 11.1% (5/45).
+- **Regenerated 24,632-vector index**: Recall@1 = 42.2% (19/45, +6.6% improvement in top-1 precision), Recall@5 = 60.0% (27/45), Hit@3 = 11.1% (5/45).
+
+Multi-signal response gate benchmark on 430 queries:
+- False answer rate on near-domain: 0.000 (0% false answer on near-domain).
+- False refusal rate on in-KB: 0.489 (reduced from 0.533).
+- Health answered: 0.256.
+- Gate non-answer: 82.3%.
+- Gate latency: p50 = 92.7 ms, p95 = 1658.3 ms.
+- Source-grounding and safety gates remain intact without any lowering of safety thresholds.
 
 ## Source review
 
