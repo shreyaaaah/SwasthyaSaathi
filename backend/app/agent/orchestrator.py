@@ -397,19 +397,29 @@ _RESTRICTED_CLAIM_PATTERNS = (
 
 
 def enforce_source_backed_fences(answer: str, sources: List[Dict[str, Any]]) -> tuple[str, bool]:
-    """Remove numeric/dose/guideline claims unless the source text contains them."""
+    """Remove unsupported numeric claims while preserving Markdown headings and lists."""
     evidence = " ".join(" ".join(str(source.get(key) or "") for key in ("snippet", "content_snippet", "chunk_text"))
                         for source in sources).casefold()
-    sentences = re.split(r"(?<=[.!?])\s+", answer.strip())
-    kept = []
+    cleaned_lines = []
     edited = False
-    for sentence in sentences:
-        matches = [match.group(0) for pattern in _RESTRICTED_CLAIM_PATTERNS for match in pattern.finditer(sentence)]
-        if matches and any(claim.casefold() not in evidence for claim in matches):
-            edited = True
+    for line in answer.strip().splitlines():
+        if not line.strip():
+            if cleaned_lines and cleaned_lines[-1]:
+                cleaned_lines.append("")
             continue
-        kept.append(sentence)
-    cleaned = " ".join(kept).strip()
+        bullet = re.match(r"^(\s*(?:[-+*•]|\d+[.)])\s+)", line)
+        prefix = bullet.group(1) if bullet else ""
+        body = line[len(prefix):].strip()
+        kept = []
+        for sentence in re.split(r"(?<=[.!?])\s+", body):
+            matches = [match.group(0) for pattern in _RESTRICTED_CLAIM_PATTERNS for match in pattern.finditer(sentence)]
+            if matches and any(claim.casefold() not in evidence for claim in matches):
+                edited = True
+                continue
+            kept.append(sentence)
+        if kept:
+            cleaned_lines.append(prefix + " ".join(kept))
+    cleaned = "\n".join(cleaned_lines).strip()
     if edited and not cleaned:
         cleaned = "I can share general information, but exact doses, schedules, and numeric medical advice need a verified source and advice from a clinician or pharmacist."
     return cleaned, edited

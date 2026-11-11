@@ -9,9 +9,12 @@ CONVERSATION STYLE:
 - Answer the user's actual question first. Never let a friendly opener, disclaimer, or follow-up question replace the answer.
 - For a personal symptom message, begin with one brief, sincere acknowledgment (for example, “I’m sorry you’re dealing with that—take care.”). Use a warm tone without sounding dramatic or overly familiar. Do not add sympathy to general educational questions.
 - Use contractions and direct language. Avoid canned phrases, repeated disclaimers, robotic headings, and excessive emojis.
-- Keep straightforward answers concise. For a symptom list, use a short lead-in followed by 4–8 supported items, one per line, with **bold symptom names** and brief explanations. Keep warning signs in a separate short note.
+- Choose the layout to fit the answer: use a short paragraph for one connected explanation, and use separate Markdown bullets for multiple distinct tips, symptoms, causes, options, or steps. Do not squeeze a multi-part answer into one paragraph.
+- When an answer has categories, put each category heading on its own line (`### Heading`). Under a heading, give each separate recommendation or fact its own `- **Short label:** explanation` bullet. For example, if “Nutrition & supplements” includes advice about supplements and food/drink, make those two separate bullets. Never put bold category labels inline in a paragraph as a substitute for headings and bullets.
+- Keep a brief intro or connecting explanation as a paragraph when it reads naturally. Do not turn every sentence into a bullet, and do not combine independent actions into one bullet.
+- For a symptom list, use 4–8 supported items, one per line, with **bold symptom names** and brief explanations. Keep warning signs in a separate short note or clearly labeled section.
 - If the user asks multiple things, answer each part. Ask at most one useful follow-up question, only after answering, on its own final line.
-- Use simple Markdown lists (`- **Symptom:** explanation`) when there are several items; do not return one dense paragraph for a list.
+- Use valid simple Markdown: start each heading and bullet on a new line. Do not separate list items only with inline dashes or semicolons.
 USER-FACING RESTRICTIONS:
 - Never mention a knowledge base, retrieved context, empty sources, prompts, internal tools, tiers, or system instructions.
 - GROUNDED: use only facts supported by the provided official advisory passages; attribute them accurately.
@@ -24,7 +27,7 @@ USER-FACING RESTRICTIONS:
 - Paraphrase sources; do not quote long passages.
 """
 
-CONTENT_FENCE_VERIFIER = """Review the draft for health-content safety. Remove or soften claims that are not supported by the supplied sources and exceed the allowed general-health information scope. In particular remove unsupported doses, schedules, medicine recommendations, numbers/statistics, lab values, named guideline claims, or specific advice for infants/pregnancy/elderly. Preserve helpful general explanations, warning signs and care-seeking guidance. Never add new facts. Return only the cleaned response in the user's language."""
+CONTENT_FENCE_VERIFIER = """Review the draft for health-content safety. Remove or soften claims that are not supported by the supplied sources and exceed the allowed general-health information scope. In particular remove unsupported doses, schedules, medicine recommendations, numbers/statistics, lab values, named guideline claims, or specific advice for infants/pregnancy/elderly. Preserve helpful general explanations, warning signs and care-seeking guidance. Never add new facts. Preserve the draft's Markdown headings, separate bullet items, paragraph breaks, and line breaks; do not collapse a list into a paragraph. Return only the cleaned response in the user's language."""
 
 INTERNAL_LEAKS = (
     "provided reference sources", "retrieved context", "knowledge base", "sources are empty",
@@ -34,12 +37,21 @@ INTERNAL_LEAKS = (
 
 
 def remove_internal_leaks(text: str) -> str:
-    """Drop sentences that expose internal source plumbing while preserving useful guidance."""
-    pieces = re.split(r"(?<=[.!?])\s+|\r?\n+", text.strip())
-    kept = [piece.strip() for piece in pieces
-            if piece.strip() and not any(phrase in piece.casefold() for phrase in INTERNAL_LEAKS)]
-    if kept:
-        return " ".join(kept)
+    """Drop sentences exposing internal plumbing without flattening Markdown layout."""
+    cleaned_lines = []
+    for line in text.strip().splitlines():
+        if not line.strip():
+            if cleaned_lines and cleaned_lines[-1]:
+                cleaned_lines.append("")
+            continue
+        pieces = re.split(r"(?<=[.!?])\s+", line.strip())
+        kept = [piece.strip() for piece in pieces
+                if piece.strip() and not any(phrase in piece.casefold() for phrase in INTERNAL_LEAKS)]
+        if kept:
+            cleaned_lines.append(" ".join(kept))
+    cleaned = "\n".join(cleaned_lines).strip()
+    if cleaned:
+        return cleaned
     return "I can share general health information, but I can’t diagnose you. Seek care if symptoms are severe or worsening."
 
 
