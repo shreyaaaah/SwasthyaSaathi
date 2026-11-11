@@ -167,7 +167,7 @@ const MessageList = ({ messages, isLoading, loadingMessage }) => {
       return () => window.clearTimeout(finishTimer);
     }
 
-    const delay = Math.max(8, Math.min(28, 2800 / Math.max(1, animation.words.length)));
+    const delay = Math.max(6, Math.min(22, 2200 / Math.max(1, animation.words.length)));
     const timer = window.setTimeout(() => {
       setAnimation((current) => current?.messageId === animation.messageId
         ? { ...current, visibleWords: current.visibleWords + 1 }

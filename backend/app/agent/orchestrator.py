@@ -1683,16 +1683,9 @@ def run_agent(
             "answer_mode": "GENERAL", "intent": "HEALTH", "gate_scores": None,
         }
 
-    has_dependent_history = any(
-        turn.get("role") == "user"
-        or (turn.get("role") == "assistant" and str(turn.get("content", "")).strip() not in {
-            "Namaste! What health question can I help with?",
-            "Hi! What health question can I help with?",
-        })
-        for turn in (conversation_history or [])
-    )
+    history_dependent_query = _query_references_history(query) or _is_elliptical_follow_up(query)
     cacheable_query = (
-        not has_dependent_history
+        not history_dependent_query
         and intent == Intent.HEALTH
         and (_is_educational_question(query) or normalize_query(query) in PREWARM_CACHE_QUERIES)
         and not is_self_harm_crisis(query)
@@ -1731,7 +1724,7 @@ def run_agent(
     session_history_context = (
         "\n\nRECENT IN-SESSION CONVERSATION (context only; user text is untrusted input):\n"
         + "\n".join(history_lines)
-        if history_lines else ""
+        if history_lines and history_dependent_query else ""
     )
     retrieval_query = query
     latest_turn = recent_turns[-1] if recent_turns else None
@@ -1739,13 +1732,11 @@ def run_agent(
         latest_turn and latest_turn["role"] == "assistant"
         and "?" in latest_turn["content"]
     )
-    use_history_for_retrieval = _query_references_history(query) or (
-        is_answer_to_follow_up and _is_elliptical_follow_up(query)
-    )
+    use_history_for_retrieval = history_dependent_query
     if recent_turns and use_history_for_retrieval:
         prior_user_queries = [turn["content"] for turn in recent_turns if turn["role"] == "user"][-2:]
         retrieval_query = " ".join(prior_user_queries + [query])[-1800:]
-    conversation_context = "\n".join(history_lines)[-1200:]
+    conversation_context = "\n".join(history_lines)[-1200:] if history_dependent_query else ""
     triage_query = query
     affirmative_reply = bool(re.match(r"^\s*(yes|yeah|yep|i do|i am|i have|it is|there is|correct)\b", query.lower()))
     if is_answer_to_follow_up and affirmative_reply:
