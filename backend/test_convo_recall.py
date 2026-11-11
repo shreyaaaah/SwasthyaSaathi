@@ -1,3 +1,4 @@
+import os
 import requests
 import json
 import time
@@ -6,7 +7,7 @@ import sys
 # Ensure UTF-8 output encoding for windows console
 sys.stdout.reconfigure(encoding='utf-8')
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = os.environ.get("SWASTHYASAATHI_API_URL", "http://localhost:8000")
 USER_ID = "convo_recall_user_final_4"
 
 messages = [
@@ -14,6 +15,7 @@ messages = [
     "is turmeric good for immunity",
     "What should I do about the cough I mentioned earlier?"
 ]
+conversation_history = []
 
 print("=== STARTING LIVE CONVERSATIONAL RECALL TEST ===")
 
@@ -21,7 +23,15 @@ for idx, msg in enumerate(messages, 1):
     print(f"\n--- MESSAGE {idx} ---")
     print(f"User: {msg}")
     start = time.time()
-    res = requests.post(f"{BASE_URL}/chat", json={"query": msg, "user_id": USER_ID})
+    res = requests.post(
+        f"{BASE_URL}/chat",
+        json={
+            "query": msg,
+            "user_id": USER_ID,
+            "conversation_history": conversation_history[-8:],
+        },
+        timeout=120,
+    )
     elapsed = round((time.time() - start) * 1000, 2)
     
     if res.status_code == 200:
@@ -31,6 +41,10 @@ for idx, msg in enumerate(messages, 1):
         print(f"Tools Used: {data.get('tools_used')}")
         print(f"Sources: {[s.get('doc_name') for s in data.get('sources', [])]}")
         print(f"Answer:\n{data.get('answer')}")
+        conversation_history.extend([
+            {"role": "user", "content": msg},
+            {"role": "assistant", "content": data.get("answer", "")},
+        ])
     else:
         print(f"Error {res.status_code}: {res.text}")
 

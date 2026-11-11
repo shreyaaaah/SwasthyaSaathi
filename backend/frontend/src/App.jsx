@@ -4,6 +4,7 @@ import ChatWindow from './components/ChatWindow';
 import { sendChatMessage, fetchHealthStatus } from './api/client';
 
 const INITIAL_WELCOME_MESSAGE = {
+  id: 'welcome',
   sender: 'bot',
   text: 'Namaste! What health question can I help with?',
   sources: [],
@@ -13,7 +14,7 @@ const INITIAL_WELCOME_MESSAGE = {
   tools_used: []
 };
 
-const GREETING_PATTERN = /^(?:hi|hii+|hello|hey(?: there)?|namaste|namaskar)[!.?\s]*$/i;
+const createMessageId = () => globalThis.crypto?.randomUUID?.() || `message-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
 function App() {
   const [messages, setMessages] = useState([INITIAL_WELCOME_MESSAGE]);
@@ -26,23 +27,7 @@ function App() {
   }, []);
 
   const handleSendMessage = async (userQuery) => {
-    if (GREETING_PATTERN.test(userQuery.trim())) {
-      setMessages((prev) => [...prev,
-        { sender: 'user', text: userQuery },
-        {
-          sender: 'bot',
-          text: 'Namaste! What health question can I help with?',
-          sources: [],
-          is_grounded: null,
-          triage_tag: null,
-          answer_mode: 'SOCIAL',
-          tools_used: []
-        }
-      ]);
-      return;
-    }
-
-    setMessages((prev) => [...prev, { sender: 'user', text: userQuery }]);
+    setMessages((prev) => [...prev, { id: createMessageId(), sender: 'user', text: userQuery }]);
     setIsLoading(true);
     setIsWakingUp(false);
     const wakeTimer = window.setTimeout(() => setIsWakingUp(true), 8000);
@@ -53,8 +38,10 @@ function App() {
       }));
       const response = await sendChatMessage(userQuery, conversationHistory);
       setMessages((prev) => [...prev, {
+        id: createMessageId(),
         sender: 'bot',
         text: response.answer,
+        animate: response.triage_tag !== 'EMERGENCY',
         sources: response.sources || [],
         is_grounded: response.is_grounded,
         triage_tag: response.triage_tag || 'GENERAL_INFO',
@@ -66,8 +53,10 @@ function App() {
     } catch (error) {
       if (error?.code === 'ERR_CANCELED' || error?.name === 'AbortError') return;
       setMessages((prev) => [...prev, {
+        id: createMessageId(),
         sender: 'bot',
         text: error.message || 'We could not get a response. Please try again in a moment.',
+        animate: false,
         sources: [],
         is_grounded: false,
         triage_tag: 'ERROR',
