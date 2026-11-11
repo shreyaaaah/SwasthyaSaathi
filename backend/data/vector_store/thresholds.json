@@ -1,124 +1,19 @@
 {
-  "calibration_count": 210,
+  "calibration_count": 190,
   "clusters": {
-    "HIV.pdf": {
-      "fallback": true,
-      "samples": 2.0,
-      "threshold": -8.62447738647461
-    },
     "__global__": {
-      "samples": 92.0,
+      "samples": 190.0,
       "threshold": -10.000001,
       "youden_j": 0.0
-    },
-    "activeworkoutwho.pdf": {
-      "fallback": true,
-      "samples": 3.0,
-      "threshold": -8.62447738647461
-    },
-    "air_pollution_advisory.txt": {
-      "fallback": true,
-      "samples": 1.0,
-      "threshold": -8.62447738647461
-    },
-    "airquality.pdf": {
-      "fallback": true,
-      "samples": 3.0,
-      "threshold": -8.62447738647461
-    },
-    "anixiety.pdf": {
-      "fallback": true,
-      "samples": 1.0,
-      "threshold": -8.62447738647461
-    },
-    "dengue_clinical_guidelines.txt": {
-      "fallback": true,
-      "samples": 1.0,
-      "threshold": -8.62447738647461
-    },
-    "depression and anxiety.pdf": {
-      "fallback": true,
-      "samples": 2.0,
-      "threshold": -8.62447738647461
-    },
-    "diabetes_hypertension_guidelines.txt": {
-      "fallback": true,
-      "samples": 3.0,
-      "threshold": -8.62447738647461
-    },
-    "fat2.pdf": {
-      "fallback": true,
-      "samples": 1.0,
-      "threshold": -8.62447738647461
-    },
-    "flood_health_guidelines.txt": {
-      "fallback": true,
-      "samples": 2.0,
-      "threshold": -8.62447738647461
-    },
-    "hepatitis b.pdf": {
-      "fallback": true,
-      "samples": 4.0,
-      "threshold": -8.62447738647461
-    },
-    "infection.pdf": {
-      "fallback": true,
-      "samples": 2.0,
-      "threshold": -8.62447738647461
-    },
-    "low hameoglobin.pdf": {
-      "fallback": true,
-      "samples": 1.0,
-      "threshold": -8.62447738647461
-    },
-    "malaria.pdf": {
-      "fallback": true,
-      "samples": 1.0,
-      "threshold": -8.62447738647461
-    },
-    "malaria_guidelines.txt": {
-      "fallback": true,
-      "samples": 1.0,
-      "threshold": -8.62447738647461
-    },
-    "maternal_child_health_guidelines.txt": {
-      "fallback": true,
-      "samples": 1.0,
-      "threshold": -8.62447738647461
-    },
-    "mengitis.pdf": {
-      "fallback": true,
-      "samples": 2.0,
-      "threshold": -8.62447738647461
-    },
-    "selfcare.pdf": {
-      "fallback": true,
-      "samples": 16.0,
-      "threshold": -8.62447738647461
-    },
-    "standard-treatment-guidelines.pdf": {
-      "samples": 69.0,
-      "threshold": -2.0960593223571777,
-      "youden_j": 0.021818181818181737
-    },
-    "stress.pdf": {
-      "fallback": true,
-      "samples": 1.0,
-      "threshold": -8.62447738647461
-    },
-    "whophysicalguideline.pdf": {
-      "fallback": true,
-      "samples": 1.0,
-      "threshold": -8.62447738647461
     }
   },
   "global": {
-    "samples": 210.0,
-    "threshold": -8.62447738647461,
-    "youden_j": 0.3369565217391304
+    "samples": 190.0,
+    "threshold": -10.000001,
+    "youden_j": 0.0
   },
-  "manifest_hash": "551545a84ad9fd0f999aa7865ddb06273f40be92236bbd04d86cf724362ae356",
+  "manifest_hash": "8e54f7f903272f135527bd604a1aef741fec83cceeb4c7115ae0125f647a2a45",
   "seed": 20261104,
-  "test_count": 90,
+  "test_count": 82,
   "version": 1
 }

@@ -1,123 +1,123 @@
 {
   "B0_faiss_threshold": {
     "queries": 130,
-    "false_answer_rate_near_domain": 0.8,
-    "false_refusal_rate_in_kb": 0.13333333333333333,
-    "health_answer_rate": 0.8333333333333334,
-    "gate_non_answer_pct": 36.92307692307693,
+    "false_answer_rate_near_domain": 0.8222222222222222,
+    "false_refusal_rate_in_kb": 0.08888888888888889,
+    "health_answer_rate": 0.8666666666666667,
     "confusion": {
-      "tp": 39,
-      "fp": 43,
-      "fn": 6,
-      "tn": 42
+      "tp": 41,
+      "fp": 44,
+      "fn": 4,
+      "tn": 41
     },
-    "p50_latency_ms": 92.73469999607187,
-    "p95_latency_ms": 1658.2511300061014
+    "p50_latency_ms": 233.3779499999764,
+    "p95_latency_ms": 3702.5626399999724,
+    "gate_non_answer_pct": 34.61538461538461
   },
   "B1_global_cross_encoder": {
     "queries": 130,
-    "false_answer_rate_near_domain": 0.6444444444444445,
-    "false_refusal_rate_in_kb": 0.37777777777777777,
-    "health_answer_rate": 0.6333333333333333,
-    "gate_non_answer_pct": 56.15384615384615,
+    "false_answer_rate_near_domain": 0.5111111111111111,
+    "false_refusal_rate_in_kb": 0.4888888888888889,
+    "health_answer_rate": 0.5111111111111111,
     "confusion": {
-      "tp": 28,
-      "fp": 29,
-      "fn": 17,
-      "tn": 56
+      "tp": 23,
+      "fp": 23,
+      "fn": 22,
+      "tn": 62
     },
-    "p50_latency_ms": 92.73469999607187,
-    "p95_latency_ms": 1658.2511300061014
+    "p50_latency_ms": 233.3779499999764,
+    "p95_latency_ms": 3702.5626399999724,
+    "gate_non_answer_pct": 64.61538461538461
   },
   "B2_original_midpoint_keyword": {
     "queries": 130,
-    "false_answer_rate_near_domain": 0.4444444444444444,
-    "false_refusal_rate_in_kb": 0.9777777777777777,
-    "health_answer_rate": 0.23333333333333334,
-    "gate_non_answer_pct": 83.84615384615385,
+    "false_answer_rate_near_domain": 0.4,
+    "false_refusal_rate_in_kb": 0.9555555555555556,
+    "health_answer_rate": 0.2222222222222222,
     "confusion": {
-      "tp": 1,
-      "fp": 20,
-      "fn": 44,
-      "tn": 65
+      "tp": 2,
+      "fp": 18,
+      "fn": 43,
+      "tn": 67
     },
-    "p50_latency_ms": 92.73469999607187,
-    "p95_latency_ms": 1658.2511300061014
+    "p50_latency_ms": 233.3779499999764,
+    "p95_latency_ms": 3702.5626399999724,
+    "gate_non_answer_pct": 84.61538461538461
   },
   "B3_always_llm_no_retrieval": {
     "queries": 130,
     "false_answer_rate_near_domain": 1.0,
     "false_refusal_rate_in_kb": 0.0,
     "health_answer_rate": 1.0,
-    "gate_non_answer_pct": 30.76923076923077,
     "confusion": {
       "tp": 45,
       "fp": 45,
       "fn": 0,
       "tn": 40
     },
-    "p50_latency_ms": 92.73469999607187,
-    "p95_latency_ms": 1658.2511300061014
+    "p50_latency_ms": 233.3779499999764,
+    "p95_latency_ms": 3702.5626399999724,
+    "gate_non_answer_pct": 30.76923076923077
   },
   "new_multi_signal_gate": {
     "queries": 130,
     "false_answer_rate_near_domain": 0.0,
-    "false_refusal_rate_in_kb": 0.4888888888888889,
-    "health_answer_rate": 0.25555555555555554,
-    "gate_non_answer_pct": 82.3076923076923,
+    "false_refusal_rate_in_kb": 0.5333333333333333,
+    "health_answer_rate": 0.23333333333333334,
     "confusion": {
-      "tp": 23,
+      "tp": 21,
       "fp": 0,
-      "fn": 22,
+      "fn": 24,
       "tn": 85
     },
-    "p50_latency_ms": 92.73469999607187,
-    "p95_latency_ms": 1658.2511300061014
+    "p50_latency_ms": 233.3779499999764,
+    "p95_latency_ms": 3702.5626399999724,
+    "gate_non_answer_pct": 83.84615384615385
   },
   "ablation_no_cluster": {
     "queries": 130,
     "false_answer_rate_near_domain": 0.0,
-    "false_refusal_rate_in_kb": 0.4222222222222222,
-    "health_answer_rate": 0.28888888888888886,
-    "gate_non_answer_pct": 80.0,
+    "false_refusal_rate_in_kb": 0.5333333333333333,
+    "health_answer_rate": 0.23333333333333334,
     "confusion": {
-      "tp": 26,
+      "tp": 21,
       "fp": 0,
-      "fn": 19,
+      "fn": 24,
       "tn": 85
     },
-    "p50_latency_ms": 92.73469999607187,
-    "p95_latency_ms": 1658.2511300061014
+    "p50_latency_ms": 233.3779499999764,
+    "p95_latency_ms": 3702.5626399999724,
+    "gate_non_answer_pct": 83.84615384615385
   },
   "ablation_no_coverage": {
     "queries": 130,
-    "false_answer_rate_near_domain": 0.5555555555555556,
-    "false_refusal_rate_in_kb": 0.4888888888888889,
-    "health_answer_rate": 0.5333333333333333,
-    "gate_non_answer_pct": 63.07692307692307,
+    "false_answer_rate_near_domain": 0.4888888888888889,
+    "false_refusal_rate_in_kb": 0.5333333333333333,
+    "health_answer_rate": 0.4777777777777778,
     "confusion": {
-      "tp": 23,
-      "fp": 25,
-      "fn": 22,
-      "tn": 60
+      "tp": 21,
+      "fp": 22,
+      "fn": 24,
+      "tn": 63
     },
-    "p50_latency_ms": 92.73469999607187,
-    "p95_latency_ms": 1658.2511300061014
+    "p50_latency_ms": 233.3779499999764,
+    "p95_latency_ms": 3702.5626399999724,
+    "gate_non_answer_pct": 66.92307692307692
   },
   "ablation_no_auto_calibration": {
     "queries": 130,
     "false_answer_rate_near_domain": 0.0,
-    "false_refusal_rate_in_kb": 0.35555555555555557,
-    "health_answer_rate": 0.32222222222222224,
-    "gate_non_answer_pct": 75.38461538461539,
+    "false_refusal_rate_in_kb": 0.4666666666666667,
+    "health_answer_rate": 0.26666666666666666,
     "confusion": {
-      "tp": 29,
+      "tp": 24,
       "fp": 3,
-      "fn": 16,
+      "fn": 21,
       "tn": 82
     },
-    "p50_latency_ms": 92.73469999607187,
-    "p95_latency_ms": 1658.2511300061014
+    "p50_latency_ms": 233.3779499999764,
+    "p95_latency_ms": 3702.5626399999724,
+    "gate_non_answer_pct": 79.23076923076923
   },
   "metadata": {
     "status": "measured_gate_only",
@@ -125,12 +125,12 @@
     "dataset_size": 430,
     "calibration_size": 300,
     "test_size": 130,
-    "faiss_threshold": 0.3847,
-    "cross_encoder_threshold": -5.314700126647949,
-    "original_midpoint_threshold": -1.2573370933532715,
-    "manifest_hash": "551545a84ad9fd0f999aa7865ddb06273f40be92236bbd04d86cf724362ae356",
+    "faiss_threshold": 0.3616109788417816,
+    "cross_encoder_threshold": -2.9257752895355225,
+    "original_midpoint_threshold": -2.301271438598633,
+    "manifest_hash": "8e54f7f903272f135527bd604a1aef741fec83cceeb4c7115ae0125f647a2a45",
     "latency_scope": "retrieval plus cross-encoder; excludes LLM generation, web search, and network latency",
-    "embedding_provider": "fastembed",
+    "embedding_provider": "sentence-transformers/all-MiniLM-L6-v2 (cached evaluation adapter)",
     "embedding_compatibility_note": "When the cached evaluation adapter is selected, it encodes queries with the same all-MiniLM-L6-v2 model family as FastEmbed but a different runtime/precision path. Treat the result as a local proxy; confirm with the production FastEmbed runtime before using as deployed-system performance evidence.",
     "answer_quality_metrics": "unsupported-claim rate, leak-phrase rate, actual answer mode split, and verifier/web ablations require end-to-end model/network runs and are not measured by this gate-only benchmark",
     "compute_savings": "not measured; a gate non-answer may still invoke an LLM through a GENERAL or WEB fallback"
