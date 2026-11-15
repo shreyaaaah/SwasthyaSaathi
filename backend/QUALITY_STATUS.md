@@ -1,5 +1,16 @@
 # SwasthyaSaathi quality status — 2026-11-04
 
+> **Update, 2026-11-15 (documentation re-check; no application code changed).** The sections below are the original 2026-11-04 note and are partly out of date. Re-running the deterministic checks from `backend/` on the committed repository gave:
+>
+> | Check | Result on 2026-11-15 |
+> |---|---|
+> | `python -m unittest discover -s . -p "test_quality*.py"` | Pass: 24 tests (the note below says 15) |
+> | `python verify_sources.py` | Pass: 32 registered documents match their SHA-256 hashes |
+> | `python verify_sources.py --check-index` | **Pass**: 24,800 vectors across all 32 registered documents (the note below says 3,341 vectors, 30 documents, and a needed re-index; the committed index has since been rebuilt) |
+> | Frontend `npm run lint` and `npm run build` | Pass |
+>
+> The retrieval smoke check and the end-to-end LLM evaluation mentioned below were **not** re-run (they need model downloads and a Groq key), so end-to-end answer quality is still not benchmark-validated.
+
 ## Work completed
 
 - Replaced cross-encoder-only sufficiency decisions with a separate evidence coverage check. The cross-encoder is now used to reject only very low relevance scores; other candidates must pass the factual sufficiency check or use the official-source web fallback.
