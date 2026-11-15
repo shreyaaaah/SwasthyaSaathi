@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from './components/Header';
 import ChatWindow from './components/ChatWindow';
+import BmiCalculator from './components/BmiCalculator';
 import { sendChatMessage, fetchHealthStatus } from './api/client';
 
 const INITIAL_WELCOME_MESSAGE = {
@@ -99,7 +100,16 @@ function App() {
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-slate-950 text-slate-100 font-sans">
-      <main className="flex-1 flex flex-col h-full overflow-hidden px-3 py-2 max-w-6xl mx-auto w-full">
+      <aside aria-label="Health tools" className="hidden w-[300px] shrink-0 flex-col gap-4 overflow-y-auto border-r border-slate-800 bg-slate-900/40 p-4 xl:flex">
+        <p className="px-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Health tools</p>
+        <BmiCalculator />
+        <p className="px-1 text-[11px] leading-relaxed text-slate-500">For adults 20 and older. Under 20 needs age- and sex-specific BMI charts.</p>
+      </aside>
+      <main className="flex min-w-0 flex-1 flex-col overflow-hidden px-3 py-2">
+        <details className="mb-2 rounded-xl border border-slate-700 bg-slate-900/80 p-3 xl:hidden">
+          <summary className="cursor-pointer list-none text-sm font-semibold text-teal-200">BMI calculator</summary>
+          <div className="pt-3"><BmiCalculator /></div>
+        </details>
         <Header status={healthStatus} />
         <ChatWindow messages={messages} onSendMessage={handleSendMessage} isLoading={isLoading} loadingMessage={isWakingUp ? 'Waking up the server, this can take a minute…' : 'Looking for relevant health guidance…'} />
         <p className="px-2 py-2 text-center text-[11px] text-slate-400">
