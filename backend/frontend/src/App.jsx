@@ -3,6 +3,7 @@ import Header from './components/Header';
 import ChatWindow from './components/ChatWindow';
 import BmiCalculator from './components/BmiCalculator';
 import QuickHelpPanel from './components/QuickHelpPanel';
+import HospitalFinder from './components/HospitalFinder';
 import { sendChatMessage, fetchHealthStatus } from './api/client';
 
 const INITIAL_WELCOME_MESSAGE = {
@@ -105,6 +106,7 @@ function App() {
         <p className="px-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Health tools</p>
         <BmiCalculator />
         <p className="px-1 text-[11px] leading-relaxed text-slate-500">For adults 20 and older. Under 20 needs age- and sex-specific BMI charts.</p>
+        <QuickHelpPanel onAsk={handleSendMessage} isLoading={isLoading} />
       </aside>
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden px-3 py-2">
         <details className="mb-2 rounded-xl border border-slate-700 bg-slate-900/80 p-3 xl:hidden">
@@ -112,17 +114,21 @@ function App() {
           <div className="pt-3"><BmiCalculator /></div>
         </details>
         <Header status={healthStatus} />
-        <details className="mt-1 rounded-xl border border-slate-700 bg-slate-900/80 p-3 2xl:hidden">
+        <details className="mt-1 rounded-xl border border-slate-700 bg-slate-900/80 p-3 xl:hidden">
           <summary className="cursor-pointer list-none text-sm font-semibold text-teal-200">Quick Help</summary>
           <div className="pt-3"><QuickHelpPanel onAsk={handleSendMessage} isLoading={isLoading} compact /></div>
+        </details>
+        <details className="mt-1 rounded-xl border border-slate-700 bg-slate-900/80 p-3 2xl:hidden">
+          <summary className="cursor-pointer list-none text-sm font-semibold text-teal-200">Nearby hospitals</summary>
+          <div className="pt-3"><HospitalFinder compact /></div>
         </details>
         <ChatWindow messages={messages} onSendMessage={handleSendMessage} isLoading={isLoading} loadingMessage={isWakingUp ? 'Waking up the server, this can take a minute…' : 'Looking for relevant health guidance…'} />
         <p className="px-2 py-2 text-center text-[11px] text-slate-400">
           Health information only. Full chats are not saved. For answers using trusted websites or general information, a normalized topic is retained to help improve the guidance library. Your question and up to six recent turns may go to the AI service; web searches may also be sent to a search provider and health websites. Avoid sharing identifying details.
         </p>
       </main>
-      <aside aria-label="Quick help" className="hidden w-[290px] shrink-0 flex-col gap-4 overflow-y-auto border-l border-slate-800 bg-slate-900/40 p-4 2xl:flex">
-        <QuickHelpPanel onAsk={handleSendMessage} isLoading={isLoading} />
+      <aside aria-label="Nearby hospitals" className="hidden w-[290px] shrink-0 flex-col gap-4 overflow-y-auto border-l border-slate-800 bg-slate-900/40 p-4 2xl:flex">
+        <HospitalFinder />
       </aside>
     </div>
   );

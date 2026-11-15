@@ -34,6 +34,8 @@ _HEALTH_TERMS = re.compile(
 _EMERGENCY = re.compile(
     r"(?:(?:severe|intense|crushing|extreme|heavy|pressure-like)\s+chest pain|"
     r"chest pain.{0,45}(?:sweat|breath|dizzy|faint|nausea)|"
+    r"(?:having|experiencing|suspected)\s+(?:a\s+)?(?:heart attack|stroke)|"
+    r"(?:heart attack|stroke)\s+(?:right now|now)|"
     r"(?:trouble breathing|difficulty breathing|shortness of breath|can't breathe|cannot breathe|"
     r"severe bleeding|heavy bleeding|bleeding heavily|unconscious|unresponsive|seizure right now|"
     r"face (?:is )?drooping|slurred speech|sudden weakness|one-sided weakness|weakness on one side|"
