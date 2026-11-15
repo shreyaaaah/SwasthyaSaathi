@@ -58,7 +58,9 @@ function App() {
     try {
       const conversationHistory = messages.slice(-6).map((message) => ({
         role: message.sender === 'user' ? 'user' : 'assistant',
-        content: message.text
+        // The backend limits each history turn to 2,000 chars. Keep a margin
+        // so long assistant replies cannot make the next chat request fail.
+        content: String(message.text ?? '').slice(0, 1900)
       }));
       const response = await sendChatMessage(userQuery, conversationHistory);
       setMessages((prev) => [...prev, {
