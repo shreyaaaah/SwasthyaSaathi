@@ -86,7 +86,10 @@ def _run_reviewer(role: str, payload: dict[str, Any]) -> dict[str, Any] | None:
                         f"You are the {agent['label']} in an optional second-look review. "
                         f"{agent['instructions']} Return only a JSON object with exactly these keys: "
                         '{"status":"...","summary":"...","flags":["..."]}. '
-                        "Keep the summary to two short sentences and flags to at most three brief items."
+                        "Keep the summary to two short sentences and flags to at most three brief items. "
+                        "Flags are the only findings shown to users: include only specific, answer-relevant "
+                        "observations supported by the supplied answer and passages. If you cannot assess "
+                        "something, leave flags empty instead of adding a generic inability message."
                     ),
                 },
                 {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
@@ -121,6 +124,8 @@ def _run_reviewer(role: str, payload: dict[str, Any]) -> dict[str, Any] | None:
         if not isinstance(raw_flags, list):
             raw_flags = []
         flags = [str(flag).strip()[:200] for flag in raw_flags[:3] if str(flag).strip()]
+        if role == "safety" and status == "cannot_assess":
+            flags = []
         return {
             "role": role,
             "label": agent["label"],

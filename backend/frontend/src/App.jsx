@@ -151,9 +151,15 @@ function App() {
           <div className="pt-3"><HospitalFinder compact /></div>
         </details>
         <ChatWindow messages={messages} onSendMessage={handleSendMessage} isLoading={isLoading} loadingMessage={isWakingUp ? 'Waking up the server, this can take a minute…' : 'Looking for relevant health guidance…'} />
-        <p className="px-2 py-2 text-center text-[11px] text-slate-400">
-          Health information only. Full chats are not saved. For answers using trusted websites or general information, a normalized topic is retained to help improve the guidance library. Your question and up to six recent turns may go to the AI service; web searches may also be sent to a search provider and health websites. Avoid sharing identifying details.
-        </p>
+        <details className="group mx-auto w-full max-w-3xl px-2 py-1 text-center">
+          <summary className="inline-flex cursor-pointer list-none items-center gap-1 text-[11px] text-slate-500 hover:text-slate-300 [&::-webkit-details-marker]:hidden">
+            Privacy &amp; data use
+            <ChevronDown aria-hidden="true" className="h-3 w-3 transition-transform group-open:rotate-180" />
+          </summary>
+          <p className="mx-auto max-w-3xl pt-2 text-[11px] leading-relaxed text-slate-500">
+            Health information only. Full chats are not saved. For answers using trusted websites or general information, a normalized topic is retained to help improve the guidance library. Your question and up to six recent turns may go to the AI service; web searches may also be sent to a search provider and health websites. Avoid sharing identifying details.
+          </p>
+        </details>
       </main>
       <aside aria-label="Nearby hospitals" className="hidden w-[290px] shrink-0 flex-col gap-4 overflow-y-auto border-l border-slate-800 bg-slate-900/40 p-4 2xl:flex">
         <details className="group">
