@@ -1,11 +1,13 @@
 import os
 import secrets
 import threading
+import math
 from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
+import requests
 
 from app.config import settings
-from app.schemas import ChatRequest, ChatResponse, SourceMetadata
+from app.schemas import ChatRequest, ChatResponse, NearbyHospitalsRequest, SourceMetadata
 from app.rag.retriever import get_retriever
 from app.agent.orchestrator import CHAT_BUDGET_SECONDS, run_agent
 from app.agent.performance import latency_history
@@ -101,6 +103,99 @@ def warmup_check():
     if status.get("status") != "ready":
         status = warm_retrieval_stack()
     return status
+
+
+@app.post("/hospitals/nearby")
+def find_nearby_hospitals(request: NearbyHospitalsRequest):
+    """Find nearby hospitals using Geoapify without exposing its API key to the browser."""
+    if not settings.GEOAPIFY_API_KEY:
+        raise HTTPException(
+            status_code=503,
+            detail="The in-app hospital list is not configured yet. You can still open the place in Maps.",
+        )
+
+    latitude = request.latitude
+    longitude = request.longitude
+    place_label = request.place
+    if place_label:
+        try:
+            geocode_response = requests.get(
+                "https://api.geoapify.com/v1/geocode/search",
+                params={
+                    "text": place_label,
+                    "format": "json",
+                    "limit": 1,
+                    "filter": "countrycode:in",
+                    "apiKey": settings.GEOAPIFY_API_KEY,
+                },
+                timeout=(4, 10),
+            )
+            geocode_response.raise_for_status()
+            geocode_results = geocode_response.json().get("results", [])
+        except (requests.RequestException, ValueError):
+            raise HTTPException(status_code=502, detail="Could not look up that place right now. Please try again.")
+
+        if not geocode_results:
+            raise HTTPException(status_code=404, detail="We couldn't find that place in India. Try a nearby city, area, or PIN code.")
+        location = geocode_results[0]
+        latitude = location.get("lat")
+        longitude = location.get("lon")
+        place_label = location.get("formatted") or place_label
+        if latitude is None or longitude is None:
+            raise HTTPException(status_code=404, detail="We couldn't find coordinates for that place. Try a nearby area or PIN code.")
+
+    try:
+        places_response = requests.get(
+            "https://api.geoapify.com/v2/places",
+            params={
+                "categories": "healthcare.hospital",
+                "filter": f"circle:{longitude},{latitude},15000",
+                "bias": f"proximity:{longitude},{latitude}",
+                "limit": 10,
+                "apiKey": settings.GEOAPIFY_API_KEY,
+            },
+            timeout=(4, 12),
+        )
+        places_response.raise_for_status()
+        features = places_response.json().get("features", [])
+    except (requests.RequestException, ValueError):
+        raise HTTPException(status_code=502, detail="The hospital directory is temporarily unavailable. Please try again.")
+
+    hospitals = []
+    for feature in features:
+        properties = feature.get("properties") or {}
+        name = properties.get("name") or properties.get("address_line1") or "Hospital"
+        address = properties.get("formatted") or properties.get("address_line2") or "Address not listed"
+        hospital_latitude = properties.get("lat")
+        hospital_longitude = properties.get("lon")
+        if hospital_latitude is None or hospital_longitude is None:
+            continue
+        contact = properties.get("contact") or {}
+        lat_delta = math.radians(float(hospital_latitude) - float(latitude))
+        lon_delta = math.radians(float(hospital_longitude) - float(longitude))
+        start_lat = math.radians(float(latitude))
+        end_lat = math.radians(float(hospital_latitude))
+        haversine = math.sin(lat_delta / 2) ** 2 + math.cos(start_lat) * math.cos(end_lat) * math.sin(lon_delta / 2) ** 2
+        distance_meters = 6_371_000 * 2 * math.atan2(math.sqrt(haversine), math.sqrt(1 - haversine))
+        hospitals.append({
+            "name": name,
+            "address": address,
+            "latitude": hospital_latitude,
+            "longitude": hospital_longitude,
+            "distance_meters": round(distance_meters),
+            "phone": contact.get("phone"),
+        })
+
+    hospitals.sort(key=lambda item: item["distance_meters"])
+    return {
+        "search_location": {
+            "label": place_label or "Your current location",
+            "latitude": latitude,
+            "longitude": longitude,
+        },
+        "hospitals": hospitals,
+        "provider": "Geoapify",
+    }
 
 @app.post("/chat", response_model=ChatResponse)
 @app.post("/api/chat", response_model=ChatResponse)

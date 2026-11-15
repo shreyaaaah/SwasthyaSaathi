@@ -73,4 +73,21 @@ export const fetchHealthStatus = async () => {
   }
 };
 
+export const findNearbyHospitals = async ({ place, latitude, longitude }) => {
+  try {
+    const response = await apiClient.post('/hospitals/nearby', {
+      ...(place ? { place } : { latitude, longitude }),
+    }, { timeout: 25000 });
+    return response.data;
+  } catch (error) {
+    const responseMessage = extractDisplayText(error.response?.data?.detail)
+      || extractDisplayText(error.response?.data?.message);
+    if (responseMessage) throw new Error(responseMessage);
+    if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+      throw new Error('The hospital search is taking too long. Please try again.');
+    }
+    throw new Error('Unable to connect to the hospital directory. You can still open the place in Maps.');
+  }
+};
+
 export default apiClient;
