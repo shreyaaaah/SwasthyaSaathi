@@ -308,17 +308,14 @@ const MessageList = ({ messages, isLoading, loadingMessage }) => {
                         ? (reviewsByMessage[id]?.open ? 'Hide second review' : 'Show second review')
                         : 'Get a second review'}
                   </button>
-                  <p className="mt-1 text-[10px] leading-relaxed text-slate-500">Sends this question, answer, and shown citations to the AI service. The original answer stays unchanged.</p>
                   {reviewsByMessage[id]?.open && reviewsByMessage[id]?.data && <div className="mt-2 space-y-2 rounded-xl border border-slate-700 bg-slate-950/60 p-3 text-xs leading-relaxed">
                     {reviewsByMessage[id].data.reviews?.map((review) => {
                       const isSafety = review.role === 'safety';
                       const ReviewIcon = isSafety ? ShieldCheck : BookOpenCheck;
-                      const unavailable = !review.available;
                       return <section key={review.role} className="space-y-1.5">
                         <h4 className="flex items-center gap-2 font-semibold text-slate-200">
                           <ReviewIcon aria-hidden="true" className="h-3.5 w-3.5 text-teal-300" />
                           {review.label}
-                          {!unavailable && <span className="font-normal text-slate-400">· {String(review.status).replaceAll('_', ' ')}</span>}
                         </h4>
                         <p className="text-slate-300">{review.summary}</p>
                         {review.flags?.length > 0 && <ul className="list-disc space-y-1 pl-5 text-amber-100">

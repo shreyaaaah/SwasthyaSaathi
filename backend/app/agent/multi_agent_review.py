@@ -113,6 +113,10 @@ def _run_reviewer(role: str, payload: dict[str, Any]) -> dict[str, Any] | None:
         if status not in agent["statuses"]:
             status = agent["unknown_status"]
         summary = str(parsed.get("summary", "Review completed.")).strip()[:500]
+        if role == "evidence" and status == "cannot_verify":
+            summary = "I couldn't confirm the answer's claims from the cited excerpts provided."
+        elif role == "safety" and status == "cannot_assess":
+            summary = "I couldn't reliably assess the answer's safety and clarity from the information provided."
         raw_flags = parsed.get("flags", [])
         if not isinstance(raw_flags, list):
             raw_flags = []
