@@ -14,7 +14,10 @@ SwasthyaSaathi is a public health information chatbot. It searches a locally ind
 - FastAPI endpoints: `GET /`, `GET /health`, and `POST /chat` (`/api/chat` and `/api/query` are aliases).
 - FAISS semantic retrieval, a cross-encoder relevance gate when available, an evidence sufficiency check, and an official-source web fallback.
 - Emergency triage tags, answer grounding review, source citations, and limited in-session follow-up context.
+- An optional, user-triggered second review: independent evidence and safety/clarity reviewers run alongside each other and report separately without changing the chat answer. It is hidden on emergency and urgent-maternity replies.
 - No application database or account history. The current question and up to six recent turns are sent to the AI service. When web search is used, the query may be sent to the search provider and source websites. Browser voice recognition may be processed by the browser provider.
+
+Selecting **Get a second review** sends that turn's question, answer, and displayed source excerpts to the configured Groq model for two independent checks. This additional review is optional, does not alter the original answer, and is not a clinical assessment. If the review service is unavailable, the original answer remains available.
 
 The former database-backed longitudinal profile was not connected to the chat API and has been removed. Conversations are not retained by the API.
 
@@ -105,3 +108,5 @@ The root `Dockerfile` builds the FastAPI service on port 7860 and preloads the F
 ```
 
 The response includes an answer, sources, grounding state, triage tag, tools used, and response time.
+
+`POST /chat/review` is a separate, optional endpoint for the evidence and safety/clarity second-look reviewers. It accepts the current question, candidate answer, and up to six displayed source excerpts. It never edits the `/chat` response.

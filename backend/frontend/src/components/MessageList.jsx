@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { User, Activity, AlertTriangle, PhoneCall } from 'lucide-react';
+import { User, Activity, AlertTriangle, PhoneCall, Sparkles, ShieldCheck, BookOpenCheck } from 'lucide-react';
 import SourceCitations from './SourceCitations';
+import { reviewChatAnswer } from '../api/client';
 
 function TriageBanner({ tag, emergencyContact }) {
   if (tag === 'EMERGENCY') return (
@@ -111,6 +112,7 @@ const MessageList = ({ messages, isLoading, loadingMessage }) => {
   const pendingAnimationFrame = useRef(null);
   const [handledAnimationIds, setHandledAnimationIds] = useState(() => new Set());
   const [animation, setAnimation] = useState(null);
+  const [reviewsByMessage, setReviewsByMessage] = useState({});
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => (
     typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
   ));
@@ -168,6 +170,43 @@ const MessageList = ({ messages, isLoading, loadingMessage }) => {
     const words = String(text || '').match(/\S+\s*/g) || [];
     setAnimation({ messageId, words, visibleWords: words.length });
   }, []);
+
+  const requestAnswerReview = useCallback(async (messageId, message) => {
+    const existing = reviewsByMessage[messageId];
+    if (existing?.data) {
+      setReviewsByMessage((current) => ({
+        ...current,
+        [messageId]: { ...current[messageId], open: !current[messageId].open },
+      }));
+      return;
+    }
+    if (existing?.loading) return;
+
+    setReviewsByMessage((current) => ({
+      ...current,
+      [messageId]: { loading: true, open: true, error: '' },
+    }));
+    try {
+      const data = await reviewChatAnswer({
+        query: message.review_query,
+        answer: message.text,
+        sources: message.sources || [],
+      });
+      setReviewsByMessage((current) => ({
+        ...current,
+        [messageId]: { loading: false, open: true, data, error: '' },
+      }));
+    } catch (error) {
+      setReviewsByMessage((current) => ({
+        ...current,
+        [messageId]: {
+          loading: false,
+          open: true,
+          error: error?.message || 'The optional review is unavailable right now. Your original answer is unchanged.',
+        },
+      }));
+    }
+  }, [reviewsByMessage]);
 
   useEffect(() => {
     if (!animation) return undefined;
@@ -247,6 +286,50 @@ const MessageList = ({ messages, isLoading, loadingMessage }) => {
                 </div>
               </div>
               {!isUser && !isTyping && message.sources?.length > 0 && <SourceCitations sources={message.sources} isGrounded={message.is_grounded} />}
+              {!isUser
+                && !isTyping
+                && message.review_query
+                && message.answer_mode !== 'SOCIAL'
+                && !['EMERGENCY', 'MATERNITY_URGENT'].includes(message.triage_tag)
+                && <div className="w-full max-w-full">
+                  <button
+                    type="button"
+                    onClick={() => requestAnswerReview(id, message)}
+                    disabled={reviewsByMessage[id]?.loading}
+                    aria-expanded={Boolean(reviewsByMessage[id]?.open)}
+                    className="inline-flex items-center gap-2 rounded-lg border border-teal-800/70 bg-slate-900/70 px-3 py-2 text-xs font-medium text-teal-200 transition hover:border-teal-500 hover:bg-slate-800 disabled:cursor-wait disabled:opacity-60"
+                  >
+                    {reviewsByMessage[id]?.loading
+                      ? <Activity aria-hidden="true" className="h-3.5 w-3.5 animate-spin" />
+                      : <Sparkles aria-hidden="true" className="h-3.5 w-3.5" />}
+                    {reviewsByMessage[id]?.loading
+                      ? 'Getting a second look…'
+                      : reviewsByMessage[id]?.data
+                        ? (reviewsByMessage[id]?.open ? 'Hide second review' : 'Show second review')
+                        : 'Get a second review'}
+                  </button>
+                  <p className="mt-1 text-[10px] leading-relaxed text-slate-500">Sends this question, answer, and shown citations to the AI service. The original answer stays unchanged.</p>
+                  {reviewsByMessage[id]?.open && reviewsByMessage[id]?.data && <div className="mt-2 space-y-2 rounded-xl border border-slate-700 bg-slate-950/60 p-3 text-xs leading-relaxed">
+                    {reviewsByMessage[id].data.reviews?.map((review) => {
+                      const isSafety = review.role === 'safety';
+                      const ReviewIcon = isSafety ? ShieldCheck : BookOpenCheck;
+                      const unavailable = !review.available;
+                      return <section key={review.role} className="space-y-1.5">
+                        <h4 className="flex items-center gap-2 font-semibold text-slate-200">
+                          <ReviewIcon aria-hidden="true" className="h-3.5 w-3.5 text-teal-300" />
+                          {review.label}
+                          {!unavailable && <span className="font-normal text-slate-400">· {String(review.status).replaceAll('_', ' ')}</span>}
+                        </h4>
+                        <p className="text-slate-300">{review.summary}</p>
+                        {review.flags?.length > 0 && <ul className="list-disc space-y-1 pl-5 text-amber-100">
+                          {review.flags.map((flag, flagIndex) => <li key={`${review.role}-${flagIndex}`}>{flag}</li>)}
+                        </ul>}
+                      </section>;
+                    })}
+                    <p className="border-t border-slate-800 pt-2 text-[10px] text-slate-500">{reviewsByMessage[id].data.disclaimer}</p>
+                  </div>}
+                  {reviewsByMessage[id]?.open && reviewsByMessage[id]?.error && <p role="status" className="mt-2 rounded-lg border border-amber-800/70 bg-amber-950/30 p-2 text-xs text-amber-100">{reviewsByMessage[id].error}</p>}
+                </div>}
             </div>
           </div>
         );

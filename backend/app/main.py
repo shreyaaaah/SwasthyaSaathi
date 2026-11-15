@@ -7,9 +7,10 @@ from fastapi.middleware.cors import CORSMiddleware
 import requests
 
 from app.config import settings
-from app.schemas import ChatRequest, ChatResponse, NearbyHospitalsRequest, SourceMetadata
+from app.schemas import AnswerReviewRequest, ChatRequest, ChatResponse, NearbyHospitalsRequest, SourceMetadata
 from app.rag.retriever import get_retriever
 from app.agent.orchestrator import CHAT_BUDGET_SECONDS, run_agent
+from app.agent.multi_agent_review import ReviewBusyError, ReviewUnavailableError, review_answer
 from app.agent.performance import latency_history
 from app.agent.warmup import warm_retrieval_stack, warmup_status
 from app.rag.gaps import ranked_gaps
@@ -241,6 +242,22 @@ def agentic_chat_endpoint(request: ChatRequest):
         intent=agent_output.get("intent"),
         emergency_contact=agent_output.get("emergency_contact"),
     )
+
+
+@app.post("/chat/review")
+@app.post("/api/chat/review")
+def review_chat_answer(request: AnswerReviewRequest):
+    """Optional second-look endpoint; deliberately separate from the primary /chat path."""
+    try:
+        source_payload = [source.model_dump() for source in request.sources]
+        return review_answer(request.query, request.answer, source_payload)
+    except ReviewBusyError as exc:
+        raise HTTPException(status_code=429, detail=str(exc))
+    except ReviewUnavailableError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    except Exception as exc:
+        print(f"[OPTIONAL ANSWER REVIEW] Request failed safely: {type(exc).__name__}: {exc}")
+        raise HTTPException(status_code=502, detail="The optional answer review is temporarily unavailable. Your original answer is unchanged.")
 
 
 @app.get("/latency")

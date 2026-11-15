@@ -71,6 +71,7 @@ function App() {
         id: createMessageId(),
         sender: 'bot',
         text: response.answer,
+        review_query: userQuery,
         sources: response.sources || [],
         is_grounded: response.is_grounded,
         triage_tag: response.triage_tag || 'GENERAL_INFO',

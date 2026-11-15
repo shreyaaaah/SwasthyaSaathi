@@ -33,6 +33,18 @@ class ChatResponse(BaseModel):
     emergency_contact: Optional[str] = None
 
 
+class AnswerReviewSource(BaseModel):
+    doc_name: str = Field(max_length=160)
+    section: str = Field(max_length=120)
+    snippet: str = Field(max_length=450)
+
+
+class AnswerReviewRequest(BaseModel):
+    query: str = Field(min_length=1, max_length=2000)
+    answer: str = Field(min_length=1, max_length=6000)
+    sources: List[AnswerReviewSource] = Field(default_factory=list, max_length=6)
+
+
 class NearbyHospitalsRequest(BaseModel):
     place: Optional[str] = Field(default=None, min_length=1, max_length=120)
     latitude: Optional[float] = Field(default=None, ge=-90, le=90)

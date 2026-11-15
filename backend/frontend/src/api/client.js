@@ -64,6 +64,29 @@ export const sendChatMessage = async (query, conversationHistory = []) => {
   }
 };
 
+export const reviewChatAnswer = async ({ query, answer, sources = [] }) => {
+  try {
+    const response = await apiClient.post('/chat/review', {
+      query: String(query || '').slice(0, 2000),
+      answer: String(answer || '').slice(0, 6000),
+      sources: sources.slice(0, 6).map((source) => ({
+        doc_name: String(source.doc_name || 'Guideline').slice(0, 160),
+        section: String(source.section || 'General').slice(0, 120),
+        snippet: String(source.snippet || '').slice(0, 450),
+      })),
+    }, { timeout: 18000 });
+    return response.data;
+  } catch (error) {
+    const responseMessage = extractDisplayText(error.response?.data?.detail)
+      || extractDisplayText(error.response?.data?.message);
+    if (responseMessage) throw new Error(responseMessage);
+    if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+      throw new Error('The optional review took too long. Your original answer is unchanged.');
+    }
+    throw new Error('The optional review is unavailable right now. Your original answer is unchanged.');
+  }
+};
+
 export const fetchHealthStatus = async () => {
   try {
     const response = await apiClient.get('/health', { timeout: 8000 });
