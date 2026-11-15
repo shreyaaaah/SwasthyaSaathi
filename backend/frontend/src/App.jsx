@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Header from './components/Header';
 import ChatWindow from './components/ChatWindow';
 import BmiCalculator from './components/BmiCalculator';
+import QuickHelpPanel from './components/QuickHelpPanel';
 import { sendChatMessage, fetchHealthStatus } from './api/client';
 
 const INITIAL_WELCOME_MESSAGE = {
@@ -111,11 +112,18 @@ function App() {
           <div className="pt-3"><BmiCalculator /></div>
         </details>
         <Header status={healthStatus} />
+        <details className="mt-1 rounded-xl border border-slate-700 bg-slate-900/80 p-3 2xl:hidden">
+          <summary className="cursor-pointer list-none text-sm font-semibold text-teal-200">Quick Help</summary>
+          <div className="pt-3"><QuickHelpPanel onAsk={handleSendMessage} isLoading={isLoading} compact /></div>
+        </details>
         <ChatWindow messages={messages} onSendMessage={handleSendMessage} isLoading={isLoading} loadingMessage={isWakingUp ? 'Waking up the server, this can take a minute…' : 'Looking for relevant health guidance…'} />
         <p className="px-2 py-2 text-center text-[11px] text-slate-400">
           Health information only. Full chats are not saved. For answers using trusted websites or general information, a normalized topic is retained to help improve the guidance library. Your question and up to six recent turns may go to the AI service; web searches may also be sent to a search provider and health websites. Avoid sharing identifying details.
         </p>
       </main>
+      <aside aria-label="Quick help" className="hidden w-[290px] shrink-0 flex-col gap-4 overflow-y-auto border-l border-slate-800 bg-slate-900/40 p-4 2xl:flex">
+        <QuickHelpPanel onAsk={handleSendMessage} isLoading={isLoading} />
+      </aside>
     </div>
   );
 }
