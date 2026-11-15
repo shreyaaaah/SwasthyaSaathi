@@ -59,13 +59,13 @@ function HospitalFinder({ compact = false }) {
 
   return (
     <section aria-label="Find nearby hospitals" className={`${compact ? '' : 'rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4 shadow-xl'}`}>
-      <div className="mb-4">
+      {!compact && <div className="mb-4">
         <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-100">
           <MapPin aria-hidden="true" className="h-4 w-4 text-teal-300" />
           Nearby hospitals
         </h2>
         <p className="mt-1 text-xs leading-relaxed text-slate-400">Search by city, area, or PIN code, or use your device location.</p>
-      </div>
+      </div>}
 
       <form onSubmit={searchPlace} className="space-y-2">
         <label htmlFor={inputId} className="sr-only">City, area, or PIN code</label>
