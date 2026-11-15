@@ -19,6 +19,17 @@ function TriageBanner({ tag, emergencyContact }) {
       </div>
     </div>
   );
+  if (tag === 'MATERNITY_URGENT') return (
+    <div role="alert" className="mb-3 p-3 rounded-xl bg-rose-950/70 border-2 border-rose-500/80 text-rose-100">
+      <div className="flex items-start gap-2.5">
+        <AlertTriangle aria-hidden="true" className="w-5 h-5 text-rose-300 flex-shrink-0" />
+        <div>
+          <h4 className="text-sm font-bold">Urgent maternity assessment</h4>
+          <p className="text-xs mt-1">Contact the maternity unit or obstetric clinician now after waters break or a fall during pregnancy. For heavy bleeding, severe pain, fainting, trouble breathing, or a visible cord, call <a href="tel:112" className="font-bold underline underline-offset-2">112</a>.</p>
+        </div>
+      </div>
+    </div>
+  );
   if (tag === 'URGENT' || tag === 'ROUTINE') return <div role="status" className="mb-3 p-2.5 rounded-xl bg-amber-950/50 border border-amber-500/40 text-amber-100 text-xs">{tag === 'URGENT' ? 'Please seek medical care promptly.' : 'Consider arranging routine medical advice if symptoms continue.'}</div>;
   return null;
 }
@@ -225,7 +236,7 @@ const MessageList = ({ messages, isLoading, loadingMessage }) => {
                     {message.answer_mode && message.answer_mode !== 'SOCIAL' && <span className="text-[10px] text-teal-300">{{ GROUNDED: 'From MoHFW/ICMR/WHO guidelines', WEB_TRUSTED: 'From trusted health websites', MIXED: 'Guidelines + general information', GENERAL: 'General health information' }[message.answer_mode] || ''}</span>}
                   </div>}
                 </div>
-                {!isUser && ['EMERGENCY', 'URGENT', 'ROUTINE'].includes(message.triage_tag) && <TriageBanner tag={message.triage_tag} emergencyContact={message.emergency_contact} />}
+                {!isUser && ['EMERGENCY', 'MATERNITY_URGENT', 'URGENT', 'ROUTINE'].includes(message.triage_tag) && <TriageBanner tag={message.triage_tag} emergencyContact={message.emergency_contact} />}
                 <div className="text-sm leading-relaxed">
                   {isUser
                     ? <div className="whitespace-pre-wrap">{message.text}</div>

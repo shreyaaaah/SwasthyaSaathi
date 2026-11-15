@@ -32,11 +32,13 @@ _HEALTH_TERMS = re.compile(
     r"symptom|treatment|prevent|prevention|first aid)\b", re.I
 )
 _EMERGENCY = re.compile(
-    r"(?:i(?:'m| am)?\s+(?:having|getting|experiencing)\s+)?(?:severe\s+)?chest pain.{0,45}(?:sweat|breath|dizzy|faint|nausea)|"
-    r"(?:trouble breathing|can't breathe|cannot breathe|severe bleeding|bleeding heavily|unconscious|seizure|"
-    r"stroke signs|face (?:is )?drooping|slurred speech|sudden weakness|one-sided weakness|weakness on one side|"
-    r"severe chest pain|suicid(?:e|al)|want to kill myself|took too many pills|overdose|"
-    r"anaphylaxis|throat closing|swelling of (?:the )?tongue)", re.I
+    r"(?:(?:severe|intense|crushing|extreme|heavy|pressure-like)\s+chest pain|"
+    r"chest pain.{0,45}(?:sweat|breath|dizzy|faint|nausea)|"
+    r"(?:trouble breathing|difficulty breathing|shortness of breath|can't breathe|cannot breathe|"
+    r"severe bleeding|heavy bleeding|bleeding heavily|unconscious|unresponsive|seizure right now|"
+    r"face (?:is )?drooping|slurred speech|sudden weakness|one-sided weakness|weakness on one side|"
+    r"want to kill myself|took too many pills|overdose|"
+    r"anaphylaxis|throat closing|swelling of (?:the )?tongue))", re.I
 )
 
 
@@ -60,8 +62,27 @@ def classify_intent(query: str, history: Sequence[dict] | None = None) -> Intent
 
 
 def is_immediate_emergency(query: str) -> bool:
-    """Conservative deterministic red-flag check for urgent escalation."""
-    return bool(_EMERGENCY.search(query))
+    """Match acute red flags without alarming on ordinary informational questions."""
+    text = re.sub(r"\s+", " ", query.casefold().replace("’", "'")).strip()
+    informational = re.match(
+        r"^(?:what|why|how|when|where|can|could|do|does|is|are|explain|define|list|symptoms?|signs?)\b",
+        text,
+    )
+    personal_or_current = re.search(
+        r"\b(?:i(?:'m| am| have| feel)?|my\s+(?:wife|husband|mother|father|child|friend|partner)|"
+        r"someone\s+(?:is|has)|he\s+is|she\s+is|they\s+are)\b",
+        text,
+    )
+    if informational and not personal_or_current:
+        return False
+    text = re.sub(
+        r"\b(?:no|not having|not experiencing|without|denies?)\s+(?:any\s+)?(?:severe|intense|crushing|heavy\s+)?"
+        r"(?:chest pain|trouble breathing|difficulty breathing|shortness of breath|bleeding heavily|heavy bleeding|"
+        r"severe bleeding|fainting|passed out|unconscious|unresponsive|seizure)\b",
+        " ",
+        text,
+    )
+    return bool(_EMERGENCY.search(text))
 
 
 def social_reply(intent: Intent, query: str) -> str:

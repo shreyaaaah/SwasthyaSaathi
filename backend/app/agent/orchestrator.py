@@ -1129,11 +1129,85 @@ def _is_educational_question(query: str) -> bool:
     ))
 
 
+def _pregnancy_event(query: str) -> str | None:
+    """Identify an actual fall during pregnancy or waters that have broken."""
+    text = re.sub(r"\s+", " ", query.casefold().replace("’", "'")).strip()
+    water_broken = re.search(
+        r"\b(?:my|her|the)?\s*waters?\s+(?:(?:have|has)\s+)?(?:just\s+)?broken\b|"
+        r"\b(?:my|her|the)?\s*waters?\s+(?:just\s+)?broke\b|"
+        r"\bwater bag\s+(?:broke|burst)\b|\bamniotic fluid (?:is )?(?:leaking|leaked)\b",
+        text,
+    )
+    if water_broken:
+        return "waters_broken"
+
+    pregnancy_mentioned = re.search(r"\b(?:pregnan\w*|expecting a baby)\b", text)
+    fall_occurred = re.search(
+        r"\b(?:fell(?:\s+down)?|have fallen|had a fall|slipped and fell|tripped and fell|hit (?:her|my) (?:belly|abdomen|bump))\b",
+        text,
+    )
+    if pregnancy_mentioned and fall_occurred:
+        return "pregnancy_fall"
+    return None
+
+
+def _pregnancy_red_flag(query: str) -> bool:
+    text = re.sub(r"\s+", " ", query.casefold().replace("’", "'")).strip()
+    text = re.sub(
+        r"\b(?:no|not having|not experiencing|without|denies?)\s+(?:any\s+)?(?:severe|heavy|major)?\s*"
+        r"(?:vaginal )?(?:bleeding|abdominal pain|injury|fainting|unconsciousness)\b",
+        " ",
+        text,
+    )
+    return bool(re.search(
+        r"\b(?:heavy (?:vaginal )?bleeding|bleeding heavily|passed out|fainted|unconscious|"
+        r"severe abdominal pain|severe injury|major injury|cord (?:is )?(?:visible|coming out|prolapsed)|"
+        r"umbilical cord (?:is )?(?:visible|coming out|prolapsed))\b",
+        text,
+    ))
+
+
+def _maternity_urgent_answer(event: str) -> str:
+    if event == "waters_broken":
+        return (
+            "Waters breaking needs prompt advice from a maternity team, even if you feel otherwise well. "
+            "Please call your maternity unit or obstetric clinician now, or go to the nearest maternity hospital. "
+            "If there is heavy bleeding, severe pain, fainting, trouble breathing, or the umbilical cord is visible, call 112."
+        )
+    return (
+        "After a fall during pregnancy, please contact the maternity unit or obstetric clinician now for advice, "
+        "especially if the abdomen was hit. If there is bleeding, fluid leaking, severe pain, fainting, trouble breathing, "
+        "or reduced baby movement, urgent hospital assessment is needed. Call 112 for severe symptoms or serious injury."
+    )
+
+
+def _emergency_fast_path_answer(query: str) -> str:
+    if _pregnancy_event(query):
+        return (
+            f"This could be a serious emergency during pregnancy. Call {settings.EMERGENCY_NUMBER} now or go to the nearest emergency department. "
+            "Do not wait for an online reply."
+        )
+    if re.search(r"\b(?:chest pain|chest pressure)\b", query, re.I):
+        return (
+            f"Intense or severe chest pain can be life-threatening. Call {settings.EMERGENCY_NUMBER} now or go to the nearest emergency department. "
+            "Do not drive yourself."
+        )
+    return (
+        f"This may be a medical emergency. Call {settings.EMERGENCY_NUMBER} now or go to the nearest emergency department. "
+        "Do not wait for an online reply."
+    )
+
+
 def deterministic_triage(query: str) -> Dict[str, Any] | None:
     """Resolve high-confidence urgency locally; return None when model triage is needed."""
     text = re.sub(r"\s+", " ", query.casefold()).strip()
     if is_self_harm_crisis(query) or is_immediate_emergency(query):
         return {"triage_tag": "EMERGENCY", "confidence": 100, "reason": "A deterministic red-flag rule matched."}
+    pregnancy_event = _pregnancy_event(query)
+    if pregnancy_event:
+        if _pregnancy_red_flag(query):
+            return {"triage_tag": "EMERGENCY", "confidence": 98, "reason": "A serious warning sign was reported during a pregnancy-related event."}
+        return {"triage_tag": "MATERNITY_URGENT", "confidence": 95, "reason": "A fall or broken waters during pregnancy needs prompt maternity assessment."}
     infant_fever = bool(
         re.search(r"\b(?:\d{1,2}\s*(?:day|week|month)s?\s*(?:old)?|newborn|new born|under\s+3\s+months?)\b", text)
         and re.search(r"\b(?:fever|temperature|hot to touch|bukhar)\b", text)
@@ -1692,7 +1766,7 @@ def run_agent(
             print(f"  [ANSWER METADATA] Could not record emergency metadata: {exc}")
         return {
             "model_used": None,
-            "answer": f"Chest pain with sweating or breathing trouble can be an emergency. Please call {settings.EMERGENCY_NUMBER} now or go to the nearest emergency department. Do not drive yourself if you feel faint.",
+            "answer": _emergency_fast_path_answer(query),
             "fallback_fired": False, "is_grounded": True, "tools_used": [],
             "tool_call_trace": [], "triage_tag": "EMERGENCY",
             "sources": [{"doc_name": "Government of India Emergency Response Support System",
@@ -1702,6 +1776,49 @@ def run_agent(
             "gate_scores": None, "emergency_contact": settings.EMERGENCY_NUMBER,
             "trace": {"query": query, "emergency_fast_path": True},
             "response_time_ms": response_time,
+        }
+
+    if initial_triage and initial_triage.get("triage_tag") == "MATERNITY_URGENT":
+        pregnancy_event = _pregnancy_event(query) or "pregnancy_fall"
+        response_time = round((time.time() - overall_start) * 1000, 2)
+        source = (
+            {
+                "doc_name": "National Health Mission — Safe Motherhood booklet",
+                "section": "Danger signs during pregnancy and labor",
+                "snippet": "Leaking fluid before labor is a danger sign that needs prompt contact with a health facility.",
+                "source_type": "official_resource",
+                "source_url": "https://nhm.gov.in/images/pdf/programmes/maternal-health/guidelines/my_safe_motherhood_booklet_english.pdf",
+            }
+            if pregnancy_event == "waters_broken"
+            else {
+                "doc_name": "Maternity triage guidance",
+                "section": "Falls or abdominal impact during pregnancy",
+                "snippet": "Contact maternity triage for assessment after a fall or impact during pregnancy.",
+                "source_type": "official_resource",
+                "source_url": "https://elht.nhs.uk/your-visit/lancashire-women-and-newborn-centre/maternity-triage",
+            }
+        )
+        try:
+            record_answer_metadata(user_id, query, "WEB_TRUSTED", None, verifier="deterministic_maternity_urgent")
+        except Exception as exc:
+            print(f"  [ANSWER METADATA] Could not record maternity triage metadata: {exc}")
+        return {
+            "model_used": None,
+            "answer": _maternity_urgent_answer(pregnancy_event),
+            "fallback_fired": False,
+            "is_grounded": True,
+            "tools_used": [],
+            "tool_call_trace": [],
+            "triage_tag": "MATERNITY_URGENT",
+            "sources": [source],
+            "grounding_audit": {"is_fully_grounded": True, "audit_summary": "Deterministic maternity urgent-care response."},
+            "gate_result": None,
+            "trace": {"query": query, "maternity_urgent_fast_path": pregnancy_event},
+            "timing_breakdown": [],
+            "response_time_ms": response_time,
+            "answer_mode": "WEB_TRUSTED",
+            "intent": "HEALTH",
+            "gate_scores": None,
         }
 
     intent = classify_intent(query, conversation_history)
