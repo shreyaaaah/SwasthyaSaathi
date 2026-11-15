@@ -1,5 +1,7 @@
 # SwasthyaSaathi quality status — 2026-11-04
 
+> **Update, 2026-11-15 (documentation review of commit `39df818`).** The figures below are the 2026-11-04 snapshot and are superseded where they differ. On 2026-11-15 the following were re-run and passed: `python -m unittest discover -s . -p "test_quality*.py"` (24 tests), `python verify_sources.py`, `python verify_sources.py --check-index` (32 documents present in a 24,800-vector index), `python -m compileall -q app`, `npm run lint` and `npm run build`. The index was not rebuilt, and the gate benchmark and `run_eval_suite.py` were not re-run. The review layer (`/chat/review`) and the frontend have no automated tests. See the root `README.md` and `docs/paper/` for current behaviour and known limitations, including rule behaviour observed in a local probe.
+
 ## Work completed
 
 - Replaced cross-encoder-only sufficiency decisions with a separate evidence coverage check. The cross-encoder is now used to reject only very low relevance scores; other candidates must pass the factual sufficiency check or use the official-source web fallback.
