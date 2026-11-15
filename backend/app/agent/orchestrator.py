@@ -113,6 +113,41 @@ def _get_cross_encoder():
 CE_SKIP_THRESHOLD = MIN_CE_THRESHOLD   # runtime/calibrated thresholds may not weaken this hard floor
 _calibration_lock = threading.Lock()
 _calibration_attempted: set[str] = set()
+_CONDITION_SOURCE_PATTERNS = (
+    re.compile(r"\b(?:tuberculosis|tb)\b", re.I),
+    re.compile(r"\bdengue\b", re.I),
+    re.compile(r"\bmalaria\b", re.I),
+    re.compile(r"\bchikungunya\b", re.I),
+    re.compile(r"\bhepatitis\b", re.I),
+    re.compile(r"\bmeningitis\b", re.I),
+    re.compile(r"\bpneumonia\b", re.I),
+    re.compile(r"\b(?:influenza|flu)\b", re.I),
+    re.compile(r"\b(?:coronavirus|covid(?:-?19)?)\b", re.I),
+    re.compile(r"\bchicken\s?pox\b", re.I),
+    re.compile(r"\bmeasles\b", re.I),
+    re.compile(r"\b(?:hiv|aids)\b", re.I),
+    re.compile(r"\bdiabetes\b", re.I),
+    re.compile(r"\bhypertension\b", re.I),
+    re.compile(r"\b(?:anemia|anaemia)\b", re.I),
+    re.compile(r"\bobesity\b", re.I),
+    re.compile(r"\b(?:anxiety|depression)\b", re.I),
+    re.compile(r"\b(?:diarrhea|diarrhoea)\b", re.I),
+)
+
+
+def _exclude_unasked_condition_sources(query: str, chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Do not use condition-specific passages unless the user asked about that condition."""
+    query_text = query.casefold()
+    relevant = []
+    for chunk in chunks:
+        source_label = re.sub(r"[_\-.]+", " ", f"{chunk.get('doc_name', '')} {chunk.get('section', '')}")
+        names_another_condition = any(
+            pattern.search(source_label) and not pattern.search(query_text)
+            for pattern in _CONDITION_SOURCE_PATTERNS
+        )
+        if not names_another_condition:
+            relevant.append(chunk)
+    return relevant
 
 
 def specificity_gate(query: str, raw_chunks: List[Dict[str, Any]], faiss_floor: float = 0.45,
@@ -187,7 +222,25 @@ def specificity_gate(query: str, raw_chunks: List[Dict[str, Any]], faiss_floor: 
             **gate_decision
         }
 
-    scored = [dict(chunk, ce_score=float(score)) for chunk, score in zip(valid, scores)]
+    scored = sorted(
+        (dict(chunk, ce_score=float(score)) for chunk, score in zip(valid, scores)),
+        key=lambda chunk: chunk["ce_score"],
+        reverse=True,
+    )
+    scored = _exclude_unasked_condition_sources(query, scored)
+    if not scored:
+        gate_decision = decide_response_gate(query, [], faiss_floor=faiss_floor)
+        return {
+            "passed": False,
+            "skip_kb": True,
+            "reason": "Retrieved passages were specific to conditions the user did not ask about.",
+            "faiss_top1": faiss_top1,
+            "max_ce_score": None,
+            "chunk_ce_scores": chunk_ce_scores,
+            **gate_decision,
+            "valid_chunks": [],
+        }
+    max_ce_score = float(scored[0]["ce_score"])
     from app.rag import retriever as retriever_module
     retriever = retriever_module.retriever_instance
     metadata = retriever.metadata if retriever is not None else []
@@ -217,6 +270,11 @@ def specificity_gate(query: str, raw_chunks: List[Dict[str, Any]], faiss_floor: 
         query, scored, thresholds=thresholds,
         covered_registry=build_covered_registry(metadata), faiss_floor=faiss_floor
     )
+    # The reranker must affect the evidence sent to generation, not only the
+    # pass/fail decision. Keep a few strongest passages for ordinary questions
+    # and a wider set when the user explicitly compares conditions.
+    evidence_limit = 6 if is_comparison_query(query) else 4
+    selected_chunks = scored[:evidence_limit]
     skip_kb = gate_decision["decision"] != "ANSWER"
     passed = not skip_kb
 
@@ -233,8 +291,8 @@ def specificity_gate(query: str, raw_chunks: List[Dict[str, Any]], faiss_floor: 
         "faiss_top1": faiss_top1,
         "max_ce_score": max_ce_score,
         "chunk_ce_scores": chunk_ce_scores,
-        "valid_chunks": valid,
-        **gate_decision
+        **gate_decision,
+        "valid_chunks": selected_chunks,
     }
 
 
@@ -359,6 +417,7 @@ def verify_content_fences(client: Groq, active_model: str, query: str, draft: st
         return {"answer": remove_internal_leaks(draft), "edited": False, "verifier": "deterministic_overlap"}
 
     if settings.ENABLE_CONTENT_VERIFIER and _remaining_budget(deadline) > 0.25:
+        verifier_token_budget = min(1600, max(400, len(draft.split()) * 2 + 100))
         evidence = "\n\n".join(
             f"{source.get('doc_name') or source.get('title')}: {source.get('snippet', '')[:500]}"
             for source in sources
@@ -371,10 +430,13 @@ def verify_content_fences(client: Groq, active_model: str, query: str, draft: st
                     {"role": "user", "content": f"Mode: GENERAL or MIXED\nUser question: {query}\nVerified evidence, if any:\n{evidence}\n\nDraft to check:\n{draft}"},
                 ],
                 temperature=0.0,
-                max_tokens=300,
+                max_tokens=verifier_token_budget,
                 deadline=deadline,
             )
-            cleaned = (result.choices[0].message.content or "").strip()
+            verifier_choice = result.choices[0]
+            if getattr(verifier_choice, "finish_reason", None) == "length":
+                raise RuntimeError("Content review reached its output limit; preserving the complete draft with deterministic checks.")
+            cleaned = (verifier_choice.message.content or "").strip()
             if cleaned:
                 return {"answer": remove_internal_leaks(cleaned), "edited": cleaned != draft, "verifier": "enabled"}
         except Exception as exc:
