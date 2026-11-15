@@ -10,7 +10,7 @@ SwasthyaSaathi is a **public-health information chatbot** for the general public
 
 > **SwasthyaSaathi provides general health information. It does not diagnose, prescribe or treat, it has not been clinically validated, and it does not replace a doctor, pharmacist or emergency services. In India, call 112 for an emergency.**
 
-Authors: Shreya S, Geddela Chiranjeevi, Yekkaluri Deekshitha. Live frontend (as reported by the authors): <https://swasthya-saathi-care.vercel.app/>.
+Authors: Shreya S, Geddela Chiranjeevi, Yekkaluri Deekshitha. Live frontend: <https://swasthya-saathi-care.vercel.app/>.
 
 *This document describes the code at commit `39df818` (branch `main`, 2026-11-15). Anything that depends on a deployment setting or an external service is labelled "configuration-dependent" so it is not mistaken for a guaranteed capability. A companion research paper is in [`docs/paper/`](docs/paper/).*
 
