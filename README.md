@@ -10,7 +10,7 @@ SwasthyaSaathi is a **public-health information chatbot** for the general public
 
 > **SwasthyaSaathi provides general health information. It does not diagnose, prescribe or treat, it has not been clinically validated, and it does not replace a doctor, pharmacist or emergency services. In India, call 112 for an emergency.**
 
-Authors: Shreya S, Gedela Chiranjeevi, Yekkaluri Deekshitha.
+Authors: Shreya S, Geddela Chiranjeevi, Yekkaluri Deekshitha. Live frontend (as reported by the authors): <https://swasthya-saathi-care.vercel.app/>.
 
 *This document describes the code at commit `39df818` (branch `main`, 2026-11-15). Anything that depends on a deployment setting or an external service is labelled "configuration-dependent" so it is not mistaken for a guaranteed capability. A companion research paper is in [`docs/paper/`](docs/paper/).*
 
@@ -287,7 +287,7 @@ npm run build
 - **Frontend:** Vercel (`backend/frontend/vercel.json`: `npm run build`, output `dist`, Vite framework, SPA rewrite). Set the project root to `backend/frontend`. This setting lives in the Vercel dashboard and cannot be verified from the repository.
 - **Backend:** Render web service from `backend/render.yaml` (root `backend`, Singapore region, `main` branch, auto-deploy on commit, health check `/health`). The build downloads the embedding and cross-encoder models and runs `verify_sources.py --check-index`; it uses the committed index rather than re-embedding. Set `GROQ_API_KEY`, `GEOAPIFY_API_KEY`, `ALLOWED_ORIGINS`, `ADMIN_TOKEN`, `GAPS_HASH_SALT` and optionally `DATABASE_URL` in the dashboard (`sync: false` in the file).
 - **Docker / Hugging Face Spaces:** the root `Dockerfile` (Python 3.11-slim, port 7860, non-root user) pre-downloads the models and rebuilds and verifies the index at build time. The YAML header at the top of this README configures a Docker Space.
-- Live URLs: the production frontend currently targets `https://swasthyasaathi-3.onrender.com`. Whether that service and the Vercel site are live was not checked for this documentation.
+- Live URLs: the authors report the frontend at `https://swasthya-saathi-care.vercel.app/`; a page fetch on 2026-11-15 returned its page title, but chat behaviour was not tested. The production frontend build targets the backend `https://swasthyasaathi-3.onrender.com`, whose availability was not checked for this documentation.
 
 > Pushing to `main` triggers a Render deployment. Documentation-only changes should go through a branch or pull request.
 
