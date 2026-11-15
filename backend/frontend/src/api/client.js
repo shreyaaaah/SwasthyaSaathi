@@ -8,6 +8,21 @@ const API_BASE_URL = import.meta.env.DEV
 
 let activeChatController = null;
 
+function extractDisplayText(value) {
+  if (typeof value === 'string') return value.trim();
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (Array.isArray(value)) {
+    return value.map(extractDisplayText).filter(Boolean).join('\n');
+  }
+  if (value && typeof value === 'object') {
+    for (const key of ['answer', 'message', 'detail', 'text', 'content', 'output', 'response', 'msg']) {
+      const text = extractDisplayText(value[key]);
+      if (text) return text;
+    }
+  }
+  return '';
+}
+
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 120000,
@@ -26,15 +41,22 @@ export const sendChatMessage = async (query, conversationHistory = []) => {
       user_id: 'anonymous',
       conversation_history: conversationHistory,
     }, { signal: controller.signal });
-    return response.data;
+    const data = response.data && typeof response.data === 'object' ? response.data : {};
+    const answer = extractDisplayText(data.answer ?? data.response ?? data.message);
+    return {
+      ...data,
+      answer: answer || 'Sorry, I couldn’t format the reply just now. Please try sending your question again.',
+    };
   } catch (error) {
     console.error('API Error sending chat message:', error);
     if (axios.isCancel(error)) throw error;
     if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
       throw new Error('The health service is taking too long to respond. Please try again shortly.');
     }
-    if (error.response && error.response.data && error.response.data.detail) {
-      throw new Error(error.response.data.detail);
+    const responseMessage = extractDisplayText(error.response?.data?.detail)
+      || extractDisplayText(error.response?.data?.message);
+    if (responseMessage) {
+      throw new Error(responseMessage);
     }
     throw new Error('Unable to connect to the health information service. Please try again shortly.');
   } finally {

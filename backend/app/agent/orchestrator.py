@@ -1933,10 +1933,16 @@ def run_agent(
             deadline=deadline,
             messages=generator_messages,
             temperature=0.2,
-            max_tokens=650,
+            max_tokens=900,
         )
         generator_served_model = getattr(gen_response, "model", active_model)
-        draft_answer = (gen_response.choices[0].message.content or "").strip()
+        generation_choice = gen_response.choices[0]
+        generation_finish_reason = getattr(generation_choice, "finish_reason", "unknown")
+        draft_answer = (generation_choice.message.content or "").strip()
+        if generation_finish_reason == "length":
+            print("  [GENERATION] Model reached the 900-token output limit; reply may be incomplete.")
+        else:
+            print(f"  [GENERATION] Finish reason: {generation_finish_reason}")
         if not draft_answer:
             raise RuntimeError("Generation returned an empty response")
     except Exception as exc:

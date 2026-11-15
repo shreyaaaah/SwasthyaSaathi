@@ -76,10 +76,13 @@ function App() {
       }]);
     } catch (error) {
       if (error?.code === 'ERR_CANCELED' || error?.name === 'AbortError') return;
+      const errorText = typeof error?.message === 'string' && error.message !== '[object Object]'
+        ? error.message
+        : 'We could not get a readable response. Please try again in a moment.';
       setMessages((prev) => [...prev, {
         id: createMessageId(),
         sender: 'bot',
-        text: error.message || 'We could not get a response. Please try again in a moment.',
+        text: errorText,
         sources: [],
         is_grounded: false,
         triage_tag: 'ERROR',
