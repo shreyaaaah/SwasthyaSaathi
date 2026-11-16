@@ -254,9 +254,7 @@ const MessageList = ({ messages, isLoading, loadingMessage }) => {
       {messages.map((message, index) => {
         const isUser = message.sender === 'user';
         const id = messageKey(message, index);
-        const reviewFindings = (reviewsByMessage[id]?.data?.reviews || []).filter(
-          (review) => review.available && Array.isArray(review.flags) && review.flags.length > 0,
-        );
+        const reviewResults = reviewsByMessage[id]?.data?.reviews || [];
         const isTyping = id === latestMessageId
           && !prefersReducedMotion
           && (animation?.messageId === id || shouldAnimateLatest);
@@ -312,19 +310,31 @@ const MessageList = ({ messages, isLoading, loadingMessage }) => {
                         : 'Get a second review'}
                   </button>
                   {reviewsByMessage[id]?.open && reviewsByMessage[id]?.data && <div className="mt-2 space-y-2 rounded-xl border border-slate-700 bg-slate-950/60 p-3 text-xs leading-relaxed">
-                    {reviewFindings.length > 0 ? reviewFindings.map((review) => {
+                    {reviewResults.length > 0 ? reviewResults.map((review) => {
                       const isSafety = review.role === 'safety';
                       const ReviewIcon = isSafety ? ShieldCheck : BookOpenCheck;
+                      const flags = Array.isArray(review.flags) ? review.flags : [];
+                      const outcome = !review.available
+                        ? 'No review result was returned.'
+                        : isSafety
+                          ? review.status === 'no_issue_seen'
+                            ? 'Safety check passed — no specific concern was identified.'
+                            : 'No clear safety result was returned.'
+                          : review.status === 'supported'
+                            ? 'Evidence check passed — the claims are supported by the cited excerpts.'
+                            : 'No clear evidence result was returned.';
                       return <section key={review.role} className="space-y-1.5">
                         <h4 className="flex items-center gap-2 font-semibold text-slate-200">
                           <ReviewIcon aria-hidden="true" className="h-3.5 w-3.5 text-teal-300" />
                           {review.label}
                         </h4>
-                        <ul className="list-disc space-y-1 pl-5 text-amber-100">
-                          {review.flags.map((flag, flagIndex) => <li key={`${review.role}-${flagIndex}`}>{flag}</li>)}
-                        </ul>
+                        {flags.length > 0
+                          ? <ul className="list-disc space-y-1 pl-5 text-amber-100">
+                            {flags.map((flag, flagIndex) => <li key={`${review.role}-${flagIndex}`}>{flag}</li>)}
+                          </ul>
+                          : <p className="text-slate-300">{outcome}</p>}
                       </section>;
-                    }) : <p className="text-slate-400">No specific findings to show.</p>}
+                    }) : <p className="text-slate-400">The reviewers did not return a result.</p>}
                     <p className="border-t border-slate-800 pt-2 text-[10px] text-slate-500">{reviewsByMessage[id].data.disclaimer}</p>
                   </div>}
                   {reviewsByMessage[id]?.open && reviewsByMessage[id]?.error && <p role="status" className="mt-2 rounded-lg border border-amber-800/70 bg-amber-950/30 p-2 text-xs text-amber-100">{reviewsByMessage[id].error}</p>}
