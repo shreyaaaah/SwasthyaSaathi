@@ -318,11 +318,11 @@ const MessageList = ({ messages, isLoading, loadingMessage }) => {
                         ? 'No review result was returned.'
                         : isSafety
                           ? review.status === 'no_issue_seen'
-                            ? 'Safety check passed — no specific concern was identified.'
-                            : 'No clear safety result was returned.'
+                            ? 'No issues found.'
+                            : 'No specific safety finding was flagged.'
                           : review.status === 'supported'
-                            ? 'Evidence check passed — the claims are supported by the cited excerpts.'
-                            : 'No clear evidence result was returned.';
+                            ? 'No issues found; the claims are supported by the cited excerpts.'
+                            : 'No specific evidence finding was flagged.';
                       return <section key={review.role} className="space-y-1.5">
                         <h4 className="flex items-center gap-2 font-semibold text-slate-200">
                           <ReviewIcon aria-hidden="true" className="h-3.5 w-3.5 text-teal-300" />
